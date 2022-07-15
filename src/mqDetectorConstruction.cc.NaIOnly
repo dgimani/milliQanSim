@@ -1589,7 +1589,7 @@ G4PhysicsVector mqDetectorConstruction::GetPMTEff_R878(){
 	effVec.Retrieve(ReadPMTQEff,true);
 	if (effVec.GetVectorLength()!=0) G4cout << "Quantum Efficiency successfully retrieved for PMT_R878_QE" << G4endl;
 	else G4cout << "ERROR: Vector length is zero!" << G4endl;
-        effVec.ScaleVector(1,1); //multiplying by 2 for scaling purposes
+        effVec.ScaleVector(1,1); //increase QE here if you want to scale to match experiment
 	return effVec;
 }
 
@@ -1601,7 +1601,7 @@ G4PhysicsVector mqDetectorConstruction::GetPMTEff_R7725(){
 	effVec.Retrieve(ReadPMTQEff,true);
 	if (effVec.GetVectorLength()!=0) G4cout << "Quantum Efficiency successfully retrieved for PMT R7725" << G4endl;
 	else G4cout << "ERROR: Vector length is zero!" << G4endl;
-        effVec.ScaleVector(1,1); //multiplying by 2 for scaling purposes
+        effVec.ScaleVector(1,1); //increase QE here if you want to scale to match experiment
 	return effVec;
 }
 
@@ -1613,7 +1613,7 @@ G4PhysicsVector mqDetectorConstruction::GetPMTEff_ET9814B(){
 	effVec.Retrieve(ReadPMTQEff,true);
 	if (effVec.GetVectorLength()!=0) G4cout << "Quantum Efficiency successfully retrieved for PMT ET9814B" << G4endl;
 	else G4cout << "ERROR: Vector length is zero!" << G4endl;
-        effVec.ScaleVector(1,1); //multiplying by 2 for scaling purposes
+        effVec.ScaleVector(1,1); //increase QE here if you want to scale to match experiment
 	return effVec;
 }
 
