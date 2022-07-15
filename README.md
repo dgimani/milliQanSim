@@ -19,6 +19,13 @@ I've written some nice macros which build everything, modify everything, and cop
 The visualization macro is vis.mac. To run with visualization:
 
 ./MilliQan
+/control/macroPath /path/to/your/milliQanSim/runMac/
+/control/execute vis.mac
+/control/execute specmuonFullPropagated_no_vis.mac (for cosmics/full sim)
+or
+/control/execute sidegamma_no_vis.mac (for NaI)
+
+When first starting, I suggest seeing how both of cosmics and the NaI geometry work, just to give a sense of what's in here.
 
 You can use quickmuon.mac (and quickmuon_pencil.mac) to throw muons at the sim if you turn on /run/beamOn 1 (or more), or use mcp_vis.mac to throw mCPs at the demonstrator (if your MilliQan.cc is configured properly). These use OGL; if you prefer a different visualization package or your geant build doesn't use OGL, there are several other options available (need to modify/write your own macro though). Also, mcp_vis is provided for visualization and generation of mCPs (just vis.mac + mcp_novis.mac).
 
