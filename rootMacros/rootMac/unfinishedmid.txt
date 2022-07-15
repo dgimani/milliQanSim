@@ -1,0 +1,10 @@
+2.0 0.02 m_2p0/q_0p02/ups1S/output_15.txt
+2.0 0.03 m_2p0/q_0p03/ups1S/output_55.txt
+2.0 0.07 m_2p0/q_0p07/ups1S/output_18.txt
+3.0 0.012 m_3p0/q_0p012/ups2S/output_6.txt
+3.0 0.03 m_3p0/q_0p03/ups1S/output_42.txt
+3.0 0.07 m_3p0/q_0p07/ups1S/output_24.txt
+4.0 0.017 m_4p0/q_0p017/ups1S/output_36.txt
+4.0 0.03 m_4p0/q_0p03/ups1S/output_28.txt
+5.0 0.014 m_5p0/q_0p014/ups2S/output_4.txt
+5.0 0.017 m_5p0/q_0p017/ups3S/output_1.txt
