@@ -1,7 +1,7 @@
 #!/bin/bash
 #create local build of sim, configured to generate gamma tests of the standalone NaI setup
 . buildsetup.sh
-cp src/mqDetectorConstruction.cc.NaIOnly mqDetectorConstruction.cc
+cp src/mqDetectorConstruction.cc.NaIOnly src/mqDetectorConstruction.cc
 cd build
 cmake ../
 make -j8
