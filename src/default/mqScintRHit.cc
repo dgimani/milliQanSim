@@ -14,10 +14,11 @@ ClassImp(mqScintRHit)
 
 mqScintRHit::mqScintRHit():
 	trackID(-1), parentID(-1),
-	copyNo(-1),
-	EDep_MeV(0.),
+	EDep_MeV(0.), trackLength_cm(0.),
+	copyNo(0),
+	hitTime_ns(0.), exitTime_ns(0.)
 	//EDepRecoil_keV(0.),
-	particleName("")
+//	particleName(""),
 //	hitPositionX_cm(0.),hitPositionY_cm(0.),hitPositionZ_cm(0.)
 
 {}
@@ -31,16 +32,17 @@ mqScintRHit::~mqScintRHit() {}
 mqScintRHit::mqScintRHit(const mqScintRHit& right):
 		TObject()// inherit from TObject?
 {
-	trackID         = right.trackID        ;
+    trackID         = right.trackID        ;
     parentID        = right.parentID       ;
-    copyNo       = right.copyNo       ;
-    EDep_MeV            = right.EDep_MeV          ;
-    //EDepRecoil_keV      = right.EDepRecoil_keV     ;
-    particleName    = right.particleName   ;
-    timeOfFirstHit_ns  = right.timeOfFirstHit_ns ;
-  //  hitPositionX_cm    = right.hitPositionX_cm   ;
-    //hitPositionY_cm    = right.hitPositionY_cm   ;
-    //hitPositionZ_cm    = right.hitPositionZ_cm   ;
+    EDep_MeV        = right.EDep_MeV          ;
+    trackLength_cm        = right.trackLength_cm          ;
+    copyNo          = right.copyNo;
+//    particleName    = right.particleName   ;
+    hitTime_ns  = right.hitTime_ns;
+    exitTime_ns  = right.exitTime_ns;
+//    hitPositionX_cm    = right.hitPositionX_cm   ;
+//    hitPositionY_cm    = right.hitPositionY_cm   ;
+//    hitPositionZ_cm    = right.hitPositionZ_cm   ;
 
 }
 
@@ -48,16 +50,14 @@ mqScintRHit::mqScintRHit(const mqScintRHit& right):
 
 const mqScintRHit& mqScintRHit::operator=(const mqScintRHit& right)
 {
-	trackID         = right.trackID        ;
+    trackID         = right.trackID        ;
     parentID        = right.parentID       ;
-    copyNo       = right.copyNo       ;
-    EDep_MeV            = right.EDep_MeV          ;
-    //EDepRecoil_keV      = right.EDepRecoil_keV     ;
-    particleName    = right.particleName   ;
-    timeOfFirstHit_ns  = right.timeOfFirstHit_ns ;
-//    hitPositionX_cm    = right.hitPositionX_cm   ;
-//    hitPositionY_cm    = right.hitPositionY_cm   ;
-//    hitPositionZ_cm    = right.hitPositionZ_cm   ;
+    EDep_MeV        = right.EDep_MeV          ;
+    trackLength_cm        = right.trackLength_cm          ;
+    copyNo          = right.copyNo;
+//    particleName    = right.particleName   ;
+    hitTime_ns  = right.hitTime_ns;
+    exitTime_ns  = right.exitTime_ns;
 
     return *this;
 }
@@ -67,14 +67,6 @@ const mqScintRHit& mqScintRHit::operator=(const mqScintRHit& right)
 Int_t mqScintRHit::operator==(const mqScintRHit& right) const
 {
   return (this==&right) ? 1 : 0;
-}
-
-
-//_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_
-bool mqScintRHit::compareHits(mqScintRHit* const &a, mqScintRHit* const &b){
-	Double_t aTime = a->timeOfFirstHit_ns;
-	Double_t bTime = b->timeOfFirstHit_ns;
-	return (aTime < bTime);
 }
 
 

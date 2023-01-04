@@ -14,22 +14,25 @@
 #side
 #/gps/position 67 0 0 mm
 #outside
-#/gps/position 228.5 0 0 mm
+/gps/position 228.5 0 0 mm
 #/gps/position 231.5 0 0 mm
-/gps/position -20 0 -100 mm
+#/gps/position 251.5 0 0 mm
 
 #Mono
-/gps/ene/type Mono
-/gps/ene/mono 300 keV
+#/gps/ene/type Mono
+#/gps/ene/mono 100 keV
 
 #Na22
-#/gps/ene/type Mono
-#/gps/ene/mono 511 keV
+/gps/ene/type Mono
+/gps/ene/mono 511 keV
 
 #Mn-54
 #/gps/ene/type Mono
 #/gps/ene/mono 835 keV
 
+
+### if you want to use sources, comment the /gpe/ene lines above, then ###
+### uncomment these two lines below and then uncomment the /gps/hist/point under your source of choice ###
 #/gps/ene/type User
 #/gps/hist/type energy
 
@@ -191,12 +194,14 @@
 
 ######################################
 
-#/gps/ang/type iso
-/gps/direction 0 0 1
+#switch between isotropic and pencil beam sources here
+/gps/ang/type iso
+#/gps/direction -1 0 0
+
+
+
 #/gps/number 10
-
-
 #/run/fname /media/ryan/Storage/computing/beamRadSim/data/60keV1MeVMixed_mixedAbsAuAgScint_5stack/
 #/run/fname /media/ryan/Storage/computing/beamRadSim/data/electron/
 #/run/beamOn 1000000
-/run/beamOn 100
+/run/beamOn 100000

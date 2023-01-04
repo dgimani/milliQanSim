@@ -8,7 +8,7 @@
 
 #include "mqScintSD.hh"
 #include "mqScintHit.hh"
-
+#include "mqDetectorConstruction.hh"
 
 #include "G4HCofThisEvent.hh"
 #include "G4Step.hh"
@@ -32,14 +32,14 @@ mqScintSD::mqScintSD(G4String name)
   G4String HCname;
   collectionName.insert(HCname = "scintCollection");
 
-  HCID= -1;
+  //HCID= -1;
 
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 mqScintSD::~mqScintSD(){
-
+//	if(scintCollection) delete scintCollection;
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
@@ -58,28 +58,48 @@ static G4int HCID = -1;
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
-
-G4bool mqScintSD::ProcessHits(G4Step* aStep,G4TouchableHistory*)
-{
-return false;
+G4bool mqScintSD::ProcessHits(G4Step* ,G4TouchableHistory* ){
+  return false;
 }
 
-G4bool mqScintSD::ProcessHits2(const G4Step* aStep,G4TouchableHistory*)
+G4bool mqScintSD::ProcessHitsEnter(const G4Step* aStep,G4TouchableHistory*)
 {
-      	G4TouchableHandle touchable = aStep->GetPreStepPoint()->GetTouchableHandle();
+  //store temp variables
+  this->SetHitEnergy     (aStep->GetPreStepPoint()->GetTotalEnergy()); // total Energy (KE+Rest mass)
+  this->SetHitTime(aStep->GetPreStepPoint()->GetGlobalTime());// Global Time
+  this->SetHitPosition(aStep->GetPreStepPoint()->GetPosition()); //position of entry to scintillator
+  return true;
+}
+
+G4bool mqScintSD::ProcessHitsExit(const G4Step* aStep,G4TouchableHistory*)
+{
+
+//  const G4VTouchable* aStep->GetPreStepPoint()->GetTouchable() = aStep->GetPreStepPoint()->GetTouchable();
 
 //  const G4VProcess* process = aStep->GetPostStepPoint()->GetProcessDefinedStep();
 
-  G4int copyNo=
-    touchable->GetCopyNumber(2);
+  G4int volCopyNo = aStep->GetPreStepPoint()->GetTouchable()->GetCopyNumber(2);
+  G4int copyNo=0;
+  if(volCopyNo<6){
 
-  G4double edep = aStep->GetTotalEnergyDeposit();
+  //get the detector to retrieve layer information
+//  mqDetectorConstruction* detector = (mqDetectorConstruction*)G4RunManager::GetRunManager()
+//                                            ->GetUserDetectorConstruction();
+  //get number of bars per layer
+//  G4int nBarPerLayer = detector->GetNBarPerLayer();
 
-  if(edep == 0.) return false;
+  G4int nBarPerLayer = 9*6*4;
 
-//  G4ThreeVector point1 = aStep->GetPreStepPoint()->GetPosition();
-//  G4ThreeVector point2 = aStep->GetPostStepPoint()->GetPosition();
-//  G4ThreeVector pointE = point1 + G4UniformRand()*(point2 - point1);
+  char layerNumberChar = aStep->GetPreStepPoint()->GetTouchable()->GetVolume(2)->GetName().back();
+  G4int layerNumber = layerNumberChar-48;
+  G4int subStackCopyNo = aStep->GetPreStepPoint()->GetTouchable()->GetCopyNumber(3);
+  copyNo = nBarPerLayer*layerNumber + volCopyNo + 4*subStackCopyNo;
+  } else {copyNo = volCopyNo;}
+
+  G4cout << "Exiting scint! Copy Number is: " << copyNo << G4endl;
+
+//  G4double energyEnter = aStep->GetTotalEnergy();
+//  if(edep == 0.) return false;
 
 //  const G4VProcess* creaProc= aStep->GetTrack()->GetCreatorProcess();
 //  G4String procName;
@@ -92,31 +112,39 @@ G4bool mqScintSD::ProcessHits2(const G4Step* aStep,G4TouchableHistory*)
 //  else creaProcName = "0";
 
   mqScintHit* hit = new mqScintHit();
+  G4cout << "Initial hit time is: " << this->GetHitTime()/CLHEP::ns << " ns" << G4endl;
+  G4cout << "Initial energy is: " << this->GetHitEnergy()/CLHEP::GeV << " GeV" << G4endl;
+  G4ThreeVector pathDiff = this->GetHitPosition()-aStep->GetPostStepPoint()->GetPosition();
+  G4cout << "Path length is: " << std::abs(pathDiff.mag())/CLHEP::cm << " cm" << G4endl;
+  G4cout << "Deposited energy is: " << (this->GetHitEnergy()-aStep->GetPostStepPoint()->GetTotalEnergy())/CLHEP::MeV << " MeV" << G4endl;
 
-
-	  hit = new mqScintHit(); //so create new hit
+	  if(this->GetHitTime()!=-1){
+//	  hit = new mqScintHit(); //so create new hit
       //
 	  hit->SetTrackID  (aStep->GetTrack()->GetTrackID());          // trackID
 	  hit->SetParentID (aStep->GetTrack()->GetParentID());         // parentID
-	  hit->SetCopyNo(copyNo);
 	  // hit->SetVtxPos   (aStep->GetTrack()->GetVertexPosition());
 	  //hit->SetProcName (procName);
 	  //hit->SetVtxProcName(creaProcName);
-	  //hit->SetStripNo(  touchable->GetReplicaNumber(0) );
-	  //hit->SetEkin     (aStep->GetPreStepPoint()->GetKineticEnergy()); // kinetic Energy
+	  //hit->SetStripNo(  aStep->GetPreStepPoint()->GetTouchable()->GetReplicaNumber(0) );
+	  hit->SetHitEnergy(this->GetHitEnergy()); 
+	  hit->SetExitEnergy     (aStep->GetPostStepPoint()->GetTotalEnergy()); // total Energy
 	  //hit->SetEdep     (edep);                         // set initial value of energy deposit
 	  //hit->SetEvtx     (aStep->GetTrack()->GetVertexKineticEnergy());
-	  hit->SetInitialHitTime(aStep->GetPreStepPoint()->GetGlobalTime());// Global Time
+	  hit->SetHitTime(this->GetHitTime());
+	  hit->SetExitTime(aStep->GetPostStepPoint()->GetGlobalTime());// Global Time
 	  //hit->SetLocal    (aStep->GetPreStepPoint()->GetLocalTime());  // Local Time
 	  //hit->SetLocalPos (localPointE); // local position
 	  //hit->SetMomentum( aStep->GetPreStepPoint()->GetMomentum());
 //	  hit->SetParticleName( aStep->GetTrack()->GetDefinition()->GetParticleName() );
-	  //hit->SetVtxVolName (touchable->GetVolume()->GetLogicalVolume()->GetName());
+	  //hit->SetVtxVolName (aStep->GetPreStepPoint()->GetTouchable()->GetVolume()->GetLogicalVolume()->GetName());
 	  //hit->SetProcName (process->GetProcessName());
-	  hit->SetHitPosition(aStep->GetPreStepPoint()->GetPosition());
-	  //hit->SetPosLocal (touchable->GetHistory()->GetTopTransform().TransformPoint(pointE));
-	  //hit->SetpName (aStep->GetTrack()->GetDefinition()->GetParticleName()); //particle name
-	  hit->SetEDep(edep); //energy deposit
+	  hit->SetHitPosition(this->GetHitPosition());
+	  hit->SetExitPosition(aStep->GetPostStepPoint()->GetPosition());
+	  //hit->SetPosLocal (aStep->GetPreStepPoint()->GetTouchable()->GetHistory()->GetTopTransform().TransformPoint(pointE));
+	  //hit->SetpName (aStep->GetTrack()->GetDefinition()->GetParticleName()); //particle name	 
+	  hit->SetCopyNo(copyNo); //energy deposit
+
 	  //hit->SetWeight(aStep->GetTrack()->GetWeight());
 	  //if (aStep->GetTrack()->GetDefinition()->GetParticleName().contains("neutron")){
 		  //const G4TrackVector *mySecondaries = aStep->GetSecondary();
@@ -136,10 +164,12 @@ G4bool mqScintSD::ProcessHits2(const G4Step* aStep,G4TouchableHistory*)
           //
 	  	  //}
 	  scintCollection->insert(hit);
-
+	this->SetHitPosition(G4ThreeVector());
+	this->SetHitTime(-1);
+	this->SetHitEnergy(0);
+	}
   return true;
 }
-
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 void mqScintSD::EndOfEvent(G4HCofThisEvent*)

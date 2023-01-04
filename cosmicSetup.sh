@@ -1,7 +1,9 @@
 #!/bin/bash
 #create local build of sim, configured to generate cosmic muons
 . buildsetup.sh
-cp src/mqDetectorConstruction.cc.default src/mqDetectorConstruction.cc
+cp CMakeLists.txt.default CMakeLists.txt 
+cp include/default/* include/
+cp src/default/* src/
 cd build
 cmake ../
 make -j8

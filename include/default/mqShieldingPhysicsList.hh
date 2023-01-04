@@ -40,6 +40,7 @@
 #define mqShieldingList_h 1
 
 #include <CLHEP/Units/SystemOfUnits.h>
+#include <boost/property_tree/ptree.hpp>
 
 #include "globals.hh"
 #include "G4VModularPhysicsList.hh"
@@ -51,7 +52,7 @@ class mqShieldingList: public G4VModularPhysicsList//: public T
 public:
   //TShielding(G4int ver = 1);
   //TShielding(G4int ver = 1, G4bool rad=true, G4bool lend=false);
-  mqShieldingList( G4int verbose = 1 , G4String low_energy_neutron_model = "HP" );
+  mqShieldingList( G4int verbose, G4String low_energy_neutron_model, boost::property_tree::ptree pt);
   virtual ~mqShieldingList();
 
 public:

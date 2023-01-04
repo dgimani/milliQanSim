@@ -17,6 +17,7 @@
 class mqMuonTrack: public TObject {
 public:
 	mqMuonTrack();
+	ClassDef(mqMuonTrack,9);
 	~mqMuonTrack();
 	 const mqMuonTrack& operator=(const mqMuonTrack &right);
      Int_t operator==(const mqMuonTrack&) const;
@@ -63,6 +64,11 @@ public:
 	Double_t GetLastPositionZ()const{ return finalPositionZ_m; }
 	Double_t GetTotalTrackLength()const{ return totalTrackLength_m; }
 
+        void SetFirstCopyNo(Int_t firstCopyNo){ initialCopyNo = firstCopyNo; }
+        void SetLastCopyNo(Int_t lastCopyNo){ finalCopyNo = lastCopyNo; }
+        Int_t   GetFirstCopyNo()const{ return initialCopyNo; }
+        Int_t   GetLastCopyNo()const{ return finalCopyNo; }
+
 	//Muon track information
 
 	void SetNbOfElastics(Int_t elastics){nbOfElastics = elastics; }
@@ -71,10 +77,8 @@ public:
 	void AddNbOfInteractions(Int_t interactions){nbOfInteractions += interactions; }
 	Int_t GetNbOfElastics()const{ return nbOfElastics; }
 	Int_t GetNbOfInteractions()const{ return nbOfInteractions; }
-	void SetEnergyEnterScinti(Double_t EkinScinti){energyEnterScinti_MeV = EkinScinti;}
-	Double_t GetEnergyEnterScinti()const{return energyEnterScinti_MeV; }
-	void SetEnergyExitScinti(Double_t EkinScinti){energyExitScinti_MeV = EkinScinti;}
-	Double_t GetEnergyExitScinti()const{return energyExitScinti_MeV;}
+	void SetEnergyDiff(Double_t EDiff){energyDiff = EDiff;}
+	Double_t GetEnergyDiff()const{return energyDiff; }
 
 	// order tracks accordong to timing information
 	static bool compareHits(mqMuonTrack* const &a, mqMuonTrack* const &b);
@@ -86,11 +90,6 @@ public:
 	bool GetMuonTriggerUp()const{ return muonTrigUp;}
 	bool GetMuonTriggerLow()const{ return muonTrigLow;}
 
-	void SetMuonTriggerUpBelow(bool trig){muonTrigUpBelow=trig;}
-	void SetMuonTriggerLowBelow(bool trig){muonTrigLowBelow=trig;}
-	bool GetMuonTriggerUpBelow()const{ return muonTrigUpBelow;}
-	bool GetMuonTriggerLowBelow()const{ return muonTrigLowBelow;}
-
 	private:
 
 	Int_t trackID;
@@ -98,6 +97,8 @@ public:
 	TString finalProcessName   ; //Name of the last process of the given track
 	TString initialVolumeName  ; //Name of the volume where the track starts
 	TString finalVolumeName    ; //Name of the volume where the track ends
+        Int_t initialCopyNo        ; //copyNo of initial volume
+        Int_t finalCopyNo          ; //copyNo of final volume
 	Double_t initialTime_s       ; //Global time when the first process occurs
  	Double_t finalTime_s         ; //Global time when the last process occurs
 	Double_t initialEnergy_MeV     ; //The kinetic energy at the begin of the track
@@ -114,13 +115,9 @@ public:
 	Double_t totalEnergy_MeV       ; //Energy loss of the track
 	Int_t nbOfElastics         ; //Number of elastic scatterings of the track
 	Int_t nbOfInteractions     ; //Number of interactions of the track
-	Double_t energyEnterScinti_MeV; // Neutron kinetic energy when entering the scintillator volume
-	Double_t energyExitScinti_MeV; //Muon Kinetic energy when exiting the scintillator volume
+	Double_t energyDiff; // Muon energy difference between creation and end of track
 	bool muonTrigUp;
 	bool muonTrigLow;
-	bool muonTrigUpBelow;
-	bool muonTrigLowBelow;
-	ClassDef(mqMuonTrack,8);
 
 
 };

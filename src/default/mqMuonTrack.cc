@@ -25,14 +25,10 @@ mqMuonTrack::mqMuonTrack() :
 			totalTrackLength_m(0.0),
 			nbOfElastics(-1),
 			nbOfInteractions(-1),
-			energyEnterScinti_MeV(0.),
-			energyExitScinti_MeV(0.),
+			energyDiff(0.),
 			muonTrigUp(false),
-			muonTrigLow(false),
-			muonTrigUpBelow(false),
-			muonTrigLowBelow(false)
+			muonTrigLow(false)
 			{
-
 }
 
 
@@ -62,10 +58,9 @@ const mqMuonTrack& mqMuonTrack::operator=(const mqMuonTrack &right){
 	totalTrackLength_m = right.totalTrackLength_m;
 	nbOfElastics       = right.nbOfElastics      ;
 	nbOfInteractions   = right.nbOfInteractions  ;
-	energyEnterScinti_MeV  = right.energyEnterScinti_MeV ;
-	energyExitScinti_MeV  = right.energyEnterScinti_MeV;
-	muonTrigUp           = right.muonTrigUp;
-	muonTrigLow           = right.muonTrigLow;
+	energyDiff         = right.energyDiff        ;
+	muonTrigUp         = right.muonTrigUp        ;
+	muonTrigLow        = right.muonTrigLow       ;
 	return *this;
 }
 

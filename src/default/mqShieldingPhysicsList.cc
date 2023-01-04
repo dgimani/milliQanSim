@@ -49,6 +49,11 @@
 
 #include "mqShieldingPhysicsList.hh"
 
+//#include "MilliQPhysicsList.hh"
+#include "MilliQEMPhysics.hh"
+#include "MilliQMonopolePhysics.hh"
+#include "MilliQMuonPhysics.hh"
+
 ////
 
 #include <iomanip>
@@ -62,6 +67,9 @@
 
 #include "G4Material.hh"
 #include "G4MaterialTable.hh"
+#include "G4PhysicalConstants.hh"
+#include "G4SystemOfUnits.hh"
+#include "G4NistManager.hh"
 
 #include "G4DecayPhysics.hh"
 #include "G4RadioactiveDecayPhysics.hh"
@@ -73,27 +81,40 @@
 #include "G4StoppingPhysics.hh"
 #include "G4HadronElasticPhysicsHP.hh"
 #include "G4HadronElasticPhysicsLEND.hh"
+#include "G4EmCalculator.hh"
+#include "G4ParticleDefinition.hh"
+#include "G4MuonMinus.hh"
+#include "G4MuonPlus.hh"
+#include "G4Material.hh"
 
-#include "G4DataQuestionaire.hh"
 #include "G4HadronPhysicsShielding.hh"
 
 #include "G4OpticalPhysics.hh"
+//#include "G4OpticalProcessIndex.hh"
 
 
 //template<class T> TShielding<T>::TShielding(G4int ver):  T()
 //template<class T> TShielding<T>::TShielding( G4int verbose, G4String LEN_model ):  T()
-mqShieldingList::mqShieldingList( G4int verbose, G4String LEN_model )
+mqShieldingList::mqShieldingList( G4int verbose, G4String LEN_model, const boost::property_tree::ptree pt)
 {
   // default cut value  (1.0mm)
   // defaultCutValue = 1.0*CLHEP::mm;
-  G4DataQuestionaire it(photon, neutron, radioactive);
   G4cout << "<<< Geant4 Physics List simulation engine: Shielding 2.1"<<G4endl;
   G4cout <<G4endl;
-  //this->defaultCutValue = 0.5*CLHEP::um; //used 0.01mm in smallStep run
   this->defaultCutValue = 0.7*CLHEP::mm; //used 0.01mm in smallStep run
   this->SetVerboseLevel(verbose);
 
- // EM Physics
+  //Monopole Physics
+  MilliQMonopolePhysics* MonopolePhys = new MilliQMonopolePhysics(pt);
+  RegisterPhysics( MonopolePhys );
+ 
+  // EM Physics
+  RegisterPhysics( new MilliQEMPhysics("standard EM"));
+
+  // Muon Physics
+  RegisterPhysics( new MilliQMuonPhysics("muon"));
+
+  // EM Physics
   this->RegisterPhysics( new G4EmStandardPhysics_option4(verbose));
   //G4EmProcessOptions emOptions;
   //emOptions.SetFluo(true); // To activate deexcitation processes and fluorescence
@@ -107,7 +128,7 @@ mqShieldingList::mqShieldingList( G4int verbose, G4String LEN_model )
   this->RegisterPhysics( new G4DecayPhysics(verbose) );
   //if ( rad == true ) this->RegisterPhysics( new G4RadioactiveDecayPhysics(verbose) );
   this->RegisterPhysics( new G4RadioactiveDecayPhysics(verbose) );
-///*
+//  /*
   size_t find = LEN_model.find("LEND__");
   G4String evaluation;
   if ( find != G4String::npos )
@@ -125,7 +146,6 @@ mqShieldingList::mqShieldingList( G4int verbose, G4String LEN_model )
   else if ( LEN_model == "LEND" )
   {
      this->RegisterPhysics( new G4HadronElasticPhysicsLEND(verbose,evaluation) );
-     G4DataQuestionaire itt(lend);
   }
   else
   {
@@ -172,8 +192,7 @@ mqShieldingList::mqShieldingList( G4int verbose, G4String LEN_model )
   // this->RegisterPhysics( new G4NeutronTrackingCut(verbose));
 
   // G.H.
-  //optical physics added manually to shielding list
-  //comment/uncomment here to turn photons on/off
+  //optical physics added manually to shielding list, comment/uncomment to turn on/off photon tracks
 ///*
   G4OpticalPhysics* opticalPhysics = new G4OpticalPhysics();
 
@@ -190,6 +209,34 @@ mqShieldingList::mqShieldingList( G4int verbose, G4String LEN_model )
 
    this->RegisterPhysics( opticalPhysics );
 //*/
+
+//calculator for various physics values
+G4EmCalculator emCalc;
+G4ParticleDefinition* mum = G4MuonMinus::Definition();
+G4ParticleDefinition* mup = G4MuonPlus::Definition();
+
+        G4NistManager* nistMan = G4NistManager::Instance();
+
+        G4Element* elH = nistMan->FindOrBuildElement("H");
+        G4Element* elC = nistMan->FindOrBuildElement("C");
+
+        G4Material* concreteMat = nistMan->FindOrBuildMaterial("G4_CONCRETE");
+        G4Material* matPlScin = new G4Material("plScintillator", 1.032 * g / cm3, 2);
+        matPlScin->AddElement(elC, 10);
+        matPlScin->AddElement(elH, 11);
+        matPlScin->GetIonisation()->SetBirksConstant(0.126*mm/MeV); // according to L. Reichhart et al., Phys. Rev, use (0.149*mm/MeV) for neutrons, but otherwise use 0.126
+
+G4double muEnergy = 1*GeV;
+G4double rockDEDX = emCalc.ComputeElectronicDEDX(muEnergy, mum, concreteMat);
+G4double scintDEDX = emCalc.ComputeElectronicDEDX(muEnergy, mum, matPlScin);
+
+G4cout << "dEdX in rock for mu-: " << rockDEDX << G4endl;
+G4cout << "dEdX in scintillator for mu-: " << scintDEDX << G4endl;
+
+emCalc.PrintDEDXTable(mum);
+emCalc.PrintRangeTable(mum);
+
+
 }
 
 mqShieldingList::~mqShieldingList()
