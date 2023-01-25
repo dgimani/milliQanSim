@@ -71,6 +71,11 @@ ROOTv5.30+ (ROOT5 or ROOT6, preferably ROOT6) : Build must be at least v5.30, wi
 gcc4.8.4+ or gcc5 for ROOT5 (earlier than gcc6), gcc4.8+ for ROOT6 (no upper bound) : Tested working on gcc4.8.5, gcc5.3.0 and gcc5.5.0 for ROOT5. Tested working on gcc7.4.0 on ROOT6. Tested NOT working for ROOT5, gcc4.8.1, at least for one particular build. Might work for an earlier build of gcc4.8, but earlier builds are not tested. Using C++11 standard in general.
 
 Geant4.9.6+ : Build originally developed on Geant4.9.6, confirmed working on Geant4.10.03. Not tested on Geant4.8 or previous.
+When building, use the following cmake command, ideally using Geant4.10.5: cmake -DGEANT4_INSTALL_DATA=ON -DGEANT4_USE_OPENGL_X11=ON -DCMAKE_INSTALL_PREFIX=/path/to/geant4.10.5-install /path/to/geant4.10.05.p01
+
+This command has 2 install options: -DGEANT4_INSTALL_DATA=ON, which installs precision Geant4 datasets, and -DGEANT4_USE_OPENGL_X11=ON, which is needed for visualization. You can install other visualization options this way and try them by appropriately modifying the runMac/vis.mac file if you don't want to deal with command line visualization.
+
+Note: A change to a header in one of the physics lists meant there needed to be some migration to move to Geant4.10.6+. It's simple-ish but not a priority right now, so just use Geant4.10.05-p01 for now unless you have a specific need for a newer version of Geant4. If you do, just email me (schmitz@ucsb.edu).
 
 CMake2.6+ : CMake will refuse to build unless this is true. Tested under CMake 3.14.1, should work under CMake3 for all versions but these have not been exhaustively tested
 
