@@ -13,19 +13,39 @@ cp include/XRD/brMuonTrack.hh.XRD include/mqMuonTrack.hh
 cp include/XRD/brScintHit.hh.XRD include/mqScintHit.hh
 cp include/XRD/brScintRHit.hh.XRD include/mqScintRHit.hh
 cp include/XRD/brROOTEvent.hh.XRD include/mqROOTEvent.hh
+
+
+################ detector geometry ################
 cp src/XRD/brDetectorConstruction.cc.XRD src/mqDetectorConstruction.cc
+
+# histogram/data management
 cp src/XRD/brHistoManager.cc.XRD src/mqHistoManager.cc
-cp src/XRD/brPMTSD.cc.XRD src/mqPMTSD.cc
-cp src/XRD/brScintSD.cc.XRD src/mqScintSD.cc
-cp src/XRD/brSteppingAction.cc.XRD src/mqSteppingAction.cc
 cp src/XRD/brUserEventInformation.cc.XRD src/mqUserEventInformation.cc
+cp src/XRD/brROOTEvent.cc.XRD src/mqROOTEvent.cc
 cp src/XRD/brEventAction.cc.XRD src/mqEventAction.cc
-cp src/XRD/brShieldingPhysicsList.cc.XRD src/mqShieldingPhysicsList.cc
-cp src/XRD/brTrackingAction.cc.XRD src/mqTrackingAction.cc
+
+# particle info
 cp src/XRD/brMuonTrack.cc.XRD src/mqMuonTrack.cc
+
+# energy deposit hit info
 cp src/XRD/brScintHit.cc.XRD src/mqScintHit.cc
 cp src/XRD/brScintRHit.cc.XRD src/mqScintRHit.cc
-cp src/XRD/brROOTEvent.cc.XRD src/mqROOTEvent.cc
+
+# PMT detector hit manager
+cp src/XRD/brPMTSD.cc.XRD src/mqPMTSD.cc
+
+# scintillator energy hit manager
+cp src/XRD/brScintSD.cc.XRD src/mqScintSD.cc
+
+##### interaction tracking happens here #####
+cp src/XRD/brSteppingAction.cc.XRD src/mqSteppingAction.cc
+
+# particle collections
+cp src/XRD/brTrackingAction.cc.XRD src/mqTrackingAction.cc
+
+# physics list
+cp src/XRD/brShieldingPhysicsList.cc.XRD src/mqShieldingPhysicsList.cc
+
 cd build
 cmake ../
 make -j8
