@@ -1698,7 +1698,7 @@ G4MaterialPropertiesTable* mptPlScin = new G4MaterialPropertiesTable();
 	G4double pEnergy;
 	G4double pWavelength;
 	G4double pSEff;
-	ReadEJ200.open("/media/schmitz/Storage/computing/beamRadSimXRay/OpticalData/LYSOScintSpectrum.txt");
+	ReadEJ200.open(mqOpticalFilePath+"LYSOScintSpectrum.txt");
 	if(ReadEJ200.is_open()){
 	while(!ReadEJ200.eof()){
 	ReadEJ200 >> pWavelength >> pSEff;
@@ -1753,7 +1753,7 @@ G4MaterialPropertiesTable* mptPlScin = new G4MaterialPropertiesTable();
 	G4double pEnergy;
 	G4double pWavelength;
 	G4double pSEff;
-	ReadEJ200.open("/media/schmitz/Storage/computing/beamRadSimXRay/OpticalData/NaIScintSpectrum.txt");
+	ReadEJ200.open(mqOpticalFilePath+"NaIScintSpectrum.txt");
 	if(ReadEJ200.is_open()){
 	while(!ReadEJ200.eof()){
 	ReadEJ200 >> pWavelength >> pSEff;
