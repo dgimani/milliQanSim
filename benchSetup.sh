@@ -49,4 +49,4 @@ cp src/Bench/mqShieldingPhysicsList.cc src/mqShieldingPhysicsList.cc
 cd build
 cmake ../
 make -j8
-./Bench ../runMac/sidegamma_no_vis.mac
+./Bench ../runMac/sidegammaBench_no_vis.mac
