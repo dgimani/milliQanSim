@@ -15,7 +15,8 @@
 #/gps/position 67 0 0 mm
 #outside
 #/gps/position 228.5 0 0 mm
-/gps/position 30 0 87.5 mm
+/gps/position 40 0 0 mm
+#/gps/position 30 0 -212.5 mm
 
 #Na22
 #/gps/ene/type Mono
@@ -120,4 +121,4 @@
 #/run/fname /media/ryan/Storage/computing/beamRadSim/data/60keV1MeVMixed_mixedAbsAuAgScint_5stack/
 #/run/fname /media/ryan/Storage/computing/beamRadSim/data/electron/
 #/run/beamOn 1000000
-/run/beamOn 50
+/run/beamOn 1000

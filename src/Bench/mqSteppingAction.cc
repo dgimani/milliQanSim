@@ -251,34 +251,35 @@ void mqSteppingAction::UserSteppingAction(const G4Step * theStep){
 	//Trigger sensitive detector manually
 
 	//determine cosine of angle of incidence  
-        //cosDetect= myStartDirection.dot(G4ThreeVector(0.935,0,1));
+        cosDetect= myStartDirection.dot(G4ThreeVector(0,0,1));
+	//G4cout << "my start direction: " << myStartDirection.x() << " " << myStartDirection.y() << " " << myStartDirection.z() << G4endl;
 		
 	//determine angle of incidence
-	//angleDetect=acos(cosDetect)*180/M_PI; //should always be less than 90 degrees
+	angleDetect=acos(cosDetect)*180/M_PI; //should always be less than 90 degrees
 
         //using a 6th degree polynomial fit based on the data in OpticalData/PMTAngularSpec.txt. Using 6th degree because detections are infrequent compared to total # of steps so it's not that expensive
-        //polyAngleFitResult=3.93E-11*pow(angleDetect,6)-9.69E-09*pow(angleDetect,5)+9.10E-07*pow(angleDetect,4)-4.26E-05*pow(angleDetect,3)+9.17E-04*pow(angleDetect,2)-8.22E-03*angleDetect+9.98E-01;	
+        polyAngleFitResult=3.93E-11*pow(angleDetect,6)-9.69E-09*pow(angleDetect,5)+9.10E-07*pow(angleDetect,4)-4.26E-05*pow(angleDetect,3)+9.17E-04*pow(angleDetect,2)-8.22E-03*angleDetect+9.98E-01;	
 
 	//if we don't think we're optimally coupled, this second 62 degrees term below is the glass-scintillator critical angle correction. Specifically, it's the correction for silicone oil-to-scintillator. The borosilicate glass-to-scintillator correction is 72.9 degrees. Enabling this cutoff for silicone oil for now since we're doing the optical coupling manually and it could possibly be a poor coupling, but it should mostly not matter for a bar since the detection angles are much sharper than 62 degrees most of the time
-	//if(G4UniformRand()<polyAngleFitResult && angleDetect<62){
-
-	//G4cout << "hit registered!" << G4endl;
-	//G4cout << theStep->GetPostStepPoint()->GetPhysicalVolume()->GetName() << G4endl;
+	if(G4UniformRand()<polyAngleFitResult && angleDetect<62){
 	//if(G4UniformRand()<cosDetect){                               //if we think we did a good job coupling, then just use this relationship (which falls off at high theta anyways)
-//		if(G4UniformRand()<0.01) G4cout << "Cosine is " << cosDetect << G4endl;
-	  myEndVolumeName=theStep->GetPostStepPoint()->GetPhysicalVolume()->GetName();
+
+	    //G4cout << "hit registered!" << G4endl;
+	    //G4cout << theStep->GetPostStepPoint()->GetPhysicalVolume()->GetName() << G4endl;
+	    //if(G4UniformRand()<0.01) G4cout << "Cosine is " << cosDetect << G4endl;
+	    myEndVolumeName=theStep->GetPostStepPoint()->GetPhysicalVolume()->GetName();
 //		if (myEndVolumeName.contains("PMTParamPhys") || myEndVolumeName.contains("ScintSlabPMT") || myEndVolumeName.contains("ScintPanelPMT") || myEndVolumeName.contains("PMTFourth")){
-	  G4String sdPMTName="PMT_SD";
-	  pmtSD = (mqPMTSD*)G4SDManager::GetSDMpointer()->FindSensitiveDetector(sdPMTName);
-	  //pmtSD->GetCollectionName(1);
-	  if(pmtSD){
-	    pmtSD->ProcessHits_constStep(theStep,NULL);
+	    G4String sdPMTName="PMT_SD";
+	    pmtSD = (mqPMTSD*)G4SDManager::GetSDMpointer()->FindSensitiveDetector(sdPMTName);
+	    //pmtSD->GetCollectionName(1);
+	    if(pmtSD){
+	        pmtSD->ProcessHits_constStep(theStep,NULL);
 	  //  G4cout << "Process Hits PMT" << G4endl;
 	    }
-	  trackInformation->AddTrackStatusFlag(hitPMT);
+	    trackInformation->AddTrackStatusFlag(hitPMT);
 
 //		}
-	//	}
+	}
 	}
 	  break;
       case FresnelReflection:
