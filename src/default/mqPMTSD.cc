@@ -113,8 +113,9 @@ G4bool mqPMTSD::ProcessHits_constStep(const G4Step* aStep,
   }	
 */
 
-  	if(copyNo==1000) detProb = GetR878_QE().Value(particleWavelength);
-	else detProb = GetET9814B_QE().Value(particleWavelength);
+  	detProb = GetR878_QE().Value(particleWavelength);
+  	//if(copyNo==1000) detProb = GetR878_QE().Value(particleWavelength);
+	//else detProb = GetET9814B_QE().Value(particleWavelength);
   
 	det=(G4UniformRand()<detProb);
   if(det){
