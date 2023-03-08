@@ -89,7 +89,7 @@
 #include "G4MuonPlus.hh"
 #include "G4Material.hh"
 
-#include "G4DataQuestionaire.hh"
+//#include "G4DataQuestionaire.hh"
 #include "G4HadronPhysicsShielding.hh"
 
 #include "G4OpticalPhysics.hh"
@@ -102,7 +102,7 @@ mqShieldingList::mqShieldingList( G4int verbose, G4String LEN_model, const boost
 {
   // default cut value  (1.0mm)
   // defaultCutValue = 1.0*CLHEP::mm;
-  G4DataQuestionaire it(photon, neutron, radioactive);
+//  G4DataQuestionaire it(photon, neutron, radioactive);
   G4cout << "<<< Geant4 Physics List simulation engine: Shielding 2.1"<<G4endl;
   G4cout <<G4endl;
   this->defaultCutValue = 0.7*CLHEP::mm; //used 0.01mm in smallStep run
