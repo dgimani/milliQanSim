@@ -12,7 +12,19 @@ Use ./MilliQan to start the sim. You can either run macros within the geant inte
 ================  Quick run script  =========================
 
 ALTERNATIVELY, TO RUN THE SIMULATION:
-I've written some nice macros which build everything, modify everything, and copy everything from scratch for two processes: Studying cosmogenic muons and a standalone sim of a NaI detector. Just run those bash scripts (cosmicSetup.sh, gammaSetup.sh) and sit back. The default number of events is 100, changed in the macros referenced in each script in runMac/ by modifying "/run/beamOn 100" to something else.
+I've written some nice macros which build everything, modify everything, and copy everything from scratch for five processes:
+
+1) cosmicSetup.sh: This sets up the full bar detector + cavern and runs a cosmic muon sim
+
+2) cosmicSetupSlab.sh: This sets up the full slab detector + cavern and runs a cosmic muon sim
+
+3) benchSetup.sh: For bench tests of a single bar + 1 PMT. The default script runs a Cd109 source
+
+4) benchSetupSlab.sh: For bench tests of a single slab + 4 PMT. The default script runs a Cd109 source (although Am241 is likely the source data will use)
+
+4) gammaSetup.sh: For an NaI detector geometry. The default script runs a Cd109 source.
+
+Just run those bash scripts and sit back. Do look at the scripts themselves to see what's being done; usually it's just copying over the files needed to change the sim into that type, building the sim, then running the sim using the default script.
 
 ================  Visualization  =========================
 
