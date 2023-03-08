@@ -215,8 +215,8 @@ G4VPhysicalVolume* mqDetectorConstruction::SetupGeometry() {
 	this->SetNLayer(nLayers);
  	
 	 G4double outerRadius_pmt   = 51* mm /2.; //26 //52
-	 G4double outerRadius_cath  = 51* mm /2.; //26 //52
-	 G4double height_pmt        = 200* mm; //142.*mm;
+	 G4double outerRadius_cath  = 46* mm /2.; //26 //52
+	 G4double height_pmt        = 147* mm; //142.*mm;
 	 G4double height_cath       = 0.5 * mm; //2mm
 	 G4double pmtYoffset        = 0*mm;
 	 G4double muMetalThickness = 0.5*mm;
@@ -1101,7 +1101,7 @@ G4LogicalVolume* ScintPanelLogic = new G4LogicalVolume(
 	 G4Tubs* phCathSolid = new G4Tubs(
 			 "photocath_tube",
 			 0,
-			 outerRadius_pmt,
+			 outerRadius_cath,
 	//		 (airGapThickness+wrapThickness)/2,
 			 height_pmt/2,
 			 0*deg,
@@ -1129,9 +1129,9 @@ G4LogicalVolume* ScintPanelLogic = new G4LogicalVolume(
 
 	 G4Tubs* pmtSolid = new G4Tubs(
 			 "pmt_tube",
-			 0,
+			 outerRadius_cath,
 			 outerRadius_pmt,
-		         (height_pmt-height_cath)/2,
+			 height_pmt/2,
 		         //(height_pmt-height_cath)/2,
 		         0*deg,
 		         360*deg);
@@ -1141,8 +1141,7 @@ G4LogicalVolume* ScintPanelLogic = new G4LogicalVolume(
 	 	 	 //matBorGlass, //actually made of matBorGlass, but the material isn't a significant source
 			 worldMaterial, //so, going with air (world material) insteadhttps://www.chem.uci.edu/~unicorn/243/handouts/pmt.pdf
  	 		"pmtLog");
-///*
-			//there's a bug involving surface overlaps of daughter volumes for sensitive detectors in Geant4, so I'm just going to have the PMT overhang the edge a bit so it doesn't affect the sensitive detector performance of the photocathode volume. Doesn't matter because it's just a cosmetic thing anyways
+/*
 	G4PVPlacement* pmtPhys = new G4PVPlacement(
 			 0,
 			 G4ThreeVector(0,0,(height_cath+50*mm)/2),
@@ -1153,7 +1152,7 @@ G4LogicalVolume* ScintPanelLogic = new G4LogicalVolume(
 			 false,
 			 0,
 			 true);
-//*/
+*/
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
 G4double topZ,leftZ,rightZ,botZ,sign, shift;
@@ -1181,8 +1180,17 @@ for(int l=0;l<nLayers;l++){
 		false,
 		1,
 		true);
-
-
+	
+	new G4PVPlacement(
+		0,
+		G4ThreeVector(barShift,barShift,-(3-2*l)*(LeadZ+wrapZ)-(2-l)*height_pmt+scintZ+height_pmt/2),
+		pmtLog,
+		"pmt_physic1_L"+std::to_string(l),
+		subStackLogic,
+		false,
+		1,
+		true);
+/////////////
 	new G4PVPlacement(
 		0,
 		G4ThreeVector(barShift,-barShift,-(3-2*l)*(LeadZ+wrapZ)-(2-l)*height_pmt),
@@ -1202,7 +1210,17 @@ for(int l=0;l<nLayers;l++){
 		false,
 		2,
 		true);
-
+	
+	new G4PVPlacement(
+		0,
+		G4ThreeVector(barShift,-barShift,-(3-2*l)*(LeadZ+wrapZ)-(2-l)*height_pmt+scintZ+height_pmt/2),
+		pmtLog,
+		"pmt_physic2_L"+std::to_string(l),
+		subStackLogic,
+		false,
+		2,
+		true);
+/////////////
 	new G4PVPlacement(
 		0,
 		G4ThreeVector(-barShift,barShift,-(3-2*l)*(LeadZ+wrapZ)-(2-l)*height_pmt),
@@ -1225,6 +1243,16 @@ for(int l=0;l<nLayers;l++){
 
 	new G4PVPlacement(
 		0,
+		G4ThreeVector(-barShift,barShift,-(3-2*l)*(LeadZ+wrapZ)-(2-l)*height_pmt+scintZ+height_pmt/2),
+		pmtLog,
+		"pmt_physic3_L"+std::to_string(l),
+		subStackLogic,
+		false,
+		3,
+		true);
+//////////////
+	new G4PVPlacement(
+		0,
 		G4ThreeVector(-barShift,-barShift,-(3-2*l)*(LeadZ+wrapZ)-(2-l)*height_pmt),
 		wrap_logic,
 		"wrap_physic4_L"+std::to_string(l),
@@ -1238,6 +1266,16 @@ for(int l=0;l<nLayers;l++){
 		G4ThreeVector(-barShift,-barShift,-(3-2*l)*(LeadZ+wrapZ)-(2-l)*height_pmt+scintZ+height_pmt/2),
 		phCathLog,
 		"phCath_physic4_L"+std::to_string(l),
+		subStackLogic,
+		false,
+		4,
+		true);
+
+	new G4PVPlacement(
+		0,
+		G4ThreeVector(-barShift,-barShift,-(3-2*l)*(LeadZ+wrapZ)-(2-l)*height_pmt+scintZ+height_pmt/2),
+		pmtLog,
+		"pmt_physic4_L"+std::to_string(l),
 		subStackLogic,
 		false,
 		4,
@@ -1347,6 +1385,16 @@ if(l==3){
 			false,
 			nLayers*nBarXCount*nBarYCount*4+(nLayers+1)+4*l,
 			true);
+	new G4PVPlacement(
+			pmtRotPanelTop1,
+			PMTPanelPlacementTop1,
+			pmtLog,
+			"pmtScintPanelPMTTop1"+std::to_string(l),
+			//logicWorld,
+			detectorWorldLogic,
+			false,
+			nLayers*nBarXCount*nBarYCount*4+(nLayers+1)+4*l,
+			true);
 }
 if(l==1){
 	new G4PVPlacement(
@@ -1354,6 +1402,16 @@ if(l==1){
 			PMTPanelPlacementTop2,
 			phCathLog,
 			"ScintPanelPMTTop2"+std::to_string(l),
+			//logicWorld,
+			detectorWorldLogic,
+			false,
+			nLayers*nBarXCount*nBarYCount*4+(nLayers+5)+4*l,
+			true);
+	new G4PVPlacement(
+			pmtRotPanelTop2,
+			PMTPanelPlacementTop2,
+			pmtLog,
+			"pmtScintPanelPMTTop2"+std::to_string(l),
 			//logicWorld,
 			detectorWorldLogic,
 			false,
@@ -1372,6 +1430,16 @@ if(l==3){
 			false,
 			nLayers*nBarXCount*nBarYCount*4+(nLayers+2)+4*l,
 			true);
+	new G4PVPlacement(
+			pmtRotPanelLeft1,
+			PMTPanelPlacementLeft1,
+			pmtLog,
+			"pmtScintPanelPMTLeft1"+std::to_string(l),
+			detectorWorldLogic,
+			//logicWorld,
+			false,
+			nLayers*nBarXCount*nBarYCount*4+(nLayers+2)+4*l,
+			true);
 }
 if(l==1){
 	new G4PVPlacement(
@@ -1379,6 +1447,16 @@ if(l==1){
 			PMTPanelPlacementLeft2,
 			phCathLog,
 			"ScintPanelPMTLeft2"+std::to_string(l),
+			detectorWorldLogic,
+			//logicWorld,
+			false,
+			nLayers*nBarXCount*nBarYCount*4+(nLayers+6)+4*l,
+			true);
+	new G4PVPlacement(
+			pmtRotPanelLeft2,
+			PMTPanelPlacementLeft2,
+			pmtLog,
+			"pmtPanelPMTLeft2"+std::to_string(l),
 			detectorWorldLogic,
 			//logicWorld,
 			false,
@@ -1397,6 +1475,16 @@ if(l==3){
 			false,
 			nLayers*nBarXCount*nBarYCount*4+(nLayers+3)+4*l,
 			true);
+	new G4PVPlacement(
+			pmtRotPanelRight1,
+			PMTPanelPlacementRight1,
+			pmtLog,
+			"pmtScintPanelPMTRight1"+std::to_string(l),
+			//logicWorld,
+			detectorWorldLogic,
+			false,
+			nLayers*nBarXCount*nBarYCount*4+(nLayers+3)+4*l,
+			true);
 }
 if(l==1){
 	new G4PVPlacement(
@@ -1404,6 +1492,16 @@ if(l==1){
 			PMTPanelPlacementRight2,
 			phCathLog,
 			"ScintPanelPMTRight2"+std::to_string(l),
+			//logicWorld,
+			detectorWorldLogic,
+			false,
+			nLayers*nBarXCount*nBarYCount*4+(nLayers+7)+4*l,
+			true);
+	new G4PVPlacement(
+			pmtRotPanelRight2,
+			PMTPanelPlacementRight2,
+			pmtLog,
+			"pmtScintPanelPMTRight2"+std::to_string(l),
 			//logicWorld,
 			detectorWorldLogic,
 			false,
@@ -1483,12 +1581,32 @@ double slabshiftfront=30*cm;
 			false,
 			nLayers*nBarXCount*nBarYCount*4+(nLayers+1)+4*4+1+10,
 			true);
+	new G4PVPlacement(
+			pmt1RotSlab,
+			PMTSlabPlacementTop1,
+			pmtLog,
+			"pmtScintSlabPMTTop1",
+			//logicWorld,
+			detectorWorldLogic,
+			false,
+			nLayers*nBarXCount*nBarYCount*4+(nLayers+1)+4*4+1+10,
+			true);
 	//bot slab
 	new G4PVPlacement(
 			pmt1RotSlab,
 			PMTSlabPlacementBot1,
 			phCathLog,
 			"ScintSlabPMTBot1",
+			//logicWorld,
+			detectorWorldLogic,
+			false,
+			nLayers*nBarXCount*nBarYCount*4+(nLayers+1)+4*4+2+10,
+			true);
+	new G4PVPlacement(
+			pmt1RotSlab,
+			PMTSlabPlacementBot1,
+			pmtLog,
+			"pmtScintSlabPMTBot1",
 			//logicWorld,
 			detectorWorldLogic,
 			false,
@@ -1509,12 +1627,32 @@ double slabshiftfront=30*cm;
 			false,
 			nLayers*nBarXCount*nBarYCount*4+(nLayers+1)+4*4+3+10,
 			true);
+	new G4PVPlacement(
+			pmt2RotSlab,
+			PMTSlabPlacementTop2,
+			pmtLog,
+			"pmtScintSlabPMTTop2",
+			//logicWorld,
+			detectorWorldLogic,
+			false,
+			nLayers*nBarXCount*nBarYCount*4+(nLayers+1)+4*4+3+10,
+			true);
 	//bot slab
 	new G4PVPlacement(
 			pmt2RotSlab,
 			PMTSlabPlacementBot2,
 			phCathLog,
 			"ScintSlabPMTBot2",
+			//logicWorld,
+			detectorWorldLogic,
+			false,
+			nLayers*nBarXCount*nBarYCount*4+(nLayers+1)+4*4+4+10,
+			true);
+	new G4PVPlacement(
+			pmt2RotSlab,
+			PMTSlabPlacementBot2,
+			pmtLog,
+			"pmtScintSlabPMTBot2",
 			//logicWorld,
 			detectorWorldLogic,
 			false,
@@ -2055,6 +2193,20 @@ if(SupportStructure){
 	mptWrap->AddProperty("REFLECTIVITY",photonEnergyWrap, wrap_REFL, nEntriesWrap);
     
     opSWrapScintillator->SetMaterialPropertiesTable(mptWrap);
+////////////////// PMT non-photocath refl ///////////////////////////
+    G4OpticalSurface* opSPMT = new G4OpticalSurface("PMT Dead Zone", unified,
+                              /*ground*/      polished,
+                                                dielectric_metal);
+        G4double photonEnergyPMT[nEntriesWrap]={ 1.5 * eV,6.3 * eV};
+        G4double wrap_PMT[nEntriesWrap] = {0,0};//{0.95,0.95}
+//      G4double wrap_RIND[nEntriesWrap];
+
+        G4MaterialPropertiesTable* mptPMT = new G4MaterialPropertiesTable();
+        //mptWrap->AddProperty("TRANSMITTANCE",photonEnergyWrap, foil_REFL, nEntriesWrap);//->SetSpline(true);
+        mptPMT->AddProperty("REFLECTIVITY",photonEnergyPMT, wrap_PMT, nEntriesWrap);
+
+    opSPMT->SetMaterialPropertiesTable(mptPMT);
+/////////////////////////////////////////////////////////////////////// 
 
 //define optical surfaces for each object in the sim, and match the optical properties of each surface to it
 
@@ -2062,6 +2214,7 @@ if(SupportStructure){
     new G4LogicalSkinSurface("Wrap", ScintPanelWrapLogic, opSWrapScintillator);
     new G4LogicalSkinSurface("Wrap", ScintSlabWrapLogic, opSWrapScintillator);
     new G4LogicalSkinSurface("PhCath", phCathLog, opSDielectricBiAlkali);
+    new G4LogicalSkinSurface("PMTDeadZone", pmtLog, opSPMT);
 
 //Connect detector volume (photocathode) to each surface which is in contact with it
 // use this if you want to explicitly define the allowed optical surfaces rather than a wrapping

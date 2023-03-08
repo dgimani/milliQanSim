@@ -231,9 +231,9 @@ G4VPhysicalVolume* mqDetectorConstruction::SetupGeometry() {
 	this->SetNBarPerLayer(nBarXCount*nBarYCount);
 	this->SetNLayer(nLayers);
  
-	 G4double outerRadius_pmt   = 52* mm /2.; //26 //52
-	 G4double outerRadius_cath  = 52* mm /2.; //26 //52
-	 G4double height_pmt        = 100* mm; //200.*mm;
+	 G4double outerRadius_pmt   = 51* mm /2.; //26 //52
+	 G4double outerRadius_cath  = 46* mm /2.; //26 //52
+	 G4double height_pmt        = 147* mm; //200.*mm;
 	 G4double height_cath       = 2.0 * mm; //2mm
 	 G4double pmtYoffset        = 0*mm;
 	 G4double muMetalThickness = 0.1*mm;
@@ -1348,7 +1348,7 @@ G4double fractionMass;
          G4Tubs* phCathSolid = new G4Tubs(
                          "photocath_tube",
                          0,
-                         outerRadius_pmt,
+                         outerRadius_cath,
         //               (airGapThickness+wrapThickness)/2,
                          height_pmt/2,
                          0*deg,
@@ -1404,9 +1404,9 @@ G4double fractionMass;
 
          G4Tubs* pmtSolid = new G4Tubs(
                          "pmt_tube",
-                         0,
+                         outerRadius_cath,
                          outerRadius_pmt,
-                         (height_pmt-height_cath)/2,
+                         height_pmt/2,
                          //(height_pmt-height_cath)/2,
                          0*deg,
                          360*deg);
@@ -1416,8 +1416,45 @@ G4double fractionMass;
                          //matBorGlass, //actually made of matBorGlass, but the material isn't a significant source
                          worldMaterial, //so, going with air (world material) insteadhttps://www.chem.uci.edu/~unicorn/243/handouts/pmt.pdf
                         "pmtLog");
-///*
-                        //there's a bug involving surface overlaps of daughter volumes for sensitive detectors in Geant4, so I'm just going to have the PMT overhang the edge a bit so it doesn't affect the sensitive detector performance of the photocathode volume. Doesn't matter because it's just a cosmetic thing anyways
+         G4PVPlacement* pmtPhysLarge = new G4PVPlacement(
+                         0,
+                         G4ThreeVector(spacing,-spacing,shift-height_NaILarge-height_pmt/2),
+                         pmtLog,
+                         "pmtPhysLarge",
+                         holder_logic,
+                         false,
+                         1,
+                         true);
+
+         G4PVPlacement* pmtPhysSmall1 = new G4PVPlacement(
+                         0,
+                         G4ThreeVector(-spacing,-spacing,shift+height_NaILarge-height_NaISmall-height_NaISmall-height_pmt/2),
+                         pmtLog,
+                         "pmtPhysSmall1",
+                         holder_logic,
+                         false,
+                         2,
+                         true);
+         G4PVPlacement* pmtPhysSmall2 = new G4PVPlacement(
+                         0,
+                         G4ThreeVector(spacing,spacing,shift+height_NaILarge-height_NaISmall-height_NaISmall-height_pmt/2),
+                         pmtLog,
+                         "pmtPhysSmall2",
+                         holder_logic,
+                         false,
+                         3,
+                         true);
+         G4PVPlacement* pmtPhysLYSO = new G4PVPlacement(
+                         0,
+                         G4ThreeVector(-spacing,spacing,shift+height_NaILarge-length_LYSOArray-length_LYSOArray-height_pmt/2),
+                         pmtLog,
+                         "pmtPhysLYSO",
+                         holder_logic,
+                         false,
+                         4,
+                         true);
+
+/*
         G4PVPlacement* pmtPhys = new G4PVPlacement(
                          0,
                          G4ThreeVector(0,0,-(height_cath+10*mm)/2),
@@ -1427,8 +1464,7 @@ G4double fractionMass;
                          false,
                          0,
                          true);
-//*/
-
+*/
 
 
 
@@ -1638,6 +1674,21 @@ G4double fractionMass;
     
     opSWrapScintillator->SetMaterialPropertiesTable(mptWrap);
 
+////////////////// PMT non-photocath refl ///////////////////////////
+    G4OpticalSurface* opSPMT = new G4OpticalSurface("PMT Dead Zone", unified,
+                              /*ground*/      polished,
+                                                dielectric_metal);
+        G4double photonEnergyPMT[nEntriesWrap]={ 1.5 * eV,6.3 * eV};
+        G4double wrap_PMT[nEntriesWrap] = {0,0};//{0.95,0.95}
+//      G4double wrap_RIND[nEntriesWrap];
+
+        G4MaterialPropertiesTable* mptPMT = new G4MaterialPropertiesTable();
+        //mptWrap->AddProperty("TRANSMITTANCE",photonEnergyWrap, foil_REFL, nEntriesWrap);//->SetSpline(true);
+        mptPMT->AddProperty("REFLECTIVITY",photonEnergyPMT, wrap_PMT, nEntriesWrap);
+
+    opSPMT->SetMaterialPropertiesTable(mptPMT);
+/////////////////////////////////////////////////////////////////////// 
+
 //define optical surfaces for each object in the sim, and match the optical properties of each surface to it
 
 //    new G4LogicalSkinSurface("Wrap", wrap_logic, opSWrapScintillator);
@@ -1646,7 +1697,7 @@ G4double fractionMass;
     new G4LogicalSkinSurface("Wrap", wrapNaISmall_logic, opSWrapScintillator);
     new G4LogicalSkinSurface("Wrap", wrapNaILarge_logic, opSWrapScintillator);
     new G4LogicalSkinSurface("Wrap", wrapLYSO_logic, opSWrapScintillator);
-//    new G4LogicalSkinSurface("PhCath", phCathLog, opSDielectricBiAlkali);
+    new G4LogicalSkinSurface("PMTDeadZone", pmtLog, opSPMT);
 
 //Connect detector volume (photocathode) to each surface which is in contact with it
 // use this if you want to explicitly define the allowed optical surfaces rather than a wrapping

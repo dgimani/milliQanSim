@@ -215,8 +215,8 @@ G4VPhysicalVolume* mqDetectorConstruction::SetupGeometry() {
 	this->SetNLayer(nLayers);
  	
 	 G4double outerRadius_pmt   = 51* mm /2.; //26 //52
-	 G4double outerRadius_cath  = 51* mm /2.; //26 //52
-	 G4double height_pmt        = 200* mm; //142.*mm;
+	 G4double outerRadius_cath  = 46* mm /2.; //26 //52
+	 G4double height_pmt        = 147* mm; //142.*mm;
 	 G4double height_cath       = 0.5 * mm; //2mm
 	 G4double pmtYoffset        = 0*mm;
 	 G4double muMetalThickness = 0.5*mm;
@@ -1107,7 +1107,7 @@ G4LogicalVolume* ScintPanelLogic = new G4LogicalVolume(
 	 G4Tubs* phCathSolid = new G4Tubs(
 			 "photocath_tube",
 			 0,
-			 outerRadius_pmt,
+			 outerRadius_cath,
 	//		 (airGapThickness+wrapThickness)/2,
 			 height_pmt/2,
 			 0*deg,
@@ -1118,6 +1118,7 @@ G4LogicalVolume* ScintPanelLogic = new G4LogicalVolume(
 					"phCathLog");
 
 //	 G4ThreeVector phCathPosition(0,0,(-height_pmt/2 + height_cath/2));
+//	 G4ThreeVector phCathPosition(0,0,scintZ+height_pmt/2);
 	 G4ThreeVector phCathPosition(0,0,scintZ+height_pmt/2);
 //////////////////// Bench testing ///////////////////////////
 ///*
@@ -1137,10 +1138,10 @@ G4LogicalVolume* ScintPanelLogic = new G4LogicalVolume(
 
 	 G4Tubs* pmtSolid = new G4Tubs(
 			 "pmt_tube",
-			 0,
+			 outerRadius_cath,
 			 outerRadius_pmt,
-		         (height_pmt-height_cath)/2,
 		         //(height_pmt-height_cath)/2,
+		         height_pmt/2,
 		         0*deg,
 		         360*deg);
 
@@ -1150,14 +1151,14 @@ G4LogicalVolume* ScintPanelLogic = new G4LogicalVolume(
 			 worldMaterial, //so, going with air (world material) insteadhttps://www.chem.uci.edu/~unicorn/243/handouts/pmt.pdf
  	 		"pmtLog");
 ///*
-			//there's a bug involving surface overlaps of daughter volumes for sensitive detectors in Geant4, so I'm just going to have the PMT overhang the edge a bit so it doesn't affect the sensitive detector performance of the photocathode volume. Doesn't matter because it's just a cosmetic thing anyways
 	G4PVPlacement* pmtPhys = new G4PVPlacement(
 			 0,
-			 G4ThreeVector(0,0,(height_cath+50*mm)/2),
+			 //G4ThreeVector(0,0,(height_cath+50*mm)/2),
 			 //G4ThreeVector(0,0,(height_cath+0.1*mm)/2),
+			 phCathPosition,
 			 pmtLog,
 			 "pmtPhys",
-			 phCathLog,
+			 logicWorld,
 			 false,
 			 0,
 			 true);
@@ -1999,8 +2000,8 @@ if(SupportStructure){
 
 	//setting same color so it doesn't look bad in isometric view
 	
-	//G4VisAttributes* visAttribPhCath = new G4VisAttributes(G4Colour::Blue());
-	G4VisAttributes* visAttribPhCath = new G4VisAttributes(G4Colour::Red());
+	G4VisAttributes* visAttribPhCath = new G4VisAttributes(G4Colour::Blue());
+	//G4VisAttributes* visAttribPhCath = new G4VisAttributes(G4Colour::Red());
 	visAttribPhCath->SetForceWireframe(false);
 	visAttribPhCath->SetForceSolid(false);
 	visAttribPhCath->SetVisibility(true);
@@ -2043,12 +2044,28 @@ if(SupportStructure){
     
     opSWrapScintillator->SetMaterialPropertiesTable(mptWrap);
 
+////////////////// PMT non-photocath refl ///////////////////////////
+    G4OpticalSurface* opSPMT = new G4OpticalSurface("PMT Dead Zone", unified,
+                              /*ground*/      polished,
+                                                dielectric_metal);
+        G4double photonEnergyPMT[nEntriesWrap]={ 1.5 * eV,6.3 * eV};
+        G4double wrap_PMT[nEntriesWrap] = {0,0};//{0.95,0.95}
+//      G4double wrap_RIND[nEntriesWrap];
+
+        G4MaterialPropertiesTable* mptPMT = new G4MaterialPropertiesTable();
+        //mptWrap->AddProperty("TRANSMITTANCE",photonEnergyWrap, foil_REFL, nEntriesWrap);//->SetSpline(true);
+        mptPMT->AddProperty("REFLECTIVITY",photonEnergyPMT, wrap_PMT, nEntriesWrap);
+
+    opSPMT->SetMaterialPropertiesTable(mptPMT);
+/////////////////////////////////////////////////////////////////////// 
+
 //define optical surfaces for each object in the sim, and match the optical properties of each surface to it
 
     new G4LogicalSkinSurface("Wrap", wrap_logic, opSWrapScintillator);
     new G4LogicalSkinSurface("Wrap", ScintPanelWrapLogic, opSWrapScintillator);
     new G4LogicalSkinSurface("Wrap", ScintSlabWrapLogic, opSWrapScintillator);
     new G4LogicalSkinSurface("PhCath", phCathLog, opSDielectricBiAlkali);
+    new G4LogicalSkinSurface("PMTDeadZone", pmtLog, opSPMT);
 
 //Connect detector volume (photocathode) to each surface which is in contact with it
 // use this if you want to explicitly define the allowed optical surfaces rather than a wrapping
