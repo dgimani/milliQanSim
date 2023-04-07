@@ -251,7 +251,7 @@ void mqSteppingAction::UserSteppingAction(const G4Step * theStep){
 	//Trigger sensitive detector manually
 
 	//determine cosine of angle of incidence  
-        cosDetect= myStartDirection.dot(G4ThreeVector(0,0,1));
+        cosDetect= abs(myStartDirection.dot(G4ThreeVector(0,0,1)));
 	//G4cout << "my start direction: " << myStartDirection.x() << " " << myStartDirection.y() << " " << myStartDirection.z() << G4endl;
 		
 	//determine angle of incidence
