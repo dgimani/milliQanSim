@@ -15,7 +15,7 @@
 /vis/drawVolume
 /vis/viewer/set/background white
 /vis/scene/add/eventID
-/vis/viewer/zoomTo 3
+/vis/viewer/zoomTo 3.5
 /vis/viewer/flush
 
 #        /vis/viewer/set/timeWindow/displayLightFront true 20 0 0 cm -0.01 ns
