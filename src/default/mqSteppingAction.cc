@@ -252,7 +252,8 @@ void mqSteppingAction::UserSteppingAction(const G4Step * theStep){
 
 	//determine cosine of angle of incidence  
         cosDetect= abs(myStartDirection.dot(G4ThreeVector(0.935,0,1)));
-		
+	myEndVolumeName=theStep->GetPostStepPoint()->GetPhysicalVolume()->GetName();
+	if(myEndVolumeName.contains("ScintSlabPMT")) cosDetect=abs(myStartDirection.dot(G4ThreeVector(1,0,-0.935)));
 	//determine angle of incidence
 	angleDetect=acos(cosDetect)*180/M_PI; //should always be less than 90 degrees
 
@@ -266,7 +267,6 @@ void mqSteppingAction::UserSteppingAction(const G4Step * theStep){
 	    //G4cout << theStep->GetPostStepPoint()->GetPhysicalVolume()->GetName() << G4endl;
 	    //if(G4UniformRand()<cosDetect){                               //if we think we did a good job coupling, then just use this relationship (which falls off at high theta anyways)
 	    //if(G4UniformRand()<0.01) G4cout << "Cosine is " << cosDetect << G4endl;
-	    myEndVolumeName=theStep->GetPostStepPoint()->GetPhysicalVolume()->GetName();
 //		if (myEndVolumeName.contains("PMTParamPhys") || myEndVolumeName.contains("ScintSlabPMT") || myEndVolumeName.contains("ScintPanelPMT") || myEndVolumeName.contains("PMTFourth")){
 	    G4String sdPMTName="PMT_SD";
 	    pmtSD = (mqPMTSD*)G4SDManager::GetSDMpointer()->FindSensitiveDetector(sdPMTName);
@@ -409,10 +409,10 @@ void mqSteppingAction::UserSteppingAction(const G4Step * theStep){
 			*/
 			G4int barCopyNum = theStep->GetPostStepPoint()->GetTouchable()
 						->GetCopyNumber(2);
-			if(barCopyNum<(4*4*9*6+1)){
+			if(barCopyNum<70 || barCopyNum>100){
 				G4cout << "Particle " << particleName << " hit bar!" << G4endl;
 				eventInformation->SetBarHit(eventInformation->GetBarHit()+1);
-			} else if(barCopyNum<(4*4*9*6+5)){
+			} else if(barCopyNum>90){
 				G4cout << "Particle " << particleName << " hit slab!" << G4endl;
 				eventInformation->SetSlabHit(eventInformation->GetSlabHit()+1);
 			} else {
@@ -422,6 +422,7 @@ void mqSteppingAction::UserSteppingAction(const G4Step * theStep){
   			G4String sdScintName="Scint_SD";
   			scintSD = (mqScintSD*)G4SDManager::GetSDMpointer()->FindSensitiveDetector(sdScintName);
 			scintSD->ProcessHitsEnter(theStep,NULL);
+/////////// want to save information from a hit into a file? do that here /////////////////////////////
 //			std::ofstream particleBarHit;
 //			particleBarHit.open("/media/ryan/Storage/computing/mqFullSim/data/particleHitData_midLayerMuon.txt",std::ofstream::out | std::ofstream::app);
 //			int barNum = postCopyNo;
@@ -448,7 +449,7 @@ void mqSteppingAction::UserSteppingAction(const G4Step * theStep){
 //////////////////////////////////////////////////////////////////////////////////////////////
 /*
  //using this to kill muons that we don't want to hit the detector, since we trigger on muons and I don't want to waste sim runtime
-///////////////////// trigger check ////////////////////////////
+///////////////////// trigger check for simulating cosmic muon triggers in a particular layer ////////////////////////////
 		if(particleName.contains("mu") && myStartVolumeName.contains("World")
 				&& (myEndVolumeName.contains("barParam") || myEndVolumeName.contains("Panel"))
 				&& !(eventInformation->GetMuonTrigger())) {theStep->GetTrack()->SetTrackStatus(fStopAndKill);
@@ -469,7 +470,7 @@ void mqSteppingAction::UserSteppingAction(const G4Step * theStep){
 		}
 	}
 */
-
+/////////// muon interaction manager ///////////////
 	if( particleName.contains("mu") ){
 		//sum energy deposit
 		sumEnergyDep=eventInformation->GetMuonTrack(theStep->GetTrack()->GetTrackID())->GetEnergyDeposit()+myEnergyEDep;
@@ -485,7 +486,7 @@ void mqSteppingAction::UserSteppingAction(const G4Step * theStep){
 			scintSD->ProcessHitsEnter(theStep,NULL);
 		}
 */
-		//muon enters scintillator
+		//muon exits scintillator
 /*		
 		if((myStartVolumeName.contains("scint") || myStartVolumeName.contains("Scint"))
 			&& (!myEndVolumeName.contains("scint") && !myEndVolumeName.contains("Scint"))){
@@ -509,6 +510,8 @@ void mqSteppingAction::UserSteppingAction(const G4Step * theStep){
 	}
 */
 //
+
+/////////////// electron debugging ////////////////	
 /*
 	if(particleName.contains("e+") || particleName.contains("e-")){
 		if(theTrack->GetCurrentStepNumber()==1) G4cout << "Electron track creator process is: " << theTrack->GetCreatorProcess()->GetProcessName() << " and energy is " << theTrack->GetTotalEnergy() << G4endl;// " *and kinetic energy is* " << theTrack->GetKineticEnergy() << G4endl;
@@ -517,38 +520,6 @@ void mqSteppingAction::UserSteppingAction(const G4Step * theStep){
 */		sumEnergyDep=eventInformation->GetEventEnergyDeposit()+myEnergyEDep;
 		eventInformation->SetEventEnergyDeposit(sumEnergyDep);
 
-/*
-///////////////////// trigger check ////////////////////////////	
-//	if(particleName.contains("mu") && myStartVolumeName.contains("World") && myEndVolumeName=="trigPad_physic_up"){ //muon hits trigger paddle
-		if((myStartVolumeName.contains("barStack") || myStartVolumeName.contains("World")) //particle started in the stack, or came from the world
-			&& myEndVolumeName.contains("barParam") //particle ends up in one of the bar wrapping layers, somewhere, afterwards
-			&& particleName.contains("mu")
-			&& ((postCopyNo == 2) || (postCopyNo == 5))){ //also, particle entered one of the middle layers
-//			&& theStep->GetPostStepPoint()->GetTouchable()->GetVolume()->GetName().back()-48==1){ //particle does so in the middlemost layer in particular
-			
-		eventInformation->GetMuonTrack(theStep->GetTrack()->GetTrackID())->SetMuonTriggerUp(true);	
-		if(eventInformation->GetMuonTrack(theStep->GetTrack()->GetTrackID())->GetMuonTriggerLow()) eventInformation->SetMuonTrigger(true);
-	}
-	//if(particleName.contains("mu") && myStartVolumeName.contains("World") && myEndVolumeName=="trigPad_physic_low"){ //muon hits trigger paddle
-		if((myStartVolumeName.contains("barStack") || myStartVolumeName.contains("World")) //particle started in the stack, or came from the world
-			&& myEndVolumeName.contains("barParam") //particle ends up in one of the bar wrapping layers, somewhere, afterwards
-			&& particleName.contains("mu")
-			&& ((postCopyNo == 0) || (postCopyNo == 3))){ //also, particle entered one of the middle layers
-//			&& theStep->GetPostStepPoint()->GetTouchable()->GetVolume()->GetName().back()-48==1){ //particle does so in the middlemost layer in particular
-		eventInformation->GetMuonTrack(theStep->GetTrack()->GetTrackID())->SetMuonTriggerLow(true);
-		if(eventInformation->GetMuonTrack(theStep->GetTrack()->GetTrackID())->GetMuonTriggerUp()) eventInformation->SetMuonTrigger(true);
-	}
-///////////////////////////////////////////////////////////////
-*/	
-/*	
-	if(particleName.contains("gamma") && myStartVolumeName=="plScin_physic" && myEndVolumeName.contains("World")){ //gamma exiting scintillator to the world
-		eventInformation->GetGammaTrack(theStep->GetTrack()->GetTrackID())->SetGammaOutScintillator(true);
-	}
-  */
-//	if(particleType==G4OpticalPhoton::OpticalPhotonDefinition() && myEndVolumeName.contains("World")){ //gamma exiting scintillator to the world
-//	if(particleType==G4OpticalPhoton::OpticalPhotonDefinition() && (myEndVolumeName.contains("panel")||myStartVolumeName.contains("panel")||myEndVolumeName.contains("World")||myStartVolumeName.contains("World"))){ //gamma exiting scintillator to the world
-//		theTrack->SetTrackStatus(fStopAndKill);
-//	}
   
 }
 

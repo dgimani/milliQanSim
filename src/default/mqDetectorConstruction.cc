@@ -174,8 +174,8 @@ G4VPhysicalVolume* mqDetectorConstruction::SetupGeometry() {
 	G4double scintZ  = 600/2*mm;//(each of these dimensions represents the half-width; e.g. this is 600mm long)
 	G4double subBarSpacing = 1*mm;
 
-	G4double airGapThickness = 0.1*mm; //1*mm
-	G4double wrapThickness = 0.1*mm; //3*mm
+	G4double airGapThickness = 0.05*cm; //1*mm
+	G4double wrapThickness = 0.05*cm; //3*mm
 	G4double airgapX = scintX+airGapThickness;	
 	G4double airgapY = scintY+airGapThickness;	
 	G4double airgapXY = scintXY+airGapThickness;	
@@ -184,6 +184,8 @@ G4VPhysicalVolume* mqDetectorConstruction::SetupGeometry() {
 	G4double wrapY=airgapY+wrapThickness;
 	G4double wrapXY=airgapXY+wrapThickness;
 	G4double wrapZ=airgapZ+wrapThickness;
+
+	G4double barSpacingInter = 0.5*cm;
 
         G4double frontLayerMid = -182.0*cm;
         G4double midLayerMid = -60.0*cm;
@@ -216,7 +218,7 @@ G4VPhysicalVolume* mqDetectorConstruction::SetupGeometry() {
  	
 	 G4double outerRadius_pmt   = 51* mm /2.; //26 //52
 	 G4double outerRadius_cath  = 46* mm /2.; //26 //52
-	 G4double height_pmt        = 147* mm; //142.*mm;
+	 G4double height_pmt        = 150* mm; //147.*mm; //150 measured from model
 	 G4double height_cath       = 0.5 * mm; //2mm
 	 G4double pmtYoffset        = 0*mm;
 	 G4double muMetalThickness = 0.5*mm;
@@ -256,11 +258,11 @@ G4VPhysicalVolume* mqDetectorConstruction::SetupGeometry() {
 	 G4double ScintPanelAirGapY = ScintPanelY+airGapThickness;
 	 G4double ScintPanelAirGapZ = ScintPanelZ+airGapThickness;
 	 
-	G4double ScintPanelOffsetXTop = centerOffsetX+barSpacingXY*(nBarXCount-1)/2+scintX+1.5*cm+2*cm-10*cm; //16*cm
-	G4double ScintPanelOffsetXBottom = centerOffsetX-barSpacingXY*(nBarXCount-1)/2-scintX-1.5*cm-37*cm+10*cm; //16*cm
+	G4double ScintPanelOffsetXTop = 4*wrapY+2*barSpacingInter+5.0*cm/2+2.5*cm+ScintPanelWrapX; //5.0cm is spacing between supermodules in X, 2.5cm comes from Sam's model
 	 G4double ScintPanelOffsetXLeft = centerOffsetX-18*cm;//6.65*cm;
 	 G4double ScintPanelOffsetXRight = centerOffsetX-18*cm;//6.65*cm;
-	 G4double ScintPanelOffsetYRight = 1.1*barSpacingXY*(nBarYCount-1)/2+scintY+1*cm*nBarYCount+10*cm;
+	 G4double ScintPanelOffsetYRight = 4*wrapY+2*barSpacingInter+2.3*cm/2+7*cm+ScintPanelWrapX; //2.3cm is spacing between supermodules in Y, 7cm comes from Sam's model	
+	 					//4*5.1*cm/2 + 2*0.5cm+2.3*cm/2+7*cm+5.1/2*cm, 21.9cm. add another 5.1/2*cm to get to the edge of the panel, so 24.45cm to edge from middle. 48.9cm between far side edges of panels
 	 G4double ScintPanelOffsetYLeft = -ScintPanelOffsetYRight;
 
 	G4double HodoX = 8.6*cm/2; //width
@@ -287,13 +289,6 @@ G4VPhysicalVolume* mqDetectorConstruction::SetupGeometry() {
 	//controls rotation of detector w.r.t. ground 
 //	G4double worldRotation = -13*deg;
 //	G4double worldRotation = 0*deg;
-
-	G4double barSpacingInter = 0.5*mm;
-	 G4double LeadX = 2*(scintXY+barSpacingInter);//20/2*cm;
-	 G4double LeadY = 2*(scintXY+barSpacingInter);//20/2*cm;
-	 G4double LeadZ = 5/2*cm;
-	 G4double LeadOffsetX = ScintSlabOffsetX;
-	 G4double LeadOffsetZ = ScintSlabOffsetZ1-LeadZ-1.5*cm; //same for both Z1,Z2 for LeadShield
 	
 	 G4double AlSupportX     = 10*cm/2;
          G4double AlSupportY     = ScintSlabY;
@@ -301,12 +296,15 @@ G4VPhysicalVolume* mqDetectorConstruction::SetupGeometry() {
 	 G4double AlSupportXOffset = ScintSlabOffsetX-ScintSlabX-AlSupportX-10*cm;
 
 	 G4double wallThickness = 1*m; //using 2m before
-	 G4double wallCylRadius = 1.5*m;//1.45*m;
+	 G4double wallCylRadius = 1.45*m;//1.45*m; //there were some conflicting measurements from the bar and slab I think related to the fact the cavern is turning there. The easier-to-make slab measurement was 2.89m,
+	 						//the bar measurement was 2.72m but not sure where on the wall this hit etc.; I think the 2.9m is a better modeling of the cavern since I know the slab detector is not on a bend
+							//like the bar detector is here. It's a bit hard to say for sure, I'm going to go with 2.9m since it seems to visually represent pictures the best. Overall minor difference of like 10cm
+							//in radius won't do much either way, splitting hairs here a bit
 	 G4double wallCylRadiusOut = wallCylRadius+wallThickness;
 	 G4double wallZ = 15*m/2;
 
 	 //G4double floorCutoutDepthX = (10*cm+wallCylRadius)/2;
-	 G4double floorCutoutDepthX = (10*cm+wallCylRadius)/2;
+	 G4double floorCutoutDepthX = (14*cm+(7*2.54*cm-5*cm)+wallCylRadius)/2;
 	 G4double floorCutoutDepthY = (-20*cm+wallCylRadius);
 	 G4double floorZ = wallZ;
 	 G4double overallDetX = ScintPanelOffsetXTop+ScintSlabX+60*cm;//30*cm; //adding larger buffer to get volume above and below
@@ -324,9 +322,9 @@ G4VPhysicalVolume* mqDetectorConstruction::SetupGeometry() {
 	 G4double SteelSupportOffsetX = -0.7*m;
 	 G4double SteelSupportOffsetZ = 0.8*m;
 
-	G4double detLength = (wrapZ*2+height_pmt+LeadZ*2+10*cm)*4;
+	G4double detLength = (wrapZ*2+height_pmt+15*cm)*4;
 	G4double interactionDist=5000.0*m;
-	G4double barAngleDelta = std::atan(barSpacingXY/(interactionDist));
+	G4double barAngleDelta = 0; //this parameter isn't used here anymore, defining supermod gaps in barParam directly
 
 	G4NistManager* nistMan = G4NistManager::Instance();
 
@@ -475,7 +473,7 @@ G4VPhysicalVolume* mqDetectorConstruction::SetupGeometry() {
 
 	G4PVPlacement* detectorWorldPhysic = new G4PVPlacement(
 				detRot,
-				G4ThreeVector(centerOffsetX, 0, centerOffsetZ),
+				G4ThreeVector(centerOffsetX+27*cm*sin(-worldRotation), 0, centerOffsetZ+27*cm*cos(-worldRotation)),
 				detectorWorldLogic,
 				"detectorWorldPhysic",
 				logicWorld,
@@ -485,17 +483,62 @@ G4VPhysicalVolume* mqDetectorConstruction::SetupGeometry() {
 ////////////////////////////////////////////////////////////////////////////////////
 //Overall volume for 2x2 stack
 
-	G4Box* subStackSolid = new G4Box("subStackSolid",
-				(2*scintXY+barSpacingInter+0.5*mm),
-				(2*scintXY+barSpacingInter+0.5*mm),
-				detLength/2-15*cm);
+	G4RotationMatrix* rot = new G4RotationMatrix(); //just an unrotated matrix used where this can't be a 0 arg
+	
+	G4Box* subStackSolidAlTotal = new G4Box("subStackSolidTotal",
+				(2*scintXY+barSpacingInter+1.2*cm), //1.2cm is from a picture measurement
+				(2*scintXY+barSpacingInter+1.2*cm),
+				86*cm*2+10*cm);
+				//detLength/2-7.5*cm);
+	G4Box* subStackSolidAlGap = new G4Box("subStackSolidAlGap",
+				0.4*cm/2, //actually 0.2cm but overlap for vis purposes and to make sure there's a gap
+				6*cm/2, //1.2cm is from a picture measurement
+				86*cm*2+10*cm);
 				//detLength/2-7.5*cm);
 
+	G4SubtractionSolid* subStackSolidAl1 = new G4SubtractionSolid("subStackSolidAl1",
+					subStackSolidAlTotal,
+					subStackSolidAlGap,
+                                        rot,
+                                        G4ThreeVector((2*scintXY+barSpacingInter+1.2*cm)-(0.2*cm)/2,
+						      0,
+                                                      0));
+	
+	G4SubtractionSolid* subStackSolidAl = new G4SubtractionSolid("subStackSolidAl",
+					subStackSolidAl1,
+					subStackSolidAlGap,
+                                        rot,
+                                        G4ThreeVector(-(2*scintXY+barSpacingInter+1.2*cm)+(0.2*cm)/2,
+						      0,
+                                                      0));
+
+	G4LogicalVolume* subStackLogicAl = new G4LogicalVolume(
+				subStackSolidAl,
+				AlMat,
+				"subStackLogicAl",
+				0,0,0);
+	
+	G4Box* subStackSolid = new G4Box("subStackSolid",
+				(2*scintXY+barSpacingInter+1.2*cm)-0.2*cm, //1.2cm is from a picture measurement
+				(2*scintXY+barSpacingInter+1.2*cm)-0.2*cm,
+				86*cm*2+10*cm);
+	
 	G4LogicalVolume* subStackLogic = new G4LogicalVolume(
 				subStackSolid,
 				worldMaterial,
 				"subStackLogic",
 				0,0,0);
+
+	G4PVPlacement* subStackPhysic = new G4PVPlacement(
+				0,
+				G4ThreeVector(),
+				subStackLogic,
+				"subStackPhysic",
+				subStackLogicAl,
+				false,
+				0,
+				true);
+
 /*
 	G4PVPlacement* subStackPhysic = new G4PVPlacement(
 				0,
@@ -507,7 +550,6 @@ G4VPhysicalVolume* mqDetectorConstruction::SetupGeometry() {
 				0,
 				true);
 */
-
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //Rock to be penetrated by muons as a test. Turn this off by commenting out the placement line below
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -526,7 +568,6 @@ G4VPhysicalVolume* mqDetectorConstruction::SetupGeometry() {
 				floorCutoutDepthY,
 				floorZ-10*cm);
 
-	G4RotationMatrix* rot = new G4RotationMatrix();
 	G4SubtractionSolid* rockSolid = new G4SubtractionSolid("rockWalls",
 				wallsCyl,
 				floorCutout,
@@ -534,12 +575,6 @@ G4VPhysicalVolume* mqDetectorConstruction::SetupGeometry() {
 				G4ThreeVector(-floorCutoutDepthX,0,0));
 				//G4ThreeVector(0,0,0));
 ///*
-/*
-	G4Box* rockSolid = new G4Box("rockSolid",
-				2*m/2,
-				15*m/2,
-				15*m/2);
-*/
 	G4LogicalVolume* rockLogic = new G4LogicalVolume(
 				rockSolid,
 				//
@@ -554,7 +589,9 @@ G4VPhysicalVolume* mqDetectorConstruction::SetupGeometry() {
 				rot,
 				//wallRot,
 				//G4ThreeVector(50*cm,0,0),//muonLoc: 20*cm+ScintSlabOffsetZEnd+ScintSlabZ+scintZ), //20cm from end of slab, plus add space for slabZ and bar thickness
-				G4ThreeVector(10*cm,0,0),//10 cm looks about right, so I'm using that as the cavern offset (so the floor is close to the bottom of the detector)
+				//G4ThreeVector(6*cm,0,0),//6cm is flush. from measurements from Neha and Teresa, shift is 4in
+				//G4ThreeVector(10*cm,0,0),//6cm is flush. from measurements from Neha and Teresa, shift is 4in
+				G4ThreeVector(10*cm-4*2.54*cm-5*cm+7*2.54*cm,-5*2.54*cm,0),//6cm is flush. from measurements from Neha and Teresa, shift is 4in from below, 7in from above. 5in shift to the left/negative Y
 				rockLogic,
 				"rockPhysic",
 				logicWorld,
@@ -594,7 +631,7 @@ G4VPhysicalVolume* mqDetectorConstruction::SetupGeometry() {
 			wrap_PMT_hole,
 			rot,
 			//11 mm is y-axis PMT offset
-			G4ThreeVector(0,0,wrapZ-(airGapThickness+wrapThickness)/2));
+			G4ThreeVector(0,0,-wrapZ+(airGapThickness+wrapThickness)/2));
 //*/
 /*
 //geometry to be used when photocathode is attached to end of Bar
@@ -611,7 +648,7 @@ G4VPhysicalVolume* mqDetectorConstruction::SetupGeometry() {
 			0, 0, 0);
 
 	
-	G4double barShift = scintXY+barSpacingInter;
+	G4double barShift = wrapXY+barSpacingInter;
 				
 /*	
 	G4PVPlacement* wrap_physic = new G4PVPlacement(
@@ -648,7 +685,7 @@ G4VPhysicalVolume* mqDetectorConstruction::SetupGeometry() {
 			airgap_PMT_hole,
 			rot2,
 			//11 mm is y-axis PMT offset
-			G4ThreeVector(0,pmtYoffset,airgapZ-airGapThickness/2));
+			G4ThreeVector(0,pmtYoffset,-airgapZ+airGapThickness/2));
 
 	G4LogicalVolume* airgap_logic = new G4LogicalVolume(
 			airgap_solid,
@@ -838,20 +875,16 @@ G4VPhysicalVolume* mqDetectorConstruction::SetupGeometry() {
 	G4ThreeVector PMTSlabPlacement(ScintSlabX-outerRadius_pmt+ScintSlabOffsetX, ScintSlabY+height_pmt/2, 0); //adjusting Z in loop
 /*
 	G4ThreeVector PMTPanelPlacementTop1(ScintPanelOffsetXTop, -ScintPanelY-height_pmt/2, 0); //adjusting Z in loop
-	G4ThreeVector PMTPanelPlacementBottom1(ScintPanelOffsetXBottom, -ScintPanelY-height_pmt/2, 0); //adjusting Z in loop
 	G4ThreeVector PMTPanelPlacementRight1(ScintPanelOffsetXRight+RPanelToPMTX, ScintPanelOffsetYRight+RPanelToPMTY, -ScintPanelZ+outerRadius_pmt); //adjusting Z in loop
 	G4ThreeVector PMTPanelPlacementLeft1(ScintPanelOffsetXLeft+LPanelToPMTX, ScintPanelOffsetYLeft+LPanelToPMTY, -ScintPanelZ+outerRadius_pmt); //adjusting Z in loop
 	G4ThreeVector PMTPanelPlacementTop2(ScintPanelOffsetXTop, ScintPanelY+height_pmt/2, 0); //adjusting Z in loop
-	G4ThreeVector PMTPanelPlacementBottom2(ScintPanelOffsetXBottom, ScintPanelY+height_pmt/2, 0); //adjusting Z in loop
 	G4ThreeVector PMTPanelPlacementRight2(ScintPanelOffsetXRight-RPanelToPMTX, ScintPanelOffsetYRight-RPanelToPMTY, -ScintPanelZ+outerRadius_pmt); //adjusting Z in loop
 	G4ThreeVector PMTPanelPlacementLeft2(ScintPanelOffsetXLeft-LPanelToPMTX, ScintPanelOffsetYLeft-LPanelToPMTY, -ScintPanelZ+outerRadius_pmt); //adjusting Z in loop
 */
 	G4ThreeVector PMTPanelPlacementTop1(ScintPanelOffsetXTop, 0, 0); //adjusting Z in loop
-	G4ThreeVector PMTPanelPlacementBottom1(ScintPanelOffsetXBottom, 0, 0); //adjusting Z in loop
 	G4ThreeVector PMTPanelPlacementRight1(ScintPanelOffsetXRight, ScintPanelOffsetYRight, -ScintPanelZ+outerRadius_pmt); //adjusting Z in loop
 	G4ThreeVector PMTPanelPlacementLeft1(ScintPanelOffsetXLeft, ScintPanelOffsetYLeft, -ScintPanelZ+outerRadius_pmt); //adjusting Z in loop
 	G4ThreeVector PMTPanelPlacementTop2(ScintPanelOffsetXTop, 0, 0); //adjusting Z in loop
-	G4ThreeVector PMTPanelPlacementBottom2(ScintPanelOffsetXBottom, 0, 0); //adjusting Z in loop
 	G4ThreeVector PMTPanelPlacementRight2(ScintPanelOffsetXRight, ScintPanelOffsetYRight, -ScintPanelZ+outerRadius_pmt); //adjusting Z in loop
 	G4ThreeVector PMTPanelPlacementLeft2(ScintPanelOffsetXLeft, ScintPanelOffsetYLeft, -ScintPanelZ+outerRadius_pmt); //adjusting Z in loop
 
@@ -869,8 +902,8 @@ G4VPhysicalVolume* mqDetectorConstruction::SetupGeometry() {
 	G4RotationMatrix* rotDetPart = new G4RotationMatrix();
 //	rotDetPart->rotateY(45*degree);
 
-	pmt1RotSlab->rotateX(-90*degree);
-	pmt2RotSlab->rotateX(90*degree);
+	pmt1RotSlab->rotateY(-90*degree);
+	pmt2RotSlab->rotateY(90*degree);
 	//pmtRotPanelTop1->rotateX(-90*degree);
 	//pmtRotPanelTop2->rotateX(90*degree);
 //	pmtRotPanelTop->rotateY(-worldRotation);
@@ -894,34 +927,12 @@ G4VPhysicalVolume* mqDetectorConstruction::SetupGeometry() {
 //	PMTStack_rot->rotateX(-1*(barAngleDelta+(nBarYCount-1)*barAngleDelta)/2);
 //	PMTStack_rot->rotateY((barAngleDelta+(nBarXCount-1)*barAngleDelta)/2);
 
-G4Box* LeadShieldSolid = new G4Box("LeadShieldSolid",
-				LeadX,
-				LeadY,
-				LeadZ);
-		
-G4LogicalVolume* LeadShieldLogic = new G4LogicalVolume(
-					LeadShieldSolid,
-					PbMat,
-					"LeadShieldLogic",
-					0,0,0);
-
-        G4PVPlacement* LeadShieldPhysic = new G4PVPlacement(
-                        0,
-                        G4ThreeVector(),
-                        airgap_logic,
-                        "airgap_physic",
-                        wrap_logic,
-                        false,
-                        0,
-                        true);
-
-
 
 /////////////////////////////////////////////////////////////////
 G4RotationMatrix* rotSlab1 = new G4RotationMatrix();
 G4RotationMatrix* rotSlab2 = new G4RotationMatrix();
 	//rotSlab1->rotateX(90*degree);
-	rotSlab2->rotateX(90*degree);
+	rotSlab2->rotateY(90*degree);
 
 G4Box* ScintSlabWrapSolidTotal = new G4Box("ScintSlabWrapSolidTotal",
 				ScintSlabWrapX,
@@ -931,10 +942,11 @@ G4Box* ScintSlabWrapSolidTotal = new G4Box("ScintSlabWrapSolidTotal",
 G4SubtractionSolid* ScintSlabWrapSolid = new G4SubtractionSolid("ScintSlabWrapSolid1",
 					ScintSlabWrapSolidTotal,
 					wrap_PMT_hole,
-					rotSlab1,
-					G4ThreeVector(0,
-						      -ScintSlabWrapY+(airGapThickness+wrapThickness)/2,
-						      ScintSlabZ-outerRadius_cath));
+					rotSlab2,
+					G4ThreeVector(
+						      ScintSlabWrapX-(airGapThickness+wrapThickness)/2,
+						      0,
+						      0));
 
 /*G4SubtractionSolid* ScintSlabWrapSolid = new G4SubtractionSolid("ScintSlabWrapSolid",
 					ScintSlabWrapSolid1,
@@ -958,9 +970,9 @@ G4SubtractionSolid* ScintSlabAirGapSolid = new G4SubtractionSolid("ScintSlabAirG
 					ScintSlabAirGapSolidTotal,
 					airgap_PMT_hole,
 					rotSlab1,
-					G4ThreeVector(0,
-						      -ScintSlabAirGapY+airGapThickness/2,
-						      ScintSlabZ-outerRadius_cath));
+					G4ThreeVector(ScintSlabAirGapY-airGapThickness/2,
+						      0,
+						      0));
 /*
 G4SubtractionSolid* ScintSlabAirGapSolid = new G4SubtractionSolid("ScintSlabAirGapSolid",
 					ScintSlabAirGapSolid1,
@@ -1167,12 +1179,13 @@ G4LogicalVolume* ScintPanelLogic = new G4LogicalVolume(
 G4double topZ,leftZ,rightZ,botZ,sign, shift;
 G4RotationMatrix* rotPanel = new G4RotationMatrix();
 rotPanel->rotateY(-1*worldRotation);
-
+double barSep = 86*cm; //from Sam Alcott's 3D model, using measurements of physical detector
+double zShift = 12*cm;
 for(int l=0;l<nLayers;l++){
 
 	new G4PVPlacement(
 		0,
-		G4ThreeVector(barShift,barShift,-(3-2*l)*(LeadZ+wrapZ)-(2-l)*height_pmt),
+		G4ThreeVector(barShift,barShift,-7.5*cm-3*wrapZ-2*height_pmt+barSep*l+zShift),
 		wrap_logic,
 		"wrap_physic1_L"+std::to_string(l),
 		subStackLogic,
@@ -1182,7 +1195,8 @@ for(int l=0;l<nLayers;l++){
 
 	new G4PVPlacement(
 		0,
-		G4ThreeVector(barShift,barShift,-(3-2*l)*(LeadZ+wrapZ)-(2-l)*height_pmt+scintZ+height_pmt/2),
+		G4ThreeVector(barShift,barShift,-7.5*cm-3*wrapZ-2*height_pmt+barSep*l-scintZ-height_pmt/2+zShift),
+		//G4ThreeVector(barShift,barShift,-(3-2*l)*(2.5*cm+wrapZ)-(2-l)*height_pmt-scintZ-height_pmt/2),
 		phCathLog,
 		"phCath_physic1_L"+std::to_string(l),
 		subStackLogic,
@@ -1192,7 +1206,7 @@ for(int l=0;l<nLayers;l++){
 	
 	new G4PVPlacement(
 		0,
-		G4ThreeVector(barShift,barShift,-(3-2*l)*(LeadZ+wrapZ)-(2-l)*height_pmt+scintZ+height_pmt/2),
+		G4ThreeVector(barShift,barShift,-7.5*cm-3*wrapZ-2*height_pmt+barSep*l-scintZ-height_pmt/2+zShift),
 		pmtLog,
 		"pmt_physic1_L"+std::to_string(l),
 		subStackLogic,
@@ -1202,7 +1216,7 @@ for(int l=0;l<nLayers;l++){
 /////////////
 	new G4PVPlacement(
 		0,
-		G4ThreeVector(barShift,-barShift,-(3-2*l)*(LeadZ+wrapZ)-(2-l)*height_pmt),
+		G4ThreeVector(barShift,-barShift,-7.5*cm-3*wrapZ-2*height_pmt+barSep*l+zShift),
 		wrap_logic,
 		"wrap_physic2_L"+std::to_string(l),
 		subStackLogic,
@@ -1212,7 +1226,7 @@ for(int l=0;l<nLayers;l++){
 
 	new G4PVPlacement(
 		0,
-		G4ThreeVector(barShift,-barShift,-(3-2*l)*(LeadZ+wrapZ)-(2-l)*height_pmt+scintZ+height_pmt/2),
+		G4ThreeVector(barShift,-barShift,-7.5*cm-3*wrapZ-2*height_pmt+barSep*l-scintZ-height_pmt/2+zShift),
 		phCathLog,
 		"phCath_physic2_L"+std::to_string(l),
 		subStackLogic,
@@ -1222,7 +1236,7 @@ for(int l=0;l<nLayers;l++){
 	
 	new G4PVPlacement(
 		0,
-		G4ThreeVector(barShift,-barShift,-(3-2*l)*(LeadZ+wrapZ)-(2-l)*height_pmt+scintZ+height_pmt/2),
+		G4ThreeVector(barShift,-barShift,-7.5*cm-3*wrapZ-2*height_pmt+barSep*l-scintZ-height_pmt/2+zShift),
 		pmtLog,
 		"pmt_physic2_L"+std::to_string(l),
 		subStackLogic,
@@ -1232,7 +1246,7 @@ for(int l=0;l<nLayers;l++){
 /////////////
 	new G4PVPlacement(
 		0,
-		G4ThreeVector(-barShift,barShift,-(3-2*l)*(LeadZ+wrapZ)-(2-l)*height_pmt),
+		G4ThreeVector(-barShift,barShift,-7.5*cm-3*wrapZ-2*height_pmt+barSep*l+zShift),
 		wrap_logic,
 		"wrap_physic3_L"+std::to_string(l),
 		subStackLogic,
@@ -1242,7 +1256,7 @@ for(int l=0;l<nLayers;l++){
 
 	new G4PVPlacement(
 		0,
-		G4ThreeVector(-barShift,barShift,-(3-2*l)*(LeadZ+wrapZ)-(2-l)*height_pmt+scintZ+height_pmt/2),
+		G4ThreeVector(-barShift,barShift,-7.5*cm-3*wrapZ-2*height_pmt+barSep*l-scintZ-height_pmt/2+zShift),
 		phCathLog,
 		"phCath_physic3_L"+std::to_string(l),
 		subStackLogic,
@@ -1252,7 +1266,7 @@ for(int l=0;l<nLayers;l++){
 
 	new G4PVPlacement(
 		0,
-		G4ThreeVector(-barShift,barShift,-(3-2*l)*(LeadZ+wrapZ)-(2-l)*height_pmt+scintZ+height_pmt/2),
+		G4ThreeVector(-barShift,barShift,-7.5*cm-3*wrapZ-2*height_pmt+barSep*l-scintZ-height_pmt/2+zShift),
 		pmtLog,
 		"pmt_physic3_L"+std::to_string(l),
 		subStackLogic,
@@ -1262,7 +1276,7 @@ for(int l=0;l<nLayers;l++){
 //////////////
 	new G4PVPlacement(
 		0,
-		G4ThreeVector(-barShift,-barShift,-(3-2*l)*(LeadZ+wrapZ)-(2-l)*height_pmt),
+		G4ThreeVector(-barShift,-barShift,-7.5*cm-3*wrapZ-2*height_pmt+barSep*l+zShift),
 		wrap_logic,
 		"wrap_physic4_L"+std::to_string(l),
 		subStackLogic,
@@ -1272,7 +1286,7 @@ for(int l=0;l<nLayers;l++){
 
 	new G4PVPlacement(
 		0,
-		G4ThreeVector(-barShift,-barShift,-(3-2*l)*(LeadZ+wrapZ)-(2-l)*height_pmt+scintZ+height_pmt/2),
+		G4ThreeVector(-barShift,-barShift,-7.5*cm-3*wrapZ-2*height_pmt+barSep*l-scintZ-height_pmt/2+zShift),
 		phCathLog,
 		"phCath_physic4_L"+std::to_string(l),
 		subStackLogic,
@@ -1282,46 +1296,25 @@ for(int l=0;l<nLayers;l++){
 
 	new G4PVPlacement(
 		0,
-		G4ThreeVector(-barShift,-barShift,-(3-2*l)*(LeadZ+wrapZ)-(2-l)*height_pmt+scintZ+height_pmt/2),
+		G4ThreeVector(-barShift,-barShift,-7.5*cm-3*wrapZ-2*height_pmt+barSep*l-scintZ-height_pmt/2+zShift),
 		pmtLog,
 		"pmt_physic4_L"+std::to_string(l),
 		subStackLogic,
 		false,
 		4,
 		true);
-
-	//place lead shielding in between layers
-        if(l!=0){
-                 new G4PVPlacement(
-                        0,
-                        G4ThreeVector(0,0,-(3-2*l)*(LeadZ+wrapZ)-(2-l)*height_pmt+scintZ+height_pmt+LeadZ),
-                        LeadShieldLogic,
-                        "LeadShieldPhys"+std::to_string(l),
-                        //logicWorld,
-                        subStackLogic,
-                        false,
-                        l,
-                        true);
-                     }
 	
        //////// place three scintillator panels: one above, one on each side (rotated by 10 deg.)
 	if(l%2==1){
-	topZ = -(3-2*((double)l-0.5))*(LeadZ+wrapZ)-(2-((double)l-0.5))*height_pmt+37*cm+2*centerOffsetZ;
-	//topZ = -(3-2*((double)l-0.5))*(LeadZ+wrapZ)-(2-((double)l-0.5))*height_pmt+37*cm+2*centerOffsetZ;
-	//topZ = -(3-2*((double)l-0.5))*(LeadZ+wrapZ)-(2-((double)l-0.5))*height_pmt+10*cm+2*centerOffsetZ;
-	leftZ = -(3-2*((double)l-0.5))*(LeadZ+wrapZ)-(2-((double)l-0.5))*height_pmt-5*cm+centerOffsetZ*0.77;
-	//leftZ = -(3-2*((double)l-0.5))*(LeadZ+wrapZ)-(2-((double)l-0.5))*height_pmt-5*cm+centerOffsetZ*0.77;
-	//leftZ = -(3-2*((double)l-0.5))*(LeadZ+wrapZ)-(2-((double)l-0.5))*height_pmt-10*cm+centerOffsetZ*0.77;
+	topZ = 86*cm*l+centerOffsetZ+frontLayerMid-5.9*cm-3.7*cm; //-5.9cm is flush. 3.7cm from Sam's model
+	if(l==1) topZ+=0.5*cm; //since the panels are 1.5cm apart, rather than 2cm, we adjust for that here
+	leftZ = topZ;
 	rightZ = leftZ;
-	botZ = -(3-2*((double)l-0.5))*(LeadZ+wrapZ)-(2-((double)l-0.5))*height_pmt+5*cm+centerOffsetZ*0.7;
-	//botZ = -(3-2*((double)l-0.5))*(LeadZ+wrapZ)-(2-((double)l-0.5))*height_pmt+5*cm+centerOffsetZ*0.7;
-	//botZ = -(3-2*((double)l-0.5))*(LeadZ+wrapZ)-(2-((double)l-0.5))*height_pmt+20*cm+centerOffsetZ*0.7;
 	if(l==1) sign = 1;
 	else sign = -1;
 	//shift = 4*cm*sign;
 	shift = 0;//4*cm*sign;
 if(l==3){
-		topZ+=13*cm;leftZ+=13*cm;rightZ+=13*cm;botZ+=5*cm;
 		rotPanT.rotateX(180*degree);
 		rotPanR.rotateX(180*degree);
 		rotPanL.rotateX(180*degree);
@@ -1365,30 +1358,13 @@ if(l==3){
 			false,
 			nLayers*nBarXCount*nBarYCount*4+(nLayers+3)+4*l,
 			true);
-/*	
-	//below
-	new G4PVPlacement(
-			0,//rotPanel,
-			G4ThreeVector(ScintPanelOffsetXBottom-shift,0,botZ),
-			ScintPanelWrapLogic,
-			"ScintPanelBottom"+std::to_string(l),
-			//logicWorld,
-			detectorWorldLogic,
-			false,
-			nLayers*nBarXCount*nBarYCount*4+(nLayers+4)+4*l,
-			true);
-*/
 	//PMTs attached to upper and side scintillator panels
        	PMTPanelPlacementTop1.setZ(topZ+ScintPanelZ+height_pmt/2);
 	PMTPanelPlacementTop1.setX(ScintPanelOffsetXTop+shift);
-       	PMTPanelPlacementBottom1.setZ(botZ+ScintPanelZ+height_pmt/2);
-	PMTPanelPlacementBottom1.setX(ScintPanelOffsetXBottom-shift);
        	PMTPanelPlacementLeft1.setZ(leftZ+ScintPanelZ+height_pmt/2);
        	PMTPanelPlacementRight1.setZ(rightZ+ScintPanelZ+height_pmt/2);
        	PMTPanelPlacementTop2.setZ(topZ-ScintPanelZ-height_pmt/2);
 	PMTPanelPlacementTop2.setX(ScintPanelOffsetXTop+shift);
-       	PMTPanelPlacementBottom2.setZ(botZ-ScintPanelZ-height_pmt/2);
-	PMTPanelPlacementBottom2.setX(ScintPanelOffsetXBottom-shift);
        	PMTPanelPlacementLeft2.setZ(leftZ-ScintPanelZ-height_pmt/2);
        	PMTPanelPlacementRight2.setZ(rightZ-ScintPanelZ-height_pmt/2);
 
@@ -1558,10 +1534,15 @@ if(l==1){
 	}
 
 }
-double slabshiftback=35*cm;
-double slabshiftfront=35*cm;
+	double slabshiftback=57.5*cm-13.5*cm; //57.5 is flush //add an extra 21.5cm from Sam's model
+        double slabshiftfront=34.5*cm+42.1*cm; //34.5 is flush //19.5cm+pmt_height //47.3cm from Sam's model
+        G4RotationMatrix* rotSlabBot = new G4RotationMatrix();
+	G4RotationMatrix* rotSlabTop = new G4RotationMatrix();
+	rotSlabTop->rotateZ(180*degree);
+
+
 	//place extra scintillator slab at the front
-        new G4PVPlacement(
+        new G4PVPlacement(                        
                         0,
                         //G4ThreeVector(-wallCylRadius+6*cm,0,-std::cos(worldRotation)*detLength+80*cm),
                         G4ThreeVector(0,0,-detLength/2-slabshiftfront),
@@ -1573,8 +1554,8 @@ double slabshiftfront=35*cm;
                         nLayers*nBarXCount*nBarYCount*4+nLayers-1,
                         true);
 	//place extra scintillator slab at the end
-        new G4PVPlacement(
-                        0,
+        new G4PVPlacement(                        
+                        rotSlabTop,
                         //G4ThreeVector(wallCylRadius-35*cm,0,std::cos(worldRotation)*detLength-212*cm),
                         G4ThreeVector(0,0,detLength/2-slabshiftback),
                         ScintSlabWrapLogic,
@@ -1586,8 +1567,10 @@ double slabshiftfront=35*cm;
                         true);
        	//G4ThreeVector PMTSlabPlacementBot1(-wallCylRadius+6*cm,-ScintSlabY-height_pmt/2,-std::cos(worldRotation)*detLength+80*cm+ScintSlabZ-outerRadius_pmt);
        	//G4ThreeVector PMTSlabPlacementTop1(wallCylRadius-35*cm,-ScintSlabY-height_pmt/2,std::cos(worldRotation)*detLength-212*cm+ScintSlabZ-outerRadius_pmt);
-       	G4ThreeVector PMTSlabPlacementBot1(0,-ScintSlabY-height_pmt/2,-detLength/2-slabshiftfront);
-       	G4ThreeVector PMTSlabPlacementTop1(0,-ScintSlabY-height_pmt/2,detLength/2-slabshiftback);
+       	G4ThreeVector PMTSlabPlacementBot1(ScintSlabY+height_pmt/2,0,-detLength/2-slabshiftfront);
+       	G4ThreeVector PMTSlabPlacementTop1(-ScintSlabY-height_pmt/2,0,detLength/2-slabshiftback);
+       	//G4ThreeVector PMTSlabPlacementBot1(0,-ScintSlabY-height_pmt/2,-detLength/2-slabshiftfront);
+       	//G4ThreeVector PMTSlabPlacementTop1(0,-ScintSlabY-height_pmt/2,detLength/2-slabshiftback);
 	//top slab
 ///*
 	new G4PVPlacement(
@@ -1631,6 +1614,7 @@ double slabshiftfront=35*cm;
 			false,
 			nLayers*nBarXCount*nBarYCount*4+(nLayers+1)+4*4+2+10,
 			true);
+//*/
        	G4ThreeVector PMTSlabPlacementBot2(0,ScintSlabY+height_pmt/2,-detLength/2-slabshiftfront);
        	G4ThreeVector PMTSlabPlacementTop2(0,ScintSlabY+height_pmt/2,detLength/2-slabshiftback);
        	//G4ThreeVector PMTSlabPlacementBot2(-wallCylRadius+6*cm,ScintSlabY+height_pmt/2,-std::cos(worldRotation)*detLength+80*cm-ScintSlabZ+outerRadius_pmt);
@@ -1694,14 +1678,15 @@ double slabshiftfront=35*cm;
 	mqBarParameterisation* barParam = new mqBarParameterisation(
 			nBarXCount,
 			nBarYCount, 
-			-38*cm, //z offset
+			-38*cm-zShift, //z offset
+			//-38*cm, //z offset
 			barAngleDelta,
 			interactionDist,
 			barSpacingXY, //actually not using either of these two bottom parameters now, but we could if bars are different sizes
 			worldRotation);
 
 	G4PVParameterised* barParamPhys= new G4PVParameterised("barParamPhys",
-			subStackLogic,
+			subStackLogicAl,
 			barStack_logic,
 			kZAxis,
 			nBarXCount*nBarYCount,
@@ -1986,6 +1971,12 @@ G4LogicalVolume* muMetalShield_logic = new G4LogicalVolume(
 	visAttribMuMetal->SetColour(0,0,0,0.1);
 	visAttribMuMetal->SetVisibility(true);
 	
+	G4VisAttributes* visAttribAl = new G4VisAttributes(
+			G4Colour::Gray());
+	visAttribAl->SetColour(0,0.2,0.35,0.3);
+	visAttribAl->SetVisibility(true);
+	visAttribAl->SetForceWireframe(true);
+	
 
 	wrap_logic->SetVisAttributes(visAttribWrap);
 	ScintPanelWrapLogic->SetVisAttributes(visAttribWrapExt);
@@ -2001,95 +1992,18 @@ G4LogicalVolume* muMetalShield_logic = new G4LogicalVolume(
 	//HodoScintLogic->SetVisAttributes(visAttribplScinExt);
 
 		
-	LeadShieldLogic->SetVisAttributes(visAttribWrapExt);//Lead);
 //	muMetalShield_logic->SetVisAttributes(visAttribMuMetal);
 	//detectorWorldLogic->SetVisAttributes(visAttribWrapExt);
 	detectorWorldLogic->SetVisAttributes(visAttWorld);
 //	detectorWorldLogic->SetVisAttributes(visAttribWrapExt);
 //	subStackLogic->SetVisAttributes(visAttribplScin);	
-//	subStackLogic->SetVisAttributes(visAttribplScin);	
+	subStackLogicAl->SetVisAttributes(visAttribAl);
 	subStackLogic->SetVisAttributes(visAttWorld);	
 //	barStack_logic->SetVisAttributes(visAttribplScin);	
 //	barStack_logic->SetVisAttributes(visAttribWrapExt);	
 	barStack_logic->SetVisAttributes(visAttWorld);	
 ////////////////////////////////////////////////////////////////////////////
 // Long Al Support Placement
-if(SupportStructure){
-        G4Box* AlSupportSolidFull = new G4Box("AlSupportSolidFull",
-                                                AlSupportX,
-                                                AlSupportY,
-                                                AlSupportZ);
-
-        G4Box* AlSupportSolidHollow = new G4Box("AlSupportSolidHollow",
-                                                AlSupportX-AlThickness,
-                                                AlSupportY-AlThickness,
-                                                AlSupportZ-AlThickness);
-
-	G4SubtractionSolid* AlSupportSolid = new G4SubtractionSolid("AlSupportSolid",
-						AlSupportSolidFull,
-						AlSupportSolidHollow,
-						rot, //unrotated
-						G4ThreeVector(0,0,0));
-
-        G4LogicalVolume* AlSupportLogic = new G4LogicalVolume(
-                                                AlSupportSolid,
-                                                AlMat,
-                                                //steelMat,
-                                                "AlSupportLogic",
-                                                0,0,0);
-
-        G4PVPlacement* AlSupportPhys = new G4PVPlacement(
-                                        0,
-                                        G4ThreeVector(AlSupportXOffset,0,0),
-                                        AlSupportLogic,
-                                        "AlSupportPhys",
-                                        //logicWorld,
-					detectorWorldLogic,
-                                        false,
-                                        0,
-                                        true);
-	G4VisAttributes* visAttribAl = new G4VisAttributes(
-			G4Colour::Gray());
-	visAttribAl->SetVisibility(true);	
-	AlSupportLogic->SetVisAttributes(visAttribAl);
-
-// add in box nearby, made of steel, representing the support structure
-/*
-	G4Box* SteelSupportBoxFull = new G4Box("SteelSupportBoxFull",
-					SteelSideLength,
-					SteelSideLength,
-					SteelSideLength);
-
-	G4Box* SteelSupportBoxHollow = new G4Box("SteelSupportBoxHollow",
-					SteelSideLength-SteelThickness,
-					SteelSideLength-SteelThickness,
-					SteelSideLength-SteelThickness);
-	
-	G4SubtractionSolid* SteelSupportBox = new G4SubtractionSolid("SteelSupportBox",
-					SteelSupportBoxFull,
-					SteelSupportBoxHollow,
-					rot,
-					G4ThreeVector(0,0,0));
-
-	G4LogicalVolume* SteelSupportLogic = new G4LogicalVolume(
-					SteelSupportBox,
-					steelMat,
-					"SteelSupportLogic",
-					0,0,0);
-
-	G4PVPlacement* SteelSupportPhys = new G4PVPlacement(
-					0,
-					G4ThreeVector(SteelSupportOffsetX,0,SteelSupportOffsetZ),
-					SteelSupportLogic,
-					"SteelSupportPhys",
-					logicWorld,
-					false,
-					0,
-					true);
-
-	SteelSupportLogic->SetVisAttributes(visAttribAl);
-/=*/
-}
 
 
 /*//////////////////////////////////////////////////////////////////////////////////////////////////////

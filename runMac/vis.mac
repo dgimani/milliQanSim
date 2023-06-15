@@ -13,7 +13,7 @@
 /run/initialize
 /vis/drawVolume
 /vis/viewer/flush
-#/vis/viewer/zoomTo 3
+/vis/viewer/zoomTo 3.5
 #/vis/viewer/panTo -1
 
 
