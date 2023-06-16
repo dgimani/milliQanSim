@@ -420,26 +420,27 @@ G4VPhysicalVolume* mqDetectorConstruction::SetupGeometry() {
 	detRot->rotateY(worldRotation); //worldRotation-45*degree
 	//first 4 vertices are +z, next four are -z
 	std::vector<G4TwoVector> vertices;
-	vertices.push_back(G4TwoVector(nBarsX*barSpacingXY/2+28*cm,detLength/2+centerOffsetZ*2.4+scintZ+height_pmt/2-4*cm+60*cm));
-	vertices.push_back(G4TwoVector(nBarsX*barSpacingXY/2+28*cm,-detLength/2-scintZ-height_pmt/2+4*cm-30*cm));
-	vertices.push_back(G4TwoVector(-nBarsX*barSpacingXY/2-28*cm,-detLength/2-centerOffsetZ*2.4-scintZ-height_pmt/2+4*cm-30*cm));
-	vertices.push_back(G4TwoVector(-nBarsX*barSpacingXY/2-28*cm,detLength/2+scintZ+height_pmt/2-4*cm+60*cm));
-	vertices.push_back(G4TwoVector(nBarsX*barSpacingXY/2+28*cm,detLength/2+centerOffsetZ*2.4+scintZ+height_pmt/2-4*cm+60*cm));
-	vertices.push_back(G4TwoVector(nBarsX*barSpacingXY/2+28*cm,-detLength/2-scintZ-height_pmt/2+4*cm-30*cm));
-	vertices.push_back(G4TwoVector(-nBarsX*barSpacingXY/2-28*cm,-detLength/2-centerOffsetZ*2.4-scintZ-height_pmt/2+4*cm-30*cm));
-	vertices.push_back(G4TwoVector(-nBarsX*barSpacingXY/2-28*cm,detLength/2+scintZ+height_pmt/2-4*cm+60*cm));
+	vertices.push_back(G4TwoVector(nBarsX*barSpacingXY/2+28*cm,detLength/2+centerOffsetZ*2.4+scintZ+height_pmt/2-4*cm+30*cm));
+	vertices.push_back(G4TwoVector(nBarsX*barSpacingXY/2+28*cm,-detLength/2-scintZ-height_pmt/2+4*cm-60*cm));
+	vertices.push_back(G4TwoVector(-nBarsX*barSpacingXY/2-28*cm,-detLength/2-centerOffsetZ*2.4-scintZ-height_pmt/2+4*cm-60*cm));
+	vertices.push_back(G4TwoVector(-nBarsX*barSpacingXY/2-28*cm,detLength/2+scintZ+height_pmt/2-4*cm+30*cm));
+	vertices.push_back(G4TwoVector(nBarsX*barSpacingXY/2+28*cm,detLength/2+centerOffsetZ*2.4+scintZ+height_pmt/2-4*cm+30*cm));
+	vertices.push_back(G4TwoVector(nBarsX*barSpacingXY/2+28*cm,-detLength/2-scintZ-height_pmt/2+4*cm-50*cm));
+	vertices.push_back(G4TwoVector(-nBarsX*barSpacingXY/2-28*cm,-detLength/2-centerOffsetZ*2.4-scintZ-height_pmt/2+4*cm-60*cm));
+	vertices.push_back(G4TwoVector(-nBarsX*barSpacingXY/2-28*cm,detLength/2+scintZ+height_pmt/2-4*cm+30*cm));
+
 /*	
-	vertices.push_back(G4TwoVector(nBarsX*barSpacingXY/2+28*cm,detLength/2+centerOffsetZ*2.4+scintZ+height_pmt/2-4*cm+40*cm));
+	vertices.push_back(G4TwoVector(nBarsX*barSpacingXY/2+28*cm,detLength/2+centerOffsetZ*2.4+scintZ+height_pmt/2-4*cm+60*cm));
 	vertices.push_back(G4TwoVector(nBarsX*barSpacingXY/2+28*cm,-detLength/2-scintZ-height_pmt/2+4*cm-30*cm));
 	vertices.push_back(G4TwoVector(-nBarsX*barSpacingXY/2-28*cm,-detLength/2-centerOffsetZ*2.4-scintZ-height_pmt/2+4*cm-30*cm));
-	vertices.push_back(G4TwoVector(-nBarsX*barSpacingXY/2-28*cm,detLength/2+scintZ+height_pmt/2-4*cm+40*cm));
-	vertices.push_back(G4TwoVector(nBarsX*barSpacingXY/2+28*cm,detLength/2+centerOffsetZ*2.4+scintZ+height_pmt/2-4*cm+40*cm));
+	vertices.push_back(G4TwoVector(-nBarsX*barSpacingXY/2-28*cm,detLength/2+scintZ+height_pmt/2-4*cm+60*cm));
+	vertices.push_back(G4TwoVector(nBarsX*barSpacingXY/2+28*cm,detLength/2+centerOffsetZ*2.4+scintZ+height_pmt/2-4*cm+60*cm));
 	vertices.push_back(G4TwoVector(nBarsX*barSpacingXY/2+28*cm,-detLength/2-scintZ-height_pmt/2+4*cm-30*cm));
 	vertices.push_back(G4TwoVector(-nBarsX*barSpacingXY/2-28*cm,-detLength/2-centerOffsetZ*2.4-scintZ-height_pmt/2+4*cm-30*cm));
-	vertices.push_back(G4TwoVector(-nBarsX*barSpacingXY/2-28*cm,detLength/2+scintZ+height_pmt/2-4*cm+40*cm));
+	vertices.push_back(G4TwoVector(-nBarsX*barSpacingXY/2-28*cm,detLength/2+scintZ+height_pmt/2-4*cm+60*cm));
 */
 	G4GenericTrap* detectorWorldSolidovr = new G4GenericTrap("detectorWorldSolidovr",
-				overallDetY/2+5*cm,
+				overallDetY/2-5*cm,
 				vertices);	
 	G4Box* detectorWorldSolidsub = new G4Box("detectorWorldSolidsub",
 				overallDetX/100,
@@ -776,6 +777,7 @@ G4VPhysicalVolume* mqDetectorConstruction::SetupGeometry() {
 	G4RotationMatrix rotPanL = G4RotationMatrix();
 	G4RotationMatrix rotPanR = G4RotationMatrix();
 	G4RotationMatrix rotPanT = G4RotationMatrix();
+	rotPanT.rotateX(180*degree);
 	rotPanR.rotateX(180*degree);
 	rotPanR.rotateZ(90*degree);
 	rotPanL.rotateY(180*degree);
@@ -796,16 +798,7 @@ G4VPhysicalVolume* mqDetectorConstruction::SetupGeometry() {
 	//detRot->rotateZ(-worldRotation); //worldRotation-45*degree
 	//first 4 vertices are +z, next four are -z
 	std::vector<G4TwoVector> verticesBarStack;
-	/*
-	verticesBarStack.push_back(G4TwoVector(nBarsX*barSpacingXY/2+5*cm,detLength/2+centerOffsetZ*1+scintZ+height_pmt/2-30*cm));
-	verticesBarStack.push_back(G4TwoVector(nBarsX*barSpacingXY/2+5*cm,-detLength/2-scintZ-height_pmt/2+30*cm));
-	verticesBarStack.push_back(G4TwoVector(-nBarsX*barSpacingXY/2-5*cm,-detLength/2-centerOffsetZ*1-scintZ-height_pmt/2+30*cm));
-	verticesBarStack.push_back(G4TwoVector(-nBarsX*barSpacingXY/2-5*cm,detLength/2+scintZ+height_pmt/2-30*cm));
-	verticesBarStack.push_back(G4TwoVector(nBarsX*barSpacingXY/2+5*cm,detLength/2+centerOffsetZ*1+scintZ+height_pmt/2-30*cm));
-	verticesBarStack.push_back(G4TwoVector(nBarsX*barSpacingXY/2+5*cm,-detLength/2-scintZ-height_pmt/2+30*cm));
-	verticesBarStack.push_back(G4TwoVector(-nBarsX*barSpacingXY/2-5*cm,-detLength/2-centerOffsetZ*1-scintZ-height_pmt/2+30*cm));
-	verticesBarStack.push_back(G4TwoVector(-nBarsX*barSpacingXY/2-5*cm,detLength/2+scintZ+height_pmt/2-30*cm));
-	*/
+/*
 	verticesBarStack.push_back(G4TwoVector(nBarsX*barSpacingXY/2+5*cm,detLength/2+5*cm+scintZ+height_pmt/2-52*cm));
 	verticesBarStack.push_back(G4TwoVector(nBarsX*barSpacingXY/2+5*cm,-detLength/2-5*cm-scintZ-height_pmt/2+65*cm));
 	verticesBarStack.push_back(G4TwoVector(-nBarsX*barSpacingXY/2-5*cm,-detLength/2-5*cm-scintZ-height_pmt/2+65*cm));
@@ -814,9 +807,18 @@ G4VPhysicalVolume* mqDetectorConstruction::SetupGeometry() {
 	verticesBarStack.push_back(G4TwoVector(nBarsX*barSpacingXY/2+5*cm,-detLength/2-5*cm-scintZ-height_pmt/2+65*cm));
 	verticesBarStack.push_back(G4TwoVector(-nBarsX*barSpacingXY/2-5*cm,-detLength/2-5*cm-scintZ-height_pmt/2+65*cm));
 	verticesBarStack.push_back(G4TwoVector(-nBarsX*barSpacingXY/2-5*cm,detLength/2+5*cm+scintZ+height_pmt/2-52*cm));
+*/
+	verticesBarStack.push_back(G4TwoVector(nBarsX*barSpacingXY/2+4*cm,detLength/2+5*cm+scintZ+height_pmt/2-47*cm));
+	verticesBarStack.push_back(G4TwoVector(nBarsX*barSpacingXY/2+4*cm,-detLength/2-5*cm-scintZ-height_pmt/2+30*cm));
+	verticesBarStack.push_back(G4TwoVector(-nBarsX*barSpacingXY/2-4*cm,-detLength/2-5*cm-scintZ-height_pmt/2+30*cm));
+	verticesBarStack.push_back(G4TwoVector(-nBarsX*barSpacingXY/2-4*cm,detLength/2+5*cm+scintZ+height_pmt/2-47*cm));
+	verticesBarStack.push_back(G4TwoVector(nBarsX*barSpacingXY/2+4*cm,detLength/2+5*cm+scintZ+height_pmt/2-47*cm));
+	verticesBarStack.push_back(G4TwoVector(nBarsX*barSpacingXY/2+4*cm,-detLength/2-5*cm-scintZ-height_pmt/2+30*cm));
+	verticesBarStack.push_back(G4TwoVector(-nBarsX*barSpacingXY/2-4*cm,-detLength/2-5*cm-scintZ-height_pmt/2+30*cm));
+	verticesBarStack.push_back(G4TwoVector(-nBarsX*barSpacingXY/2-4*cm,detLength/2+5*cm+scintZ+height_pmt/2-47*cm));
 
 	G4GenericTrap* barStack_solidovr = new G4GenericTrap("barStack_solidovr",
-				nBarsY*barSpacingXY/2+1*cm,
+				nBarsY*barSpacingXY/2+6*cm,
 				verticesBarStack);
 /*	
 	G4Box* detectorWorldSolidsub = new G4Box("detectorWorldSolidsub",
@@ -1322,9 +1324,11 @@ if(l==3){
 //if(l==3){topZ+=3*cm;leftZ+=3*cm;rightZ+=3*cm;botZ+=5*cm;}
 
 	//top
+			panelPlace=G4ThreeVector(ScintPanelOffsetXTop+shift,0,topZ);
 		new G4PVPlacement(
-			0,//rotPanel,
-			G4ThreeVector(ScintPanelOffsetXTop+shift,0,topZ),
+			G4Transform3D(rotPanT,panelPlace),
+			//0,//rotPanel,
+			//G4ThreeVector(ScintPanelOffsetXTop+shift,0,topZ),
 			ScintPanelWrapLogic,
 			"ScintPanelTop"+std::to_string(l),
 			//logicWorld,
@@ -2001,7 +2005,7 @@ G4LogicalVolume* muMetalShield_logic = new G4LogicalVolume(
 	subStackLogic->SetVisAttributes(visAttWorld);	
 //	barStack_logic->SetVisAttributes(visAttribplScin);	
 //	barStack_logic->SetVisAttributes(visAttribWrapExt);	
-	barStack_logic->SetVisAttributes(visAttWorld);	
+	barStack_logic->SetVisAttributes(visAttWorld);
 ////////////////////////////////////////////////////////////////////////////
 // Long Al Support Placement
 
