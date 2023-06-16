@@ -169,8 +169,8 @@ G4VPhysicalVolume* mqDetectorConstruction::SetupGeometry() {
 	G4double scintXY = 50/2*mm;
 	G4double scintZ  = 800/2*mm;//(each of these dimensions represents the half-width; e.g. this is 600mm long)
 
-	G4double airGapThickness = 0.2*mm; //1*mm
-	G4double wrapThickness = 0.15*mm; //3*mm
+	G4double airGapThickness = 0.05*cm; //0.2*mm; //1*mm
+	G4double wrapThickness = 0.05*cm; //0.15*mm; //3*mm
 	G4double airgapX = scintX+airGapThickness;	
 	G4double airgapY = scintY+airGapThickness;	
 	G4double airgapXY = scintXY+airGapThickness;	
@@ -284,9 +284,10 @@ G4VPhysicalVolume* mqDetectorConstruction::SetupGeometry() {
 	 G4double wallCylRadius = 1.45*m;//1.8*m;
 	 G4double wallCylRadiusOut = wallCylRadius+wallThickness;
 	 G4double wallZ = 15*m/2;
-
-	 G4double floorCutoutDepthX = (10*cm+wallCylRadius)/2;
-	 G4double floorCutoutDepthY = (-20*cm+wallCylRadius);
+         
+	 G4double floorCutoutDepthX = (14*cm+(7*2.54*cm-5*cm)+wallCylRadius)/2;
+         G4double floorCutoutDepthY = (-20*cm+wallCylRadius);
+	 
 	 G4double floorZ = wallZ;
 
 	 G4double overallDetX = ScintPanelOffsetXTop+ScintPanelX+120*cm; //adding larger buffer to get volume above and below
@@ -394,58 +395,58 @@ G4VPhysicalVolume* mqDetectorConstruction::SetupGeometry() {
 				0,
 				true);
 */
+	G4RotationMatrix* rot = new G4RotationMatrix(); //just an unrotated matrix used where this can't be a 0 arg
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //Rock to be penetrated by muons as a test. Turn this off by commenting out the placement line below
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-//	G4RotationMatrix* wallRot = new G4RotationMatrix();
-//	wallRot->rotateY(43.1*deg);
-	G4Tubs* wallsCyl = new G4Tubs("wallsCyl",
-				wallCylRadius, //rMin
-				wallCylRadiusOut, //rMax
-				wallZ, //half-Z
-				0*deg,
-				360*deg);
+//      G4RotationMatrix* wallRot = new G4RotationMatrix();
+//      wallRot->rotateY(43.1*deg);
 
-	G4Box* floorCutout = new G4Box("floorCutout",
-				floorCutoutDepthX,
-				floorCutoutDepthY,
-				floorZ-10*cm);
+        G4Tubs* wallsCyl = new G4Tubs("wallsCyl",
+                                wallCylRadius, //rMin
+                                wallCylRadiusOut, //rMax
+                                wallZ, //half-Z
+                                0*deg,
+                                360*deg);
 
-	G4RotationMatrix* rot = new G4RotationMatrix();
-	G4SubtractionSolid* rockSolid = new G4SubtractionSolid("rockWalls",
-				wallsCyl,
-				floorCutout,
-				rot,
-				G4ThreeVector(-floorCutoutDepthX,0,0));
-				//G4ThreeVector(0,0,0));
+        G4Box* floorCutout = new G4Box("floorCutout",
+                                floorCutoutDepthX,
+                                floorCutoutDepthY,
+                                floorZ-10*cm);
+
+        G4SubtractionSolid* rockSolid = new G4SubtractionSolid("rockWalls",
+                                wallsCyl,
+                                floorCutout,
+                                rot,
+                                G4ThreeVector(-floorCutoutDepthX,0,0));
+                                //G4ThreeVector(0,0,0));
 ///*
-/*
-	G4Box* rockSolid = new G4Box("rockSolid",
-				2*m/2,
-				15*m/2,
-				15*m/2);
-*/
-	G4LogicalVolume* rockLogic = new G4LogicalVolume(
-				rockSolid,
-				//
-				//silicaMat,
-				concreteMat,
-				//PbMat, //testing muon-induced neutrons
-				"rockLogic",
-				0,0,0);
+        G4LogicalVolume* rockLogic = new G4LogicalVolume(
+                                rockSolid,
+                                //
+                                //silicaMat,
+                                concreteMat,
+                                //PbMat, //testing muon-induced neutrons
+                                "rockLogic",
+                                0,0,0);
 ////////////////////////////////////////////// TURN CAVERN ON/OFF BY COMMENTING OR UNCOMMENTING THIS CODE BLOCK /////////////////////
 ///*
-	G4PVPlacement* rockPhysic = new G4PVPlacement(
-				rot,
-				//wallRot,
-				//G4ThreeVector(50*cm,0,0),//muonLoc: 20*cm+ScintSlabOffsetZEnd+ScintSlabZ+scintZ), //20cm from end of slab, plus add space for slabZ and bar thickness
-				G4ThreeVector(10*cm,0,0),//10 cm looks about right, so I'm using that as the cavern offset (so the floor is close to the bottom of the detector)
-				rockLogic,
-				"rockPhysic",
-				logicWorld,
-				false,
-				0,
-				true);
+        G4PVPlacement* rockPhysic = new G4PVPlacement(
+                                rot,
+                                //wallRot,
+                                //G4ThreeVector(50*cm,0,0),//muonLoc: 20*cm+ScintSlabOffsetZEnd+ScintSlabZ+scintZ), //20cm from end of slab, plus add space for slabZ and bar thickness
+                                //G4ThreeVector(6*cm,0,0),//6cm is flush. from measurements from Neha and Teresa, shift is 4in
+                                //G4ThreeVector(10*cm,0,0),//6cm is flush. from measurements from Neha and Teresa, shift is 4in
+                                G4ThreeVector(37.3*cm-6.5*2.54*cm,-23*2.54*cm,0),//37.3cm is flush in X. y offset from neha and teresa
+                                //G4ThreeVector(37.3*cm-6.5*2.54*cm,-23*2.54*cm,0),//37.3cm is flush in X. y offset from neha and teresa
+                                rockLogic,
+                                "rockPhysic",
+                                logicWorld,
+                                false,
+                                0,
+                                true);
+
 //*/
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ///*	
@@ -875,8 +876,7 @@ for(int z=0;z<nslabsz;z++){
 	//place scintillator slabs between layers
 	new G4PVPlacement(
 			rotSlabPlace, //-15, -30 worked kinda
-			G4ThreeVector(ScintSlabOffsetX+pow(-1,(z+1)%2)*(outerRadius_pmt+1*cm)-(ScintSlabPlaceZ-ScintSlabWrapX+1*cm/2)*sin(worldRotation),centerOffsetY+(y-(double)(nslabsy-1)/2)*(2*ScintSlabWrapY+2/2*cm),(ScintSlabPlaceZ*cos(worldRotation)+(z-(double)(nslabsz-1)/2)*2*ScintSlabWrapX+((double)(nslabsz-1)/2-z)*1*cm)),
-			//G4ThreeVector(ScintSlabOffsetX+pow(-1,(z+1)%2)*(outerRadius_pmt+1/2*cm)-(ScintSlabPlaceZ-ScintSlabWrapX+1*cm/2)*sin(worldRotation),(y-(double)(nslabsy-1)/2)*(ScintSlabWrapY+1/2*cm),(ScintSlabPlaceZ+2*(z-(double)(nslabsz-1)/2)*ScintSlabWrapX+((double)(nslabsz-1)/2-z)*1*cm)*cos(worldRotation)),
+			G4ThreeVector(ScintSlabOffsetX+pow(-1,(z+1)%2)*(ScintSlabWrapZ+0.5/2*2.54*cm)+i*(ScintSlabWrapZ*3+20*2.54*cm)-(frontLayerMid+ScintSlabOffsetZ0-ScintSlabWrapX+1*cm/2)*sin(worldRotation),centerOffsetY+(y-(double)(nslabsy-1)/2)*(2*ScintSlabWrapY+0.25*2.54*cm),(i*40*2.54*cm+(frontLayerMid+ScintSlabOffsetZ0)*cos(worldRotation)+(z-(double)(nslabsz-1)/2)*2*ScintSlabWrapX+((double)(nslabsz-1)/2-z)*4.5*2.54*cm)), //quarter inch spacing in y between slabs, 4.5in overlap. other measurements integrated also.
 			ScintSlabWrapLogic,
 			"ScintSlabPhys"+std::to_string(i)+std::to_string(z)+std::to_string(y),
 			logicWorld,
@@ -1227,8 +1227,8 @@ for(int z=0;z<nslabsz;z++){
 	//PMTs attached to slabs
 	new G4PVPlacement(
 			pmtRotSlab, //pmtRotSlabPlace
-                        G4ThreeVector(ScintSlabOffsetX+pow(-1,(z+1)%2)*(outerRadius_pmt+1*cm)-(ScintSlabPlaceZ-ScintSlabWrapX+1*cm/2)*sin(worldRotation),pmtOffsetY+centerOffsetY+(y-(double)(nslabsy-1)/2)*(2*ScintSlabWrapY+2/2*cm),(ScintSlabPlaceZ*cos(worldRotation)+(z-(double)(nslabsz-1)/2)*2*ScintSlabWrapX+((double)(nslabsz-1)/2-z)*1*cm)+pmtOffsetZ1),
-                        //G4ThreeVector(ScintSlabOffsetX+pow(-1,(z+1)%2)*(outerRadius_pmt+1*cm)-(ScintSlabPlaceZ-ScintSlabWrapX+1*cm/2)*sin(worldRotation),centerOffsetY+(y-(double)(nslabsy-1)/2)*(2*ScintSlabWrapY+2/2*cm),(ScintSlabPlaceZ*cos(worldRotation)+(z-(double)(nslabsz-1)/2)*2*ScintSlabWrapX+((double)(nslabsz-1)/2-z)*1*cm)+pmtOffsetZ),
+                        //G4ThreeVector(ScintSlabOffsetX+pow(-1,(z+1)%2)*(ScintSlabWrapZ+0.5/2*2.54*cm)-(ScintSlabPlaceZ-ScintSlabWrapX+1*cm/2)*sin(worldRotation),pmtOffsetY+centerOffsetY+(y-(double)(nslabsy-1)/2)*(2*ScintSlabWrapY+0.25*2.54*cm),(ScintSlabPlaceZ*cos(worldRotation)+(z-(double)(nslabsz-1)/2)*2*ScintSlabWrapX+((double)(nslabsz-1)/2-z)*1*cm)+pmtOffsetZ1),
+			G4ThreeVector(ScintSlabOffsetX+pow(-1,(z+1)%2)*(ScintSlabWrapZ+0.5/2*2.54*cm)+j*(ScintSlabWrapZ*3+20*2.54*cm)-(frontLayerMid+ScintSlabOffsetZ0-ScintSlabWrapX+1*cm/2)*sin(worldRotation),pmtOffsetY+centerOffsetY+(y-(double)(nslabsy-1)/2)*(2*ScintSlabWrapY+0.25*2.54*cm),(j*40*2.54*cm+(frontLayerMid+ScintSlabOffsetZ0)*cos(worldRotation)+(z-(double)(nslabsz-1)/2)*2*ScintSlabWrapX+((double)(nslabsz-1)/2-z)*4.5*2.54*cm)+pmtOffsetZ1), //quarter inch spacing in y between slabs, 4.5in overlap. other measurements integrated also.
 			phCathLog,
 		        "ScintSlabPMT"+std::to_string(j)+std::to_string(z)+std::to_string(y),
       		        logicWorld,
@@ -1238,8 +1238,8 @@ for(int z=0;z<nslabsz;z++){
 	                true);
 	new G4PVPlacement(
 			pmtRotSlab, //pmtRotSlabPlace
-                        G4ThreeVector(ScintSlabOffsetX+pow(-1,(z+1)%2)*(outerRadius_pmt+1*cm)-(ScintSlabPlaceZ-ScintSlabWrapX+1*cm/2)*sin(worldRotation),pmtOffsetY+centerOffsetY+(y-(double)(nslabsy-1)/2)*(2*ScintSlabWrapY+2/2*cm),(ScintSlabPlaceZ*cos(worldRotation)+(z-(double)(nslabsz-1)/2)*2*ScintSlabWrapX+((double)(nslabsz-1)/2-z)*1*cm)+pmtOffsetZ1),
-                        //G4ThreeVector(ScintSlabOffsetX+pow(-1,(z+1)%2)*(outerRadius_pmt+1*cm)-(ScintSlabPlaceZ-ScintSlabWrapX+1*cm/2)*sin(worldRotation),centerOffsetY+(y-(double)(nslabsy-1)/2)*(2*ScintSlabWrapY+2/2*cm),(ScintSlabPlaceZ*cos(worldRotation)+(z-(double)(nslabsz-1)/2)*2*ScintSlabWrapX+((double)(nslabsz-1)/2-z)*1*cm)+pmtOffsetZ),
+			G4ThreeVector(ScintSlabOffsetX+pow(-1,(z+1)%2)*(ScintSlabWrapZ+0.5/2*2.54*cm)+j*(ScintSlabWrapZ*3+20*2.54*cm)-(frontLayerMid+ScintSlabOffsetZ0-ScintSlabWrapX+1*cm/2)*sin(worldRotation),pmtOffsetY+centerOffsetY+(y-(double)(nslabsy-1)/2)*(2*ScintSlabWrapY+0.25*2.54*cm),(j*40*2.54*cm+(frontLayerMid+ScintSlabOffsetZ0)*cos(worldRotation)+(z-(double)(nslabsz-1)/2)*2*ScintSlabWrapX+((double)(nslabsz-1)/2-z)*4.5*2.54*cm)+pmtOffsetZ1), //quarter inch spacing in y between slabs, 4.5in overlap. other measurements integrated also.
+                        //G4ThreeVector(ScintSlabOffsetX+pow(-1,(z+1)%2)*(ScintSlabWrapZ+0.5/2*2.54*cm)-(ScintSlabPlaceZ-ScintSlabWrapX+1*cm/2)*sin(worldRotation),pmtOffsetY+centerOffsetY+(y-(double)(nslabsy-1)/2)*(2*ScintSlabWrapY+0.25*2.54*cm),(ScintSlabPlaceZ*cos(worldRotation)+(z-(double)(nslabsz-1)/2)*2*ScintSlabWrapX+((double)(nslabsz-1)/2-z)*1*cm)+pmtOffsetZ1),
 			pmtLog,
 		        "ScintSlabPMT"+std::to_string(j)+std::to_string(z)+std::to_string(y),
       		        logicWorld,
@@ -1250,8 +1250,8 @@ for(int z=0;z<nslabsz;z++){
 	
 	new G4PVPlacement(
 			pmtRotSlab, //pmtRotSlabPlace
-                        G4ThreeVector(ScintSlabOffsetX+pow(-1,(z+1)%2)*(outerRadius_pmt+1*cm)-(ScintSlabPlaceZ-ScintSlabWrapX+1*cm/2)*sin(worldRotation),-pmtOffsetY+centerOffsetY+(y-(double)(nslabsy-1)/2)*(2*ScintSlabWrapY+2/2*cm),(ScintSlabPlaceZ*cos(worldRotation)+(z-(double)(nslabsz-1)/2)*2*ScintSlabWrapX+((double)(nslabsz-1)/2-z)*1*cm)+pmtOffsetZ1),
-                        //G4ThreeVector(ScintSlabOffsetX+pow(-1,(z+1)%2)*(outerRadius_pmt+1*cm)-(ScintSlabPlaceZ-ScintSlabWrapX+1*cm/2)*sin(worldRotation),centerOffsetY+(y-(double)(nslabsy-1)/2)*(2*ScintSlabWrapY+2/2*cm),(ScintSlabPlaceZ*cos(worldRotation)+(z-(double)(nslabsz-1)/2)*2*ScintSlabWrapX+((double)(nslabsz-1)/2-z)*1*cm)+pmtOffsetZ),
+			G4ThreeVector(ScintSlabOffsetX+pow(-1,(z+1)%2)*(ScintSlabWrapZ+0.5/2*2.54*cm)+j*(ScintSlabWrapZ*3+20*2.54*cm)-(frontLayerMid+ScintSlabOffsetZ0-ScintSlabWrapX+1*cm/2)*sin(worldRotation),-pmtOffsetY+centerOffsetY+(y-(double)(nslabsy-1)/2)*(2*ScintSlabWrapY+0.25*2.54*cm),(j*40*2.54*cm+(frontLayerMid+ScintSlabOffsetZ0)*cos(worldRotation)+(z-(double)(nslabsz-1)/2)*2*ScintSlabWrapX+((double)(nslabsz-1)/2-z)*4.5*2.54*cm)+pmtOffsetZ1), //quarter inch spacing in y between slabs, 4.5in overlap. other measurements integrated also.
+                        //G4ThreeVector(ScintSlabOffsetX+pow(-1,(z+1)%2)*(ScintSlabWrapZ+0.5/2*2.54*cm)-(ScintSlabPlaceZ-ScintSlabWrapX+1*cm/2)*sin(worldRotation),-pmtOffsetY+centerOffsetY+(y-(double)(nslabsy-1)/2)*(2*ScintSlabWrapY+0.25*2.54*cm),(ScintSlabPlaceZ*cos(worldRotation)+(z-(double)(nslabsz-1)/2)*2*ScintSlabWrapX+((double)(nslabsz-1)/2-z)*1*cm)+pmtOffsetZ1),
 			phCathLog,
 		        "ScintSlabPMT"+std::to_string(j)+std::to_string(z)+std::to_string(y),
       		        logicWorld,
@@ -1261,8 +1261,8 @@ for(int z=0;z<nslabsz;z++){
 	                true);
 	new G4PVPlacement(
 			pmtRotSlab, //pmtRotSlabPlace
-                        G4ThreeVector(ScintSlabOffsetX+pow(-1,(z+1)%2)*(outerRadius_pmt+1*cm)-(ScintSlabPlaceZ-ScintSlabWrapX+1*cm/2)*sin(worldRotation),-pmtOffsetY+centerOffsetY+(y-(double)(nslabsy-1)/2)*(2*ScintSlabWrapY+2/2*cm),(ScintSlabPlaceZ*cos(worldRotation)+(z-(double)(nslabsz-1)/2)*2*ScintSlabWrapX+((double)(nslabsz-1)/2-z)*1*cm)+pmtOffsetZ1),
-                        //G4ThreeVector(ScintSlabOffsetX+pow(-1,(z+1)%2)*(outerRadius_pmt+1*cm)-(ScintSlabPlaceZ-ScintSlabWrapX+1*cm/2)*sin(worldRotation),centerOffsetY+(y-(double)(nslabsy-1)/2)*(2*ScintSlabWrapY+2/2*cm),(ScintSlabPlaceZ*cos(worldRotation)+(z-(double)(nslabsz-1)/2)*2*ScintSlabWrapX+((double)(nslabsz-1)/2-z)*1*cm)+pmtOffsetZ),
+			G4ThreeVector(ScintSlabOffsetX+pow(-1,(z+1)%2)*(ScintSlabWrapZ+0.5/2*2.54*cm)+j*(ScintSlabWrapZ*3+20*2.54*cm)-(frontLayerMid+ScintSlabOffsetZ0-ScintSlabWrapX+1*cm/2)*sin(worldRotation),-pmtOffsetY+centerOffsetY+(y-(double)(nslabsy-1)/2)*(2*ScintSlabWrapY+0.25*2.54*cm),(j*40*2.54*cm+(frontLayerMid+ScintSlabOffsetZ0)*cos(worldRotation)+(z-(double)(nslabsz-1)/2)*2*ScintSlabWrapX+((double)(nslabsz-1)/2-z)*4.5*2.54*cm)+pmtOffsetZ1), //quarter inch spacing in y between slabs, 4.5in overlap. other measurements integrated also.
+                        //G4ThreeVector(ScintSlabOffsetX+pow(-1,(z+1)%2)*(ScintSlabWrapZ+0.5/2*2.54*cm)-(ScintSlabPlaceZ-ScintSlabWrapX+1*cm/2)*sin(worldRotation),-pmtOffsetY+centerOffsetY+(y-(double)(nslabsy-1)/2)*(2*ScintSlabWrapY+0.25*2.54*cm),(ScintSlabPlaceZ*cos(worldRotation)+(z-(double)(nslabsz-1)/2)*2*ScintSlabWrapX+((double)(nslabsz-1)/2-z)*1*cm)+pmtOffsetZ1),
 			pmtLog,
 		        "ScintSlabPMT"+std::to_string(j)+std::to_string(z)+std::to_string(y),
       		        logicWorld,
@@ -1273,7 +1273,8 @@ for(int z=0;z<nslabsz;z++){
   
 	new G4PVPlacement(
 			pmtRotSlab2,
-                        G4ThreeVector(ScintSlabOffsetX+pow(-1,(z+1)%2)*(outerRadius_pmt+1*cm)-(ScintSlabPlaceZ-ScintSlabWrapX+1*cm/2)*sin(worldRotation),-pmtOffsetY+centerOffsetY+(y-(double)(nslabsy-1)/2)*(2*ScintSlabWrapY+2/2*cm),(ScintSlabPlaceZ*cos(worldRotation)+(z-(double)(nslabsz-1)/2)*2*ScintSlabWrapX+((double)(nslabsz-1)/2-z)*1*cm)+pmtOffsetZ2),
+			G4ThreeVector(ScintSlabOffsetX+pow(-1,(z+1)%2)*(ScintSlabWrapZ+0.5/2*2.54*cm)+j*(ScintSlabWrapZ*3+20*2.54*cm)-(frontLayerMid+ScintSlabOffsetZ0-ScintSlabWrapX+1*cm/2)*sin(worldRotation),-pmtOffsetY+centerOffsetY+(y-(double)(nslabsy-1)/2)*(2*ScintSlabWrapY+0.25*2.54*cm),(j*40*2.54*cm+(frontLayerMid+ScintSlabOffsetZ0)*cos(worldRotation)+(z-(double)(nslabsz-1)/2)*2*ScintSlabWrapX+((double)(nslabsz-1)/2-z)*4.5*2.54*cm)+pmtOffsetZ2), //quarter inch spacing in y between slabs, 4.5in overlap. other measurements integrated also.
+                        //G4ThreeVector(ScintSlabOffsetX+pow(-1,(z+1)%2)*(ScintSlabWrapZ+0.5/2*2.54*cm)-(ScintSlabPlaceZ-ScintSlabWrapX+1*cm/2)*sin(worldRotation),-pmtOffsetY+centerOffsetY+(y-(double)(nslabsy-1)/2)*(2*ScintSlabWrapY+0.25*2.54*cm),(ScintSlabPlaceZ*cos(worldRotation)+(z-(double)(nslabsz-1)/2)*2*ScintSlabWrapX+((double)(nslabsz-1)/2-z)*1*cm)+pmtOffsetZ2),
 			phCathLog,
 		        "ScintSlabPMT"+std::to_string(j)+std::to_string(z)+std::to_string(y),
       		        logicWorld,
@@ -1283,7 +1284,8 @@ for(int z=0;z<nslabsz;z++){
 	                true);
 	new G4PVPlacement(
 			pmtRotSlab2,
-                        G4ThreeVector(ScintSlabOffsetX+pow(-1,(z+1)%2)*(outerRadius_pmt+1*cm)-(ScintSlabPlaceZ-ScintSlabWrapX+1*cm/2)*sin(worldRotation),-pmtOffsetY+centerOffsetY+(y-(double)(nslabsy-1)/2)*(2*ScintSlabWrapY+2/2*cm),(ScintSlabPlaceZ*cos(worldRotation)+(z-(double)(nslabsz-1)/2)*2*ScintSlabWrapX+((double)(nslabsz-1)/2-z)*1*cm)+pmtOffsetZ2),
+			G4ThreeVector(ScintSlabOffsetX+pow(-1,(z+1)%2)*(ScintSlabWrapZ+0.5/2*2.54*cm)+j*(ScintSlabWrapZ*3+20*2.54*cm)-(frontLayerMid+ScintSlabOffsetZ0-ScintSlabWrapX+1*cm/2)*sin(worldRotation),-pmtOffsetY+centerOffsetY+(y-(double)(nslabsy-1)/2)*(2*ScintSlabWrapY+0.25*2.54*cm),(j*40*2.54*cm+(frontLayerMid+ScintSlabOffsetZ0)*cos(worldRotation)+(z-(double)(nslabsz-1)/2)*2*ScintSlabWrapX+((double)(nslabsz-1)/2-z)*4.5*2.54*cm)+pmtOffsetZ2), //quarter inch spacing in y between slabs, 4.5in overlap. other measurements integrated also.
+                        //G4ThreeVector(ScintSlabOffsetX+pow(-1,(z+1)%2)*(ScintSlabWrapZ+0.5/2*2.54*cm)-(ScintSlabPlaceZ-ScintSlabWrapX+1*cm/2)*sin(worldRotation),-pmtOffsetY+centerOffsetY+(y-(double)(nslabsy-1)/2)*(2*ScintSlabWrapY+0.25*2.54*cm),(ScintSlabPlaceZ*cos(worldRotation)+(z-(double)(nslabsz-1)/2)*2*ScintSlabWrapX+((double)(nslabsz-1)/2-z)*1*cm)+pmtOffsetZ2),
 			pmtLog,
 		        "ScintSlabPMT"+std::to_string(j)+std::to_string(z)+std::to_string(y),
       		        logicWorld,
@@ -1294,7 +1296,8 @@ for(int z=0;z<nslabsz;z++){
   
 	new G4PVPlacement(
 			pmtRotSlab2,
-                        G4ThreeVector(ScintSlabOffsetX+pow(-1,(z+1)%2)*(outerRadius_pmt+1*cm)-(ScintSlabPlaceZ-ScintSlabWrapX+1*cm/2)*sin(worldRotation),pmtOffsetY+centerOffsetY+(y-(double)(nslabsy-1)/2)*(2*ScintSlabWrapY+2/2*cm),(ScintSlabPlaceZ*cos(worldRotation)+(z-(double)(nslabsz-1)/2)*2*ScintSlabWrapX+((double)(nslabsz-1)/2-z)*1*cm)+pmtOffsetZ2),
+			G4ThreeVector(ScintSlabOffsetX+pow(-1,(z+1)%2)*(ScintSlabWrapZ+0.5/2*2.54*cm)+j*(ScintSlabWrapZ*3+20*2.54*cm)-(frontLayerMid+ScintSlabOffsetZ0-ScintSlabWrapX+1*cm/2)*sin(worldRotation),pmtOffsetY+centerOffsetY+(y-(double)(nslabsy-1)/2)*(2*ScintSlabWrapY+0.25*2.54*cm),(j*40*2.54*cm+(frontLayerMid+ScintSlabOffsetZ0)*cos(worldRotation)+(z-(double)(nslabsz-1)/2)*2*ScintSlabWrapX+((double)(nslabsz-1)/2-z)*4.5*2.54*cm)+pmtOffsetZ2), //quarter inch spacing in y between slabs, 4.5in overlap. other measurements integrated also.
+                        //G4ThreeVector(ScintSlabOffsetX+pow(-1,(z+1)%2)*(ScintSlabWrapZ+0.5/2*2.54*cm)-(ScintSlabPlaceZ-ScintSlabWrapX+1*cm/2)*sin(worldRotation),pmtOffsetY+centerOffsetY+(y-(double)(nslabsy-1)/2)*(2*ScintSlabWrapY+0.25*2.54*cm),(ScintSlabPlaceZ*cos(worldRotation)+(z-(double)(nslabsz-1)/2)*2*ScintSlabWrapX+((double)(nslabsz-1)/2-z)*1*cm)+pmtOffsetZ2),
 			phCathLog,
 		        "ScintSlabPMT"+std::to_string(j)+std::to_string(z)+std::to_string(y),
       		        logicWorld,
@@ -1304,7 +1307,8 @@ for(int z=0;z<nslabsz;z++){
 	                true);
 	new G4PVPlacement(
 			pmtRotSlab2,
-                        G4ThreeVector(ScintSlabOffsetX+pow(-1,(z+1)%2)*(outerRadius_pmt+1*cm)-(ScintSlabPlaceZ-ScintSlabWrapX+1*cm/2)*sin(worldRotation),pmtOffsetY+centerOffsetY+(y-(double)(nslabsy-1)/2)*(2*ScintSlabWrapY+2/2*cm),(ScintSlabPlaceZ*cos(worldRotation)+(z-(double)(nslabsz-1)/2)*2*ScintSlabWrapX+((double)(nslabsz-1)/2-z)*1*cm)+pmtOffsetZ2),
+			G4ThreeVector(ScintSlabOffsetX+pow(-1,(z+1)%2)*(ScintSlabWrapZ+0.5/2*2.54*cm)+j*(ScintSlabWrapZ*3+20*2.54*cm)-(frontLayerMid+ScintSlabOffsetZ0-ScintSlabWrapX+1*cm/2)*sin(worldRotation),pmtOffsetY+centerOffsetY+(y-(double)(nslabsy-1)/2)*(2*ScintSlabWrapY+0.25*2.54*cm),(j*40*2.54*cm+(frontLayerMid+ScintSlabOffsetZ0)*cos(worldRotation)+(z-(double)(nslabsz-1)/2)*2*ScintSlabWrapX+((double)(nslabsz-1)/2-z)*4.5*2.54*cm)+pmtOffsetZ2), //quarter inch spacing in y between slabs, 4.5in overlap. other measurements integrated also.
+                        //G4ThreeVector(ScintSlabOffsetX+pow(-1,(z+1)%2)*(ScintSlabWrapZ+0.5/2*2.54*cm)-(ScintSlabPlaceZ-ScintSlabWrapX+1*cm/2)*sin(worldRotation),pmtOffsetY+centerOffsetY+(y-(double)(nslabsy-1)/2)*(2*ScintSlabWrapY+0.25*2.54*cm),(ScintSlabPlaceZ*cos(worldRotation)+(z-(double)(nslabsz-1)/2)*2*ScintSlabWrapX+((double)(nslabsz-1)/2-z)*1*cm)+pmtOffsetZ2),
 			pmtLog,
 		        "ScintSlabPMT"+std::to_string(j)+std::to_string(z)+std::to_string(y),
       		        logicWorld,
