@@ -2,6 +2,20 @@
 
 This is the simulation for the MilliQan Detector. Compatibility: Geant 4.9+, ROOT 5.34 and other ROOT5 or ROOT6 onward (ideally ROOT6)
 
+================ Saving movies ======================
+
+I have added movie-saving scripts to runMac. To use them, just run the visMovieRun script in an interactive session, then find an event you want, and turn it into a movie by executing visMovieSave. There are two pairs of these files: one for cosmics and one for beam-induced events. Here is an example for how to save a cosmic movie:
+
+./MilliQan
+/control/macroPath /path/to/install/milliQanSim/runMac/
+/control/execute visMovieRunCosmic.mac
+/run/beamOn 1 (one at a time until you find an event you like)
+/control/execute visMovieSaveCosmic.mac
+
+The best way to save these is to use a tool like peek (a screen recording tool that saves the screen as a gif) and just record the event as it plays back. If you want to see an event multiple times you can run visMovieSaveCosmic.mac each time, but be sure to delete the g4_N files from the build dir in between running this script, else the viewer will play the event back multiple times.
+
+
+
 ================  Running the simulation  ========================
 
 To run the sim:
