@@ -14,6 +14,9 @@ I have added movie-saving scripts to runMac. To use them, just run the visMovieR
 
 The best way to save these is to use a tool like peek (a screen recording tool that saves the screen as a gif) and just record the event as it plays back. If you want to see an event multiple times you can run visMovieSaveCosmic.mac each time, but be sure to delete the g4_N files from the build dir in between running this script, else the viewer will play the event back multiple times.
 
+If the sim is taking a long time to save the tracks (basically, it just hangs for longer than a minute or so after executing an event), I suggest changing the light yield in the detector construction to a much lower value (around line 2244, set mptPlScin->AddConstProperty("SCINTILLATIONYIELD", 100. / MeV);). If there are more than 10k events produced (and really, much more than 5k) the event will just take forever to run, so this helps get better vis quicker.
+
+For beam muon visualizations the Cerenkov light is also pretty strong which makes the sim movie vis take a long time even if scintillation is turned off, you might want to add a line to mqSteppingAction deleting photons created by Cerenkov. If you don't feel comfortable doing this, maybe just stick to visualizing mCPs and cosmics.
 
 
 ================  Running the simulation  ========================
