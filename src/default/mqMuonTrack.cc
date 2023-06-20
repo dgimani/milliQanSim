@@ -26,6 +26,9 @@ mqMuonTrack::mqMuonTrack() :
 			nbOfElastics(-1),
 			nbOfInteractions(-1),
 			energyDiff(0.),
+			Zposition(0.),
+			Xposition(0.),
+			Yposition(0.),
 			muonTrigUp(false),
 			muonTrigLow(false)
 			{
@@ -61,6 +64,9 @@ const mqMuonTrack& mqMuonTrack::operator=(const mqMuonTrack &right){
 	energyDiff         = right.energyDiff        ;
 	muonTrigUp         = right.muonTrigUp        ;
 	muonTrigLow        = right.muonTrigLow       ;
+	Xposition          = right.Xposition         ;
+	Yposition          = right.Yposition         ;
+	Zposition          = right.Zposition         ;
 	return *this;
 }
 
