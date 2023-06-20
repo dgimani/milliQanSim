@@ -13,6 +13,8 @@
 #include "mqHistoManager.hh"
 #include "mqUserEventInformation.hh"
 #include "G4ThreeVector.hh"
+#include "G4VTouchable.hh"
+#include "G4NavigationHistory.hh"
 
 #include "G4TrackingManager.hh"
 #include "G4EventManager.hh"
@@ -26,16 +28,20 @@
 mqTrackingAction::mqTrackingAction(mqHistoManager* histo):
 	histoManager(histo), verbose(0),
 	photonTrackStorage(false),
-	gammaTrackStorage(true),
-	neutronTrackStorage(true),
+	gammaTrackStorage(false),
+	neutronTrackStorage(false),
 	muonTrackStorage(true),
+	electronTrackStorage(false),
+	mcpTrackStorage(false),
 	trackID(-1),parentID(-1),
 	particleName(""),
 	initialVolumeName(""),
+	initialCopyNo(-1),
 	initialProcessName(""),
 	initialPosition(0.,0.,0.),
 	initialEnergy(0.),
-	initialTime(0.){
+	initialTime(0.)
+{
 
 }
 
@@ -57,6 +63,14 @@ void mqTrackingAction::PreUserTrackingAction(const G4Track* aTrack)
 
   mqUserEventInformation* eventInformation
   =(mqUserEventInformation*)G4EventManager::GetEventManager()->GetUserInformation();
+  
+  //mqPhotonTrack *photonTrack = new mqPhotonTrack();
+  //mqGammaTrack *gammaTrack = new mqGammaTrack();
+  //mqNeutronTrack *neutronTrack = new mqNeutronTrack();
+  //mqMuonTrack *muonTrack = new mqMuonTrack();
+  //mqElectronTrack *electronTrack = new mqElectronTrack();
+  //mqMCPTrack *mcpTrack = new mqMCPTrack();
+
 
   fpTrackingManager->SetUserTrackInformation(new mqUserTrackInformation);
 
@@ -72,6 +86,88 @@ void mqTrackingAction::PreUserTrackingAction(const G4Track* aTrack)
 	//Get general information about this track
 	parentID = aTrack->GetParentID();
 	initialVolumeName = aTrack->GetVolume()->GetName();
+	initialCopyNo = aTrack->GetTouchable()->GetCopyNumber();
+	const G4VTouchable* touch = aTrack->GetTouchable();
+
+	
+	if(initialVolumeName.contains("plScin")){
+
+		//get bar copy num
+		G4int barCopyNo = touch->GetCopyNumber(2);
+/*
+		//get nBarPerLayer
+		  mqDetectorConstruction* detector = (mqDetectorConstruction*)G4RunManager::GetRunManager()
+                                        ->GetUserDetectorConstruction();
+		  G4int nBarPerLayer = detector->GetNBarPerLayer();
+*/
+		G4int nBarPerLayer = 6;
+
+		//get layer number
+		char layerNumberChar = touch->GetVolume(2)->GetName().back();
+
+		//ASCII conversion to num
+		G4int layerNumber = layerNumberChar-48;
+
+		//set copy num
+		initialCopyNo = nBarPerLayer*layerNumber + barCopyNo;
+	//	G4cout << "copy num is " << initialCopyNo << G4endl;
+	//	G4cout << "volume is " << touch->GetVolume(2)->GetName() << G4endl;
+	}
+	else if(initialVolumeName.contains("airgap_physic")){
+	
+		//get bar copy num
+		G4int barCopyNo = touch->GetCopyNumber(1);
+/*
+		//get nBarPerLayer
+		  mqDetectorConstruction* detector = (mqDetectorConstruction*)G4RunManager::GetRunManager()
+                                        ->GetUserDetectorConstruction();
+		  G4int nBarPerLayer = detector->GetNBarPerLayer();
+*/
+		G4int nBarPerLayer = 6;
+
+		//get layer number
+		char layerNumberChar = touch->GetVolume(1)->GetName().back();
+
+		//ASCII conversion to num
+		G4int layerNumber = layerNumberChar-48;
+
+		//set copy num
+		initialCopyNo = nBarPerLayer*layerNumber + barCopyNo;
+	//	G4cout << "copy num is " << initialCopyNo << G4endl;
+	//	G4cout << "volume is " << touch->GetVolume(1)->GetName() << G4endl;
+	}
+	else if(initialVolumeName.contains("barParam")){
+	
+		//get bar copy num
+		G4int barCopyNo = touch->GetCopyNumber(0);
+/*
+		//get nBarPerLayer
+		  mqDetectorConstruction* detector = (mqDetectorConstruction*)G4RunManager::GetRunManager()
+                                        ->GetUserDetectorConstruction();
+		  G4int nBarPerLayer = detector->GetNBarPerLayer();
+*/
+		G4int nBarPerLayer = 6;
+
+		//get layer number
+		char layerNumberChar = touch->GetVolume(0)->GetName().back();
+
+		//ASCII conversion to num
+		G4int layerNumber = layerNumberChar-48;
+
+		//set copy num
+		initialCopyNo = nBarPerLayer*layerNumber + barCopyNo;
+	//	G4cout << "copy num is " << initialCopyNo << G4endl;
+	//	G4cout << "volume is " << touch->GetVolume(1)->GetName() << G4endl;
+	}
+
+	else if(initialVolumeName.contains("slab_physic")
+		|| initialVolumeName.contains("panel_physic")){
+		initialCopyNo = touch->GetCopyNumber(2);
+		}
+	else if(initialVolumeName.contains("airGapSlab_physic")
+		|| initialVolumeName.contains("airGapPanel_physic")){
+		initialCopyNo = touch->GetCopyNumber(1);	
+		}
 
 	//Primary track has no creator process, so ensure that it exists before you try to access it.
 	const G4VProcess* myProcess = aTrack->GetCreatorProcess();
@@ -93,8 +189,7 @@ void mqTrackingAction::PreUserTrackingAction(const G4Track* aTrack)
 
 			eventInformation->SetGammaLastTrackID(trackID);
 
-			mqGammaTrack *gammaTrack = new mqGammaTrack();
-
+  			mqGammaTrack *gammaTrack = new mqGammaTrack();
 			gammaTrack->SetTrackID(trackID);
 			gammaTrack->SetParentID(parentID);
 
@@ -104,8 +199,12 @@ void mqTrackingAction::PreUserTrackingAction(const G4Track* aTrack)
 			gammaTrack->SetFirstPositionX(initialPosition.getX()/m);
 			gammaTrack->SetFirstPositionY(initialPosition.getY()/m);
 			gammaTrack->SetFirstPositionZ(initialPosition.getZ()/m);
+			gammaTrack->SetFirstVolume(initialVolumeName);
+			gammaTrack->SetFirstProcessName(initialProcessName);
+			gammaTrack->SetFirstCopyNo(initialCopyNo);
 
 			eventInformation->AddGammaTrack(gammaTrack);
+//			delete gammaTrack;
 	}
 
 	//
@@ -115,8 +214,8 @@ void mqTrackingAction::PreUserTrackingAction(const G4Track* aTrack)
 			&& neutronTrackStorage){
 		eventInformation->SetNeutronLastTrackID(trackID);
 
-		mqNeutronTrack *neutronTrack = new mqNeutronTrack();
 
+  		mqNeutronTrack *neutronTrack = new mqNeutronTrack();
 		neutronTrack->SetTrackID(trackID);
 		neutronTrack->SetParentID(parentID);
 
@@ -128,21 +227,22 @@ void mqTrackingAction::PreUserTrackingAction(const G4Track* aTrack)
 		neutronTrack->SetFirstPositionZ(initialPosition.getZ()/m);
 		neutronTrack->SetFirstVolume(initialVolumeName);
 		neutronTrack->SetFirstProcessName(initialProcessName);
-
+		neutronTrack->SetFirstCopyNo(initialCopyNo);
+		
 		eventInformation->AddNeutronTrack(neutronTrack);
+//		delete neutronTrack;
 	}
 
 
 	//
 	//Store info about muons
 	//	
-//	if( ((particleName.contains("mu-"))||(particleName.contains("mu+"))) //&& (eventInformation->GetMuonLastTrackID() != trackID)
 	if( (particleName.contains("mu")) //&& (eventInformation->GetMuonLastTrackID() != trackID)
 				&& muonTrackStorage){
 		eventInformation->SetMuonLastTrackID(trackID);
 
-		mqMuonTrack *muonTrack = new mqMuonTrack();
 
+  		mqMuonTrack *muonTrack = new mqMuonTrack();
 		muonTrack->SetTrackID(trackID);
 		muonTrack->SetParentID(parentID);
 
@@ -154,9 +254,85 @@ void mqTrackingAction::PreUserTrackingAction(const G4Track* aTrack)
 		muonTrack->SetFirstPositionZ(initialPosition.getZ()/m);
 		muonTrack->SetFirstVolume(initialVolumeName);
 		muonTrack->SetFirstProcessName(initialProcessName);
+		muonTrack->SetFirstCopyNo(initialCopyNo);
 
 		eventInformation->AddMuonTrack(muonTrack);
+		//delete muonTrack;
 	}
+
+
+	//
+	//Store info about electrons
+	//	
+	if( (particleName.contains("e+") || particleName.contains("e-")) //&& (eventInformation->GetElectronLastTrackID() != trackID)
+				&& electronTrackStorage){
+		eventInformation->SetElectronLastTrackID(trackID);
+
+
+  		mqElectronTrack *electronTrack = new mqElectronTrack();
+		electronTrack->SetTrackID(trackID);
+		electronTrack->SetParentID(parentID);
+
+		//begin of track information
+		electronTrack->SetTimeOfFirstProcess(initialTime/s);
+		electronTrack->SetInitialEnergy(initialEnergy/MeV);
+		electronTrack->SetFirstPositionX(initialPosition.getX()/m);
+		electronTrack->SetFirstPositionY(initialPosition.getY()/m);
+		electronTrack->SetFirstPositionZ(initialPosition.getZ()/m);
+		electronTrack->SetFirstVolume(initialVolumeName);
+		electronTrack->SetFirstProcessName(initialProcessName);
+		electronTrack->SetFirstCopyNo(initialCopyNo);
+
+		eventInformation->AddElectronTrack(electronTrack);
+		//delete electronTrack;
+	}
+
+
+	//
+	//Store info about mcps
+	//	
+	if( (particleName.contains("monopole")) //&& (eventInformation->GetMCPLastTrackID() != trackID)
+				&& mcpTrackStorage){
+		eventInformation->SetMCPLastTrackID(trackID);
+
+
+  		mqMCPTrack *mcpTrack = new mqMCPTrack();
+		mcpTrack->SetTrackID(trackID);
+		mcpTrack->SetParentID(parentID);
+
+		//begin of track information
+		mcpTrack->SetTimeOfFirstProcess(initialTime/s);
+		mcpTrack->SetInitialEnergy(initialEnergy/MeV);
+		mcpTrack->SetFirstPositionX(initialPosition.getX()/m);
+		mcpTrack->SetFirstPositionY(initialPosition.getY()/m);
+		mcpTrack->SetFirstPositionZ(initialPosition.getZ()/m);
+		mcpTrack->SetFirstVolume(initialVolumeName);
+		mcpTrack->SetFirstProcessName(initialProcessName);
+		mcpTrack->SetFirstCopyNo(initialCopyNo);
+
+		eventInformation->AddMCPTrack(mcpTrack);
+	//	delete mcpTrack;
+	}
+	if(photonTrackStorage && aTrack->GetDefinition() == G4OpticalPhoton::OpticalPhotonDefinition()
+			// connect optical photon track info (which hit a PMT) with according event
+			// information can only be stored in Post Tracking
+			// as it is only known here if the photon hit the PMT
+					//&&  (eventInformation->GetPhotonLastTrackID() != trackID)
+					){
+				eventInformation->SetPhotonLastTrackID(trackID);
+
+  				mqPhotonTrack *photonTrack = new mqPhotonTrack();
+				photonTrack->SetTrackID(trackID);
+				photonTrack->SetParentID(parentID);
+            
+				////begin of track information
+				photonTrack->SetTimeOfFirstProcess(initialTime/s);
+				photonTrack->SetInitialEnergy(initialEnergy/eV);
+				photonTrack->SetFirstPositionX(initialPosition.getX()/m);
+				photonTrack->SetFirstPositionY(initialPosition.getY()/m);
+				photonTrack->SetFirstPositionZ(initialPosition.getZ()/m);
+			        eventInformation->AddPhotonTrack(photonTrack);
+			}
 }
 
 //_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_
@@ -177,35 +353,28 @@ void mqTrackingAction::PostUserTrackingAction(const G4Track* aTrack){
     //
 	G4StepPoint *finalStepPoint = aTrack->GetStep()->GetPostStepPoint();
 	//G4StepPoint *prefinalStepPoint = aTrack->GetStep()->GetPreStepPoint();
-	G4String finalVolumeName;
+	G4String finalVolumeName="";
+	G4int finalCopyNo=0;
 	G4ThreeVector finalPosition = aTrack->GetPosition();
 	G4ThreeVector finalDirection = aTrack->GetMomentumDirection();
 	G4double finalEnergy = aTrack->GetKineticEnergy();
 	G4double totalEnergy = aTrack->GetTotalEnergy();
-//	G4double energyDeposit= aTrack->GetEnergyDeposit();
+//	G4double energyDeposit= aTrack->GetEnergyDeposit(); //this is the implicit deposited energy
+//	if we want a better deposited energy figure, use an initial-final approach
 	G4double finalTime = aTrack->GetGlobalTime();
 	G4double finalTrackLength = aTrack->GetTrackLength();
 	G4int trackID = aTrack->GetTrackID();
 	G4int parentID = aTrack->GetParentID();
-    G4double muDistanceToTank= 0.;
-	if (finalStepPoint != NULL) {
-			if (finalStepPoint->GetPhysicalVolume() != NULL) {
-				finalVolumeName =
-						finalStepPoint->GetPhysicalVolume()->GetName();
-			}
-		}
-    G4String myEndProcessName = "";
-
+    	G4String myEndProcessName = "";
 
         if (finalStepPoint != NULL) {
                         if (finalStepPoint->GetPhysicalVolume() != NULL) {
-                                finalVolumeName =
-                                                finalStepPoint->GetPhysicalVolume()->GetName();
+                                finalVolumeName = finalStepPoint->GetPhysicalVolume()->GetName();
+				finalCopyNo = finalStepPoint->GetPhysicalVolume()->GetCopyNo();
                         }
 
                         if (finalStepPoint->GetProcessDefinedStep() != NULL) {
-                                                myEndProcessName =
-                                                                finalStepPoint->GetProcessDefinedStep()->GetProcessName();
+                                myEndProcessName = finalStepPoint->GetProcessDefinedStep()->GetProcessName();
                                         }
                 }
 
@@ -219,12 +388,13 @@ void mqTrackingAction::PostUserTrackingAction(const G4Track* aTrack){
 	    eventInformation->GetGammaTrack(trackID)->SetLastPositionX(finalPosition.getX()/m);
 	    eventInformation->GetGammaTrack(trackID)->SetLastPositionY(finalPosition.getY()/m);
 	    eventInformation->GetGammaTrack(trackID)->SetLastPositionZ(finalPosition.getZ()/m);
-//	    eventInformation->GetGammaTrack(trackID)->SetEnergyDeposit(energyDeposit/MeV);
 	    eventInformation->GetGammaTrack(trackID)->SetFinalEnergy(finalEnergy/MeV);
 	    eventInformation->GetGammaTrack(trackID)->SetTotalEnergy(totalEnergy/MeV);
 	    eventInformation->GetGammaTrack(trackID)->SetTotalTrackLength(finalTrackLength/m);
+	    eventInformation->GetGammaTrack(trackID)->SetLastVolume(finalVolumeName);
+	    eventInformation->GetGammaTrack(trackID)->SetLastProcessName(myEndProcessName);
 	    eventInformation->GetGammaTrack(trackID)->SetTimeOfLastProcess(finalTime/ns);
-
+	    eventInformation->GetGammaTrack(trackID)->SetLastCopyNo(finalCopyNo);
 
 	}
 	//
@@ -239,10 +409,11 @@ void mqTrackingAction::PostUserTrackingAction(const G4Track* aTrack){
 		eventInformation->GetNeutronTrack(trackID)->SetLastPositionZ(finalPosition.getZ()/m);
 		eventInformation->GetNeutronTrack(trackID)->SetFinalEnergy(finalEnergy/MeV);
 		eventInformation->GetNeutronTrack(trackID)->SetTotalEnergy(totalEnergy/MeV);
-        eventInformation->GetNeutronTrack(trackID)->SetTotalTrackLength(finalTrackLength/m);
-	    eventInformation->GetNeutronTrack(trackID)->SetLastVolume(finalVolumeName);
-	    eventInformation->GetNeutronTrack(trackID)->SetLastProcessName(myEndProcessName);
-        eventInformation->GetNeutronTrack(trackID)->SetTimeOfLastProcess(finalTime/s);
+        	eventInformation->GetNeutronTrack(trackID)->SetTotalTrackLength(finalTrackLength/m);
+	        eventInformation->GetNeutronTrack(trackID)->SetLastVolume(finalVolumeName);
+	        eventInformation->GetNeutronTrack(trackID)->SetLastProcessName(myEndProcessName);
+        	eventInformation->GetNeutronTrack(trackID)->SetTimeOfLastProcess(finalTime/s);
+		eventInformation->GetNeutronTrack(trackID)->SetLastCopyNo(finalCopyNo);
 
 		//G4cout << "Total energy neutron: " << totalEnergy/MeV << G4endl;
 		//G4cout << "Final energy neutron: " << finalEnergy/MeV << G4endl;
@@ -252,7 +423,6 @@ void mqTrackingAction::PostUserTrackingAction(const G4Track* aTrack){
 	//
 	//Store information about muon tracks
 	//
-//	if( ((particleName.contains("mu-"))||(particleName.contains("mu+"))) //&& (eventInformation->GetNeutronLastTrackID() != trackID)
 	if( (particleName.contains("mu")) //&& (eventInformation->GetMuonLastTrackID() != trackID)
 			&& muonTrackStorage){
 
@@ -261,17 +431,59 @@ void mqTrackingAction::PostUserTrackingAction(const G4Track* aTrack){
 		eventInformation->GetMuonTrack(trackID)->SetLastPositionY(finalPosition.getY()/m);
 		eventInformation->GetMuonTrack(trackID)->SetLastPositionZ(finalPosition.getZ()/m);
 		eventInformation->GetMuonTrack(trackID)->SetFinalEnergy(finalEnergy/MeV);
-//		eventInformation->GetMuonTrack(trackID)->SetEnergyDeposit(energyDeposit/MeV);
 		eventInformation->GetMuonTrack(trackID)->SetTotalEnergy(totalEnergy/MeV);
 		eventInformation->GetMuonTrack(trackID)->SetTotalTrackLength(finalTrackLength/m);
 		eventInformation->GetMuonTrack(trackID)->SetLastVolume(finalVolumeName);
 	    	eventInformation->GetMuonTrack(trackID)->SetLastProcessName(myEndProcessName);
         	eventInformation->GetMuonTrack(trackID)->SetTimeOfLastProcess(finalTime/s);
+		eventInformation->GetMuonTrack(trackID)->SetLastCopyNo(finalCopyNo);
 		G4double initialEnergy_MeV = eventInformation->GetMuonTrack(trackID)->GetInitialEnergy();
-		eventInformation->GetMuonTrack(trackID)->SetEnergyExitScinti(initialEnergy_MeV - finalEnergy/MeV);
+		eventInformation->GetMuonTrack(trackID)->SetEnergyDiff(initialEnergy_MeV - finalEnergy/MeV);
 
-		//G4cout << "Total energy neutron: " << totalEnergy/MeV << G4endl;
-		//G4cout << "Final energy neutron: " << finalEnergy/MeV << G4endl;
+	}
+
+
+	//
+	//Store information about electron tracks
+	//
+	if( (particleName.contains("e+") || particleName.contains("e-")) //&& (eventInformation->GetElectronLastTrackID() != trackID)
+			&& electronTrackStorage){
+
+		//end of track information
+//		eventInformation->GetElectronTrack(trackID)->SetLastPositionX(finalPosition.getX()/m);
+//		eventInformation->GetElectronTrack(trackID)->SetLastPositionY(finalPosition.getY()/m);
+//		eventInformation->GetElectronTrack(trackID)->SetLastPositionZ(finalPosition.getZ()/m);
+		eventInformation->GetElectronTrack(trackID)->SetFinalEnergy(finalEnergy/MeV);
+		eventInformation->GetElectronTrack(trackID)->SetTotalEnergy(totalEnergy/MeV);
+		eventInformation->GetElectronTrack(trackID)->SetTotalTrackLength(finalTrackLength/m);
+		eventInformation->GetElectronTrack(trackID)->SetLastVolume(finalVolumeName);
+	    	eventInformation->GetElectronTrack(trackID)->SetLastProcessName(myEndProcessName);
+        	eventInformation->GetElectronTrack(trackID)->SetTimeOfLastProcess(finalTime/s);
+		eventInformation->GetElectronTrack(trackID)->SetLastCopyNo(finalCopyNo);
+		G4double initialEnergy_MeV = eventInformation->GetElectronTrack(trackID)->GetInitialEnergy();
+		eventInformation->GetElectronTrack(trackID)->SetEnergyDiff(initialEnergy_MeV - finalEnergy/MeV);
+
+	}
+
+
+	//
+	//Store information about mcp tracks
+	//
+	if( (particleName.contains("monopole")) //&& (eventInformation->GetMCPLastTrackID() != trackID)
+			&& mcpTrackStorage){
+		//end of track information
+		eventInformation->GetMCPTrack(trackID)->SetLastPositionX(finalPosition.getX()/m);
+		eventInformation->GetMCPTrack(trackID)->SetLastPositionY(finalPosition.getY()/m);
+		eventInformation->GetMCPTrack(trackID)->SetLastPositionZ(finalPosition.getZ()/m);
+		eventInformation->GetMCPTrack(trackID)->SetFinalEnergy(finalEnergy/MeV);
+		eventInformation->GetMCPTrack(trackID)->SetTotalEnergy(totalEnergy/MeV);
+		eventInformation->GetMCPTrack(trackID)->SetTotalTrackLength(finalTrackLength/m);
+		eventInformation->GetMCPTrack(trackID)->SetLastVolume(finalVolumeName);
+	    	eventInformation->GetMCPTrack(trackID)->SetLastProcessName(myEndProcessName);
+        	eventInformation->GetMCPTrack(trackID)->SetTimeOfLastProcess(finalTime/s);
+		eventInformation->GetMCPTrack(trackID)->SetLastCopyNo(finalCopyNo);
+		G4double initialEnergy_MeV = eventInformation->GetMCPTrack(trackID)->GetInitialEnergy();
+		eventInformation->GetMCPTrack(trackID)->SetEnergyDiff(initialEnergy_MeV - finalEnergy/MeV);
 
 	}
 
@@ -299,39 +511,25 @@ void mqTrackingAction::PostUserTrackingAction(const G4Track* aTrack){
 			if(photonTrackStorage
 					//&&  (eventInformation->GetPhotonLastTrackID() != trackID)
 					){
-				eventInformation->SetPhotonLastTrackID(trackID);
-
-				mqPhotonTrack *photonTrack = new mqPhotonTrack();
-
-				photonTrack->SetTrackID(trackID);
-				photonTrack->SetParentID(parentID);
-            
-				////begin of track information
-				if (myEndProcessName == "OpAbsorption") photonTrack->SetAbsorption(true);
-				photonTrack->SetTimeOfFirstProcess(initialTime/s);
-				photonTrack->SetInitialEnergy(initialEnergy/eV);
-				photonTrack->SetFirstPositionX(initialPosition.getX()/m);
-				photonTrack->SetFirstPositionY(initialPosition.getY()/m);
-				photonTrack->SetFirstPositionZ(initialPosition.getZ()/m);
-
-                if(initialEnergy > 5*eV){
+                //if(initialEnergy > 5*eV){
 //                		std::cout << "volume: " << initialVolumeName << std::endl;
   //              		std::cout << "process: " << initialProcessName << std::endl;
     //            		std::cout << "final volume: " << finalVolumeName << std::endl;
       //         		std::cout << "final process: " << myEndProcessName << std::endl;
-                }
+                //}
 //			std::cout << "tracking finished" << std::endl;
 				////end of track information
-			    photonTrack->SetLastPositionX(finalPosition.getX()/m);
-			    photonTrack->SetLastPositionY(finalPosition.getY()/m);
-			    photonTrack->SetLastPositionZ(finalPosition.getZ()/m);
-			    photonTrack->SetFinalEnergy(finalEnergy/eV);
-			    photonTrack->SetTotalEnergy(totalEnergy/eV);
-		        photonTrack->SetTotalTrackLength(finalTrackLength/m);
-			    photonTrack->SetTimeOfLastProcess(finalTime/s);
-			    photonTrack->SetNbOfReflections(trackInformation->GetInternalReflectionCount());
-			    eventInformation->AddPhotonTrack(photonTrack);
-			}
+				if (myEndProcessName == "OpAbsorption") eventInformation->GetPhotonTrack(trackID)->SetAbsorption(true);
+			    eventInformation->GetPhotonTrack(trackID)->SetLastPositionX(finalPosition.getX()/m);
+			    eventInformation->GetPhotonTrack(trackID)->SetLastPositionY(finalPosition.getY()/m);
+			    eventInformation->GetPhotonTrack(trackID)->SetLastPositionZ(finalPosition.getZ()/m);
+			    eventInformation->GetPhotonTrack(trackID)->SetFinalEnergy(finalEnergy/eV);
+			    eventInformation->GetPhotonTrack(trackID)->SetTotalEnergy(totalEnergy/eV);
+        		    eventInformation->GetPhotonTrack(trackID)->SetTotalTrackLength(finalTrackLength/m);
+			    eventInformation->GetPhotonTrack(trackID)->SetTimeOfLastProcess(finalTime/s);
+			    eventInformation->GetPhotonTrack(trackID)->SetNbOfReflections(trackInformation->GetInternalReflectionCount());
+			    //delete photonTrack;	
+		}
 
 			//
             //

@@ -6,10 +6,10 @@
 /gps/pos/shape Rectangle
 /gps/pos/centre 290 0 -160 cm
 #/gps/pos/centre 340 0 -160 cm
-#/gps/pos/halfx 340 cm
-#/gps/pos/halfy 575 cm #500cm
-/gps/pos/halfx 10 cm
-/gps/pos/halfy 20 cm #500cm
+/gps/pos/halfx 340 cm
+/gps/pos/halfy 575 cm #500cm
+#/gps/pos/halfx 10 cm
+#/gps/pos/halfy 20 cm #500cm
 /gps/pos/rot1 0 1 0
 /gps/pos/rot2 0 0 1
 

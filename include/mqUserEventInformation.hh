@@ -13,6 +13,8 @@
 #include "mqGammaTrack.hh"
 #include "mqNeutronTrack.hh"
 #include "mqMuonTrack.hh"
+#include "mqElectronTrack.hh"
+#include "mqMCPTrack.hh"
 #include "mqPMTHit.hh"
 #include "mqScintHit.hh"
 #include "G4ThreeVector.hh"
@@ -20,10 +22,16 @@
 #include "mqROOTEvent.hh"
 
 #include <TObject.h>
+const int numDetectors = 31;
 
 class mqUserEventInformation : public G4VUserEventInformation
 {
 public:
+
+  double Yposition;
+  double Zposition;
+  double Xposition;
+
   mqUserEventInformation();
   //virtual
   ~mqUserEventInformation();
@@ -82,43 +90,32 @@ public:
 	void SetScintToPMT (G4bool in){scintToPMT = in;}
 	G4bool GetScintToPMT()const{return scintToPMT;}
 
-  void SetEnergyEnterScinti(G4double in){energyEnterScinti_MeV = in;}
-  void SetEnergyExitScinti(G4double out){energyExitScinti_MeV = out;}
-  G4double GetEnergyEnterScinti()const {return energyEnterScinti_MeV;}
-  G4double GetEnergyExitScinti()const {return energyExitScinti_MeV;}
+  void SetXposition(double xp) {Xposition = xp;}
+  double GetXposition()const{return Xposition;}
+
+  void SetYposition(double yp) {Yposition = yp;}
+  double GetYposition()const{return Yposition;}
+
+  void SetZposition(double zp) {Zposition = zp;}
+  double GetZposition()const{return Zposition;}
 
   void SetBarHit(G4int hit){barHit = hit;}
   G4int GetBarHit()const {return barHit;}
 
-  void SetEventEnergyDepositSi1(G4double out){Edep_MeV_Si1 = out;}
-  G4double GetEventEnergyDepositSi1()const {return Edep_MeV_Si1;}
+  void SetSlabHit(G4int hit){slabHit = hit;}
+  G4int GetSlabHit()const {return slabHit;}
 
-  void SetEventEnergyDepositSi2(G4double out){Edep_MeV_Si2 = out;}
-  G4double GetEventEnergyDepositSi2()const {return Edep_MeV_Si2;}
+  void SetPanelHit(G4int hit){panelHit = hit;}
+  G4int GetPanelHit()const {return panelHit;}
 
-  void SetEventEnergyDepositSi3(G4double out){Edep_MeV_Si3 = out;}
-  G4double GetEventEnergyDepositSi3()const {return Edep_MeV_Si3;}
+  void SetEventEnergyDeposit(G4double out){Edep_MeV = out;}
+  G4double GetEventEnergyDeposit()const {return Edep_MeV;}
 
-  void SetEventEnergyDepositSi4(G4double out){Edep_MeV_Si4 = out;}
-  G4double GetEventEnergyDepositSi4()const {return Edep_MeV_Si4;}
+  void SetEventWeight(G4double ew){eventWeight = ew;}
+  G4double GetEventWeight()const{ return eventWeight;}
 
-  void SetEventEnergyDepositSi5(G4double out){Edep_MeV_Si5 = out;}
-  G4double GetEventEnergyDepositSi5()const {return Edep_MeV_Si5;}
-
-  void SetEventEnergyDepositAbs1(G4double out){Edep_MeV_Abs1 = out;}
-  G4double GetEventEnergyDepositAbs1()const {return Edep_MeV_Abs1;}
-
-  void SetEventEnergyDepositAbs2(G4double out){Edep_MeV_Abs2 = out;}
-  G4double GetEventEnergyDepositAbs2()const {return Edep_MeV_Abs2;}
-
-  void SetEventEnergyDepositAbs3(G4double out){Edep_MeV_Abs3 = out;}
-  G4double GetEventEnergyDepositAbs3()const {return Edep_MeV_Abs3;}
-
-  void SetEventEnergyDepositAbs4(G4double out){Edep_MeV_Abs4 = out;}
-  G4double GetEventEnergyDepositAbs4()const {return Edep_MeV_Abs4;}
-
-  void SetEventEnergyDepositScintVeto(G4double out){Edep_MeV_ScintVeto = out;}
-  G4double GetEventEnergyDepositScintVeto()const {return Edep_MeV_ScintVeto;}
+  void SetProcessID(G4int pn){processID = pn;}
+  G4int GetProcessID()const{ return processID;}
 
   /*It's necessary to reset the lastTrackID for tracking, because for example there is mostly only 1 gamma (the primary id=1) per event
    * In the second event per run, the primary has again id=1, but tmLastTrackID is already 1 from the previous events
@@ -136,6 +133,12 @@ public:
   void SetMuonLastTrackID(G4int tnLastTrackID){muonLastTrackID = tnLastTrackID ;}
   G4int GetMuonLastTrackID()const{return muonLastTrackID;}
 
+  void SetElectronLastTrackID(G4int tnLastTrackID){electronLastTrackID = tnLastTrackID ;}
+  G4int GetElectronLastTrackID()const{return electronLastTrackID;}
+
+  void SetMCPLastTrackID(G4int tnLastTrackID){mcpLastTrackID = tnLastTrackID ;}
+  G4int GetMCPLastTrackID()const{return mcpLastTrackID;}
+
   //gamma tracking
   void AddGammaTrack (mqGammaTrack *track);
   mqGammaTrack* GetGammaTrack (G4int trackID);
@@ -152,6 +155,16 @@ public:
   mqMuonTrack* GetMuonTrack(G4int trackID);
   mqMuonTrackVector* GetMuonTracks();
 
+  //electron tracking
+  void AddElectronTrack (mqElectronTrack *track);
+  mqElectronTrack* GetElectronTrack(G4int trackID);
+  mqElectronTrackVector* GetElectronTracks();
+
+  //muon tracking
+  void AddMCPTrack (mqMCPTrack *track);
+  mqMCPTrack* GetMCPTrack(G4int trackID);
+  mqMCPTrackVector* GetMCPTracks();
+
   //photon tracking
   void AddPhotonTrack (mqPhotonTrack *track);
   mqPhotonTrack* GetPhotonTrack(G4int trackID);
@@ -160,7 +173,6 @@ public:
   //PMT Hits
   void AddPMTHit(mqPMTHit *hit);
   mqPMTHitVector* GetPMTHits();
-
 
   //Scint Hits
   void AddScintHit(mqScintHit *hit);
@@ -184,6 +196,12 @@ private:
   mqMuonTrackVector MuonTracks;
   G4int NbOfMuonTracks;
 
+  mqElectronTrackVector ElectronTracks;
+  G4int NbOfElectronTracks;
+
+  mqMCPTrackVector MCPTracks;
+  G4int NbOfMCPTracks;
+
   mqPMTHitVector PMTHits;
   G4int NbOfPMTHits;
 
@@ -191,6 +209,8 @@ private:
   G4int NbOfScintHits;
 
   G4int barHit;
+  G4int slabHit;
+  G4int panelHit;
   G4int peCountPMT;
   G4int photonCount_Scint;
   G4int photonCount_Cheren;
@@ -202,27 +222,20 @@ private:
   G4double totalNREDepInCrystals;
 
   G4int pmtsAboveThreshold;
-  G4double Edep_MeV_Si1;
-  G4double Edep_MeV_Si2;
-  G4double Edep_MeV_Si3;
-  G4double Edep_MeV_Si4;
-  G4double Edep_MeV_Si5;
-  G4double Edep_MeV_Abs1;
-  G4double Edep_MeV_Abs2;
-  G4double Edep_MeV_Abs3;
-  G4double Edep_MeV_Abs4;
-  G4double Edep_MeV_ScintVeto;
+  G4double Edep_MeV;
   G4int runID;
   G4int eventID;
   G4int photonLastTrackID;
   G4int gammaLastTrackID;
   G4int neutronLastTrackID;
   G4int muonLastTrackID;
-  G4double energyEnterScinti_MeV;
-  G4double energyExitScinti_MeV;
+  G4int electronLastTrackID;
+  G4int mcpLastTrackID;
   bool gammaOutScintillator;
   bool muonTrig;
-	G4bool scintToPMT;
+  G4bool scintToPMT;
+  G4double eventWeight;
+  G4int processID;
 };
 
 

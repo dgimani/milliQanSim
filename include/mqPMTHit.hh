@@ -63,6 +63,9 @@ public:
 
    void SetLastHitTime(G4double gtimeFinal){finalHitTime = gtimeFinal;}
    G4double GetLastHitTime()const{return finalHitTime; }
+   
+   void SetHitAngle(G4double ang){hitAngle = ang;}
+   G4double GetHitAngle()const{return hitAngle; }
 
    void SetHitPosition(G4ThreeVector hitpos){position = hitpos;}
    G4ThreeVector GetHitPosition()const{return position;}
@@ -96,6 +99,7 @@ private:
   G4ThreeVector pos;
   //G4VPhysicalVolume* physVol;
   G4bool drawit;
+  G4double hitAngle;
   G4double energy;
   G4double hitTime;
   G4double finalHitTime;

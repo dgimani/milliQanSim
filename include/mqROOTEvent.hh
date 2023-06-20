@@ -13,6 +13,8 @@
 #include "mqGammaTrack.hh"
 #include "mqNeutronTrack.hh"
 #include "mqMuonTrack.hh"
+#include "mqElectronTrack.hh"
+#include "mqMCPTrack.hh"
 #include "mqPMTRHit.hh"
 #include "mqScintRHit.hh"
 
@@ -43,24 +45,24 @@ public:
   void SetPhotonCountScint(Int_t photons_Scint){ this->nbOfScintillationPhotons = photons_Scint; }
   void SetAbsorptionCount(Int_t absCount){ this->absorptionCount = absCount; }
   void SetBoundaryAbsorption(Int_t boundaryAbs){ this->boundaryAbsorptionCount = boundaryAbs; }
-  void SetPMTHitCount(Int_t hits){ this->totalNbOfPEPMT = hits; }
+//  void SetPMTHitCount(Int_t hits){ this->totalNbOfPEPMT = hits; }
   void SetPMTSAboveThreshold(Int_t pmts){this->pmtsAboveTrigger = pmts; }
 
   Int_t GetPhotonCountCeren()const { return nbOfCerenkovPhotons; }
   Int_t GetPhotonCountScint()const { return nbOfScintillationPhotons; }
-  Int_t GetPMTHitCount()const { return totalNbOfPEPMT; }
+//  Int_t GetPMTHitCount()const { return totalNbOfPEPMT; }
   Int_t GetAbsorptionCount()const { return absorptionCount; }
   Int_t GetBoundaryAbsorptionCount() const { return boundaryAbsorptionCount; }
   Int_t GetPMTSAboveThreshold()const {return pmtsAboveTrigger;}
 
 
   // info about crystal hits
-  void SetTotalEDepInCrystals(Double_t edep){this->totalEDepInCrytals = edep;}
-  void SetTotalNREDepInCrystals(Double_t edepNR){this->totalNREDepInCrytals = edepNR;}
+//  void SetTotalEDepInCrystals(Double_t edep){this->totalEDepInCrytals = edep;}
+//  void SetTotalNREDepInCrystals(Double_t edepNR){this->totalNREDepInCrytals = edepNR;}
 
 
-  Double_t GetTotalEDepInCrystals()const {return totalEDepInCrytals;}
-  Double_t GetTotalNREDepInCrystals()const {return totalNREDepInCrytals;}
+//  Double_t GetTotalEDepInCrystals()const {return totalEDepInCrytals;}
+//  Double_t GetTotalNREDepInCrystals()const {return totalNREDepInCrytals;}
 
   //gamma tracking
   void AddGammaTrack (mqGammaTrack *track);
@@ -80,53 +82,52 @@ public:
   mqMuonTrack* GetMuonTrack(Int_t trackID);
   mqMuonTrackVector* GetMuonTracks();
 
+  //electron tracking 
+  void AddElectronTrack (mqElectronTrack *track);
+  void SetElectronTracks(mqElectronTrackVector *trackVec);
+  mqElectronTrack* GetElectronTrack(Int_t trackID);
+  mqElectronTrackVector* GetElectronTracks();
 
-  void SetGammaOutScintillator (bool in) {gammaOutScintillator = in;}
-  bool GetGammaOutScintillator() const{return gammaOutScintillator;}
+  //mCP tracking 
+  void AddMCPTrack (mqMCPTrack *track);
+  void SetMCPTracks(mqMCPTrackVector *trackVec);
+  mqMCPTrack* GetMCPTrack(Int_t trackID);
+  mqMCPTrackVector* GetMCPTracks();
+  
+//  void SetGammaOutScintillator (bool in) {gammaOutScintillator = in;}
+//  bool GetGammaOutScintillator() const{return gammaOutScintillator;}
 
   void SetMuonTrigger (bool in) {muonTrig = in;}
   bool GetMuonTrigger() const{return muonTrig;}
 
-	void SetScintToPMT(bool in) {scintToPMT = in;}
-	bool GetScintToPMT()const{return scintToPMT;}
+//	void SetScintToPMT(bool in) {scintToPMT = in;}
+//	bool GetScintToPMT()const{return scintToPMT;}
+  void SetXposition(double xp) {this->Xposition = xp;}
+  double GetXposition()const{return Xposition;}
 
-  void SetEnergyEnterScinti (Double_t EkinScinti){ this->energyEnterScinti_MeV = EkinScinti;}
-  void SetEnergyExitScinti(Double_t EkinScinti){ this->energyExitScinti_MeV = EkinScinti;}
-  Double_t GetEnergyEnterScinti()const{ return energyEnterScinti_MeV;}
-  Double_t GetEnergyExitScinti()const{ return energyExitScinti_MeV;}
+  void SetYposition(double yp) {this->Yposition = yp;}
+  double GetYposition()const{return Yposition;}
+
+  void SetZposition(double zp) {this->Zposition = zp;}
+  double GetZposition()const{return Zposition;}
 
   void SetBarHit (Int_t hit){ this->barHit = hit;}
   Int_t GetBarHit()const{ return barHit;}
 
-  void SetEventEnergyDepositSi1(Double_t edep){ this->Edep_MeV_Si1 = edep;}
-  Double_t GetEventEnergyDepositSi1()const{ return Edep_MeV_Si1;}
+  void SetSlabHit (Int_t hit){ this->slabHit = hit;}
+  Int_t GetSlabHit()const{ return slabHit;}
+  
+  void SetPanelHit (Int_t hit){ this->panelHit = hit;}
+  Int_t GetPanelHit()const{ return panelHit;}
+  
+  void SetEventEnergyDeposit(Double_t edep){ this->Edep_MeV = edep;}
+  Double_t GetEventEnergyDeposit()const{ return Edep_MeV;}
 
-  void SetEventEnergyDepositSi2(Double_t edep){ this->Edep_MeV_Si2 = edep;}
-  Double_t GetEventEnergyDepositSi2()const{ return Edep_MeV_Si2;}
+  void SetEventWeight(Double_t ew){eventWeight = ew;}
+  Double_t GetEventWeight()const{ return eventWeight;}
 
-  void SetEventEnergyDepositSi3(Double_t edep){ this->Edep_MeV_Si3 = edep;}
-  Double_t GetEventEnergyDepositSi3()const{ return Edep_MeV_Si3;}
-
-  void SetEventEnergyDepositSi4(Double_t edep){ this->Edep_MeV_Si4 = edep;}
-  Double_t GetEventEnergyDepositSi4()const{ return Edep_MeV_Si4;}
-
-  void SetEventEnergyDepositSi5(Double_t edep){ this->Edep_MeV_Si5 = edep;}
-  Double_t GetEventEnergyDepositSi5()const{ return Edep_MeV_Si5;}
-
-  void SetEventEnergyDepositAbs1(Double_t edep){ this->Edep_MeV_Abs1 = edep;}
-  Double_t GetEventEnergyDepositAbs1()const{ return Edep_MeV_Abs1;}
-
-  void SetEventEnergyDepositAbs2(Double_t edep){ this->Edep_MeV_Abs2 = edep;}
-  Double_t GetEventEnergyDepositAbs2()const{ return Edep_MeV_Abs2;}
-
-  void SetEventEnergyDepositAbs3(Double_t edep){ this->Edep_MeV_Abs3 = edep;}
-  Double_t GetEventEnergyDepositAbs3()const{ return Edep_MeV_Abs3;}
-
-  void SetEventEnergyDepositAbs4(Double_t edep){ this->Edep_MeV_Abs4 = edep;}
-  Double_t GetEventEnergyDepositAbs4()const{ return Edep_MeV_Abs4;}
-
-  void SetEventEnergyDepositScintVeto(Double_t edep){ this->Edep_MeV_ScintVeto = edep;}
-  Double_t GetEventEnergyDepositScintVeto()const{ return Edep_MeV_ScintVeto;}
+  void SetProcessID(Int_t pn){processID = pn;}
+  Int_t GetProcessID()const{ return processID;}
 
   //photon tracking
   void AddPhotonTrack (mqPhotonTrack *track);
@@ -148,6 +149,10 @@ public:
   //std::vector<unsigned long> Seeds;//Seeds of the random number generator for the current event
 private:
 
+  double Yposition;
+  double Zposition;
+  double Xposition;
+
   Int_t eventID;
 
   mqGammaTrackVector GammaTracks;
@@ -162,6 +167,12 @@ private:
   mqMuonTrackVector MuonTracks;
   Int_t NbOfMuonTracks;
 
+  mqElectronTrackVector ElectronTracks;
+  Int_t NbOfElectronTracks;
+
+  mqMCPTrackVector MCPTracks;
+  Int_t NbOfMCPTracks;
+
   mqPMTRHitVector PMTHits;
   Int_t NbOfPMTHits;
 
@@ -173,30 +184,24 @@ private:
   Int_t absorptionCount;
   Int_t boundaryAbsorptionCount;
 
-  Int_t totalNbOfPEPMT;
+//  Int_t totalNbOfPEPMT;
   Int_t pmtsAboveTrigger;
 
-  Double_t totalEDepInCrytals;
-  Double_t totalNREDepInCrytals;
+//  Double_t totalEDepInCrytals;
+//  Double_t totalNREDepInCrytals;
 
-  Double_t energyEnterScinti_MeV;
-  Double_t energyExitScinti_MeV;
-  Double_t Edep_MeV_Si1;
-  Double_t Edep_MeV_Si2;
-  Double_t Edep_MeV_Si3;
-  Double_t Edep_MeV_Si4;
-  Double_t Edep_MeV_Si5;
-  Double_t Edep_MeV_Abs1;
-  Double_t Edep_MeV_Abs2;
-  Double_t Edep_MeV_Abs3;
-  Double_t Edep_MeV_Abs4;
-  Double_t Edep_MeV_ScintVeto;
+  Double_t Edep_MeV;
   Int_t barHit;
+  Int_t slabHit;
+  Int_t panelHit;
 
-  bool gammaOutScintillator;
+//  bool gammaOutScintillator;
   bool muonTrig;
-	bool scintToPMT;
-  ClassDef(mqROOTEvent,7);
+  Double_t eventWeight;
+  Int_t processID;
+
+//	bool scintToPMT;
+  ClassDef(mqROOTEvent,12);
 
 };
 

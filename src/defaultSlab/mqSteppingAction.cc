@@ -110,6 +110,10 @@ void mqSteppingAction::UserSteppingAction(const G4Step * theStep){
   //
   // Get information about the start point of the step
   //
+  G4ThreeVector position;
+  G4double Yposition;
+  G4double Zposition;
+  G4double Xposition;
   G4ThreeVector myStartPosition;
   G4ThreeVector myStartDirection;
   G4double myStartXYMagnitude;
@@ -480,6 +484,21 @@ void mqSteppingAction::UserSteppingAction(const G4Step * theStep){
 		//sum energy deposit
 		sumEnergyDep=eventInformation->GetMuonTrack(theStep->GetTrack()->GetTrackID())->GetEnergyDeposit()+myEnergyEDep;
 		eventInformation->GetMuonTrack(theStep->GetTrack()->GetTrackID())->SetEnergyDeposit(sumEnergyDep);
+		if((!myStartVolumeName.contains("rockPhysic") && myEndVolumeName.contains("World")))
+		{
+			if (thePrePoint != NULL)
+			{
+				position = thePrePoint->GetPosition();
+				Xposition = position.x();// or getX()
+				Yposition = position.y();
+				Zposition = position.z();
+				//std::cout << "muon enter the cavern" <<std::endl;
+				std::cout << "Xposition:" << Xposition <<std::endl;
+				std::cout << "Yposition:" << Yposition <<std::endl;
+				std::cout << "Zposition:" << Zposition <<std::endl;
+
+			}
+		}
 /*		
 		//muon enters scintillator
 		if((!myStartVolumeName.contains("scint") && !myStartVolumeName.contains("Scint"))

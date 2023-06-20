@@ -47,9 +47,9 @@ void mqHistoManager::book(G4String outfile)
  // This tree is associated to an output file.
  //
 
- G4cout << "XRD> Create ROOT file : XRD.root" << G4endl;
+ G4cout << "MilliQan> Create ROOT file : MilliQan.root" << G4endl;
 
- G4String fileName = outfile + "XRD.root";
+ G4String fileName = outfile + "MilliQan.root";
  rootFile = new TFile(fileName,"RECREATE");
  if(!rootFile) {
    G4cout << " mqHistoManager::book :"
@@ -60,7 +60,7 @@ void mqHistoManager::book(G4String outfile)
 
 
  //info about event statistics
- ntuplEvent = new TTree("Events", "XRD event statistics");
+ ntuplEvent = new TTree("Events", "MilliQan event statistics");
 
 
  myROOTEvent = new mqROOTEvent();

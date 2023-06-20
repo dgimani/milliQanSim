@@ -25,53 +25,54 @@ class mqScintRHit : public TObject
 
 
     void SetTrackID(Int_t track){ trackID = track; };
+    Int_t    GetTrackID()const{ return trackID; };
+    
     void SetParentID(Int_t pid){ parentID  = pid; };
-
-    void SetCopyNo(Int_t nb){ copyNo  = nb;   };
-    Int_t    GetCopyNo()const{ return copyNo; };
+    Int_t    GetParentID()const{ return parentID; };
+    
 
     void SetEDep(Double_t ed){ EDep_MeV    = ed;    };
-    void AddEDep(Double_t de){ EDep_MeV   += de;    };
-    //void SetEDepRecoil(Double_t er){ EDepRecoil_keV    = er;    };
-    //void AddEDepRecoil(Double_t der){ EDepRecoil_keV   += der;   };
-    void SetInitialHitTime(Double_t tm){ timeOfFirstHit_ns    = tm;    };
-    void SetParticleName(TString pn){ particleName   = pn;    };
-    //void SetScintNb(Int_t bn){ scintNb  = bn;    };
-    void SetHitPositionX(Double_t x){ hitPositionX_cm     =  x;   };
-    void SetHitPositionY(Double_t y){ hitPositionY_cm     =  y;   };
-    void SetHitPositionZ(Double_t z){ hitPositionZ_cm     =  z;   };
-
-    Int_t    GetTrackID()const{ return trackID; };
-    Int_t    GetParentID()const{ return parentID; };
+//    void AddEDep(Double_t de){ EDep_MeV   += de;    };
     Double_t GetEDep()const{ return EDep_MeV; };
-    //Double_t GetEDepRecoil()const{ return EDepRecoil_keV; };
 
-    Double_t GetInitialHitTime()const{ return timeOfFirstHit_ns; };
-    TString GetParticleName(){ return particleName; };
+    void SetTrackLength(Double_t tl){ trackLength_cm    = tl;    };
+    Double_t GetTrackLength()const{ return trackLength_cm; };
 
-    //Int_t    GetScintNb()const{ return scintNb; };
-    Double_t GetHitPositionX()const{ return hitPositionX_cm; };
-    Double_t GetHitPositionY()const{ return hitPositionY_cm; };
-    Double_t GetHitPositionZ()const{ return hitPositionZ_cm; };
+    void SetCopyNo(Int_t n){ copyNo = n;};
+    Int_t GetCopyNo()const{ return copyNo;};
+
+    void SetHitTime(Double_t tm){ hitTime_ns    = tm;    };
+    Double_t GetHitTime()const{ return hitTime_ns; };
+    
+
+    void SetExitTime(Double_t tm){ exitTime_ns    = tm;    };
+    Double_t GetExitTime()const{ return exitTime_ns; };
+//    void SetParticleName(TString pn){ particleName   = pn;    };
+//    TString GetParticleName(){ return particleName; };
 
 
-    static bool compareHits(mqScintRHit* const &a, mqScintRHit* const &b);
+//    void SetHitPositionX(Double_t x){ hitPositionX_cm     =  x;   };
+//    void SetHitPositionY(Double_t y){ hitPositionY_cm     =  y;   };
+//    void SetHitPositionZ(Double_t z){ hitPositionZ_cm     =  z;   };
+//    Double_t GetHitPositionX()const{ return hitPositionX_cm; };
+//    Double_t GetHitPositionY()const{ return hitPositionY_cm; };
+//    Double_t GetHitPositionZ()const{ return hitPositionZ_cm; };
 
   private:
 
     Int_t    trackID;
     Int_t    parentID;
-    Int_t    copyNo;
-    //Int_t    scintNb;
     Double_t EDep_MeV;
-    //Double_t EDepRecoil_keV;
-    Double_t timeOfFirstHit_ns;
-    TString  particleName;
-    Double_t hitPositionX_cm;
-    Double_t hitPositionY_cm;
-    Double_t hitPositionZ_cm;
+    Double_t trackLength_cm;
+    Int_t    copyNo;
+    Double_t hitTime_ns;
+    Double_t exitTime_ns;
+//    TString  particleName;
+//    Double_t hitPositionX_cm;
+//    Double_t hitPositionY_cm;
+//    Double_t hitPositionZ_cm;
 
-    ClassDef(mqScintRHit,8);
+    ClassDef(mqScintRHit,9);
 
 };
 

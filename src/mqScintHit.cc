@@ -21,12 +21,16 @@ G4Allocator<mqScintHit> mqScintHitAllocator;
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 mqScintHit::mqScintHit():
-	trackID(-1), parentID(-1), copyNo(-1),
-	EDep(0.),
-	EDepRecoil(0.),
-	particleName(""),
-	initialHitTime(0.),//finalHitTime(0.),
-	hitPosition(0.,0.,0.)
+	trackID(-1), parentID(-1),
+	hitEnergy(0.),
+	exitEnergy(0.),
+//	trackLength(0.),
+        copyNo(0),
+//	particleName(""),
+	hitTime(0.),
+	exitTime(0.),
+	hitPosition(0.,0.,0.),
+	exitPosition(0.,0.,0.)
 
 {}
 
@@ -39,15 +43,17 @@ mqScintHit::~mqScintHit() {}
 mqScintHit::mqScintHit(const mqScintHit& right)
   : G4VHit()
 {
-	trackID         = right.trackID        ;
+    trackID         = right.trackID        ;
     parentID        = right.parentID       ;
-    copyNo        = right.copyNo       ;
-    EDep            = right.EDep           ;
-    EDepRecoil      = right.EDepRecoil     ;
-    particleName    = right.particleName   ;
-    initialHitTime  = right.initialHitTime ;
-    //finalHitTime  = right.finalHitTime ; //ToDo
+    hitEnergy            = right.hitEnergy           ;
+    exitEnergy            = right.exitEnergy           ;
+    copyNo          = right.copyNo         ;
+//    trackLength            = right.trackLength   ;
+//    particleName    = right.particleName   ;
+    hitTime  = right.hitTime ;
+    exitTime  = right.exitTime ;
     hitPosition     = right.hitPosition    ;
+    exitPosition     = right.exitPosition    ;
 
 }
 
@@ -55,15 +61,17 @@ mqScintHit::mqScintHit(const mqScintHit& right)
 
 const mqScintHit& mqScintHit::operator=(const mqScintHit& right)
 {
-	trackID         = right.trackID        ;
+    trackID         = right.trackID        ;
     parentID        = right.parentID       ;
-    copyNo        = right.copyNo       ;
-    EDep            = right.EDep           ;
-    EDepRecoil      = right.EDepRecoil     ;
-    particleName    = right.particleName   ;
-    initialHitTime  = right.initialHitTime ;
-    //finalHitTime  = right.finalHitTime ; TODO
+    hitEnergy            = right.hitEnergy           ;
+    exitEnergy            = right.exitEnergy           ;
+//    trackLength            = right.trackLength           ;
+    copyNo          = right.copyNo         ;
+//    particleName    = right.particleName   ;
+    hitTime  = right.hitTime ;
+    exitTime  = right.exitTime ;
     hitPosition     = right.hitPosition    ;
+    exitPosition     = right.exitPosition    ;
 
     return *this;
 }
@@ -74,15 +82,6 @@ G4int mqScintHit::operator==(const mqScintHit& right) const
 {
   return (this==&right) ? 1 : 0;
 }
-
-
-//_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_
-bool mqScintHit::compareHits(mqScintHit* const &a, mqScintHit* const &b){
-	G4double aTime = a->initialHitTime;
-	G4double bTime = b->initialHitTime;
-	return (aTime < bTime);
-}
-
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
@@ -107,10 +106,9 @@ void mqScintHit::Print()
 {
 	//if(pName.contains("Ge")){ //only print info if it is a Ge
 		G4cout  << "  trackID  : " << trackID
-				<< "  Particle : " << particleName
+//				<< "  Particle : " << particleName
 				<< "  Parent ID: " << parentID
-				<< "  Energy   : " << G4BestUnit(EDep,"Energy")
-				//<< "  Nuclear recoil deposit: " << G4BestUnit(EDepRecoil,"Energy")
+				<< "  Energy   : " << G4BestUnit(hitEnergy-exitEnergy,"Energy")
 				<< "  Position : " << G4BestUnit(hitPosition,"Length") << G4endl;
 	//}
 }
@@ -121,16 +119,24 @@ mqScintRHit* mqScintHit::ConvertToROOTHit() const{
 
   mqScintRHit *myROOTHit = new mqScintRHit();
 
-  myROOTHit->SetEDep(this->GetEDep());
+  myROOTHit->SetEDep(this->GetHitEnergy()/MeV-this->GetExitEnergy()/MeV);
+  
+  G4ThreeVector hitVec = this->GetHitPosition();
+  G4ThreeVector exitVec = this->GetExitPosition();
+
+  G4ThreeVector tLength = hitVec-exitVec;
+  myROOTHit->SetTrackLength(tLength.mag()/cm);
   myROOTHit->SetCopyNo(this->GetCopyNo());
-  //myROOTHit->SetEDepRecoil(this->GetEDepRecoil()/keV);
-  myROOTHit->SetHitPositionX(this->GetHitPosition().getX()/cm);
-  myROOTHit->SetHitPositionY(this->GetHitPosition().getY()/cm);
-  myROOTHit->SetHitPositionZ(this->GetHitPosition().getZ()/cm);
-  myROOTHit->SetInitialHitTime(this->GetInitialHitTime()/ns);
-  //myROOTHit->SetFinalHitTime(this->GetFinalHitTime());
+//  myROOTHit->SetHitPositionX(this->GetHitPosition().getX()/m);
+//  myROOTHit->SetHitPositionY(this->GetHitPosition().getY()/m);
+//  myROOTHit->SetHitPositionZ(this->GetHitPosition().getZ()/m);
+//  myROOTHit->SetExitPositionX(this->GetExitPosition().getX()/m);
+//  myROOTHit->SetExitPositionY(this->GetExitPosition().getY()/m);
+//  myROOTHit->SetExitPositionZ(this->GetExitPosition().getZ()/m);
+  myROOTHit->SetHitTime(this->GetHitTime()/ns);
+  myROOTHit->SetExitTime(this->GetExitTime()/ns);
   myROOTHit->SetParentID(this->GetParentID());
-  myROOTHit->SetParticleName(this->GetParticleName());
+//  myROOTHit->SetParticleName(this->GetParticleName());
   myROOTHit->SetTrackID(this->GetTrackID());
 
 
