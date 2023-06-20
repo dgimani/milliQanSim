@@ -496,9 +496,9 @@ void mqSteppingAction::UserSteppingAction(const G4Step * theStep){
 				eventInformation->GetMuonTrack(theStep->GetTrack()->GetTrackID())->SetYposition(Yposition);
 				eventInformation->GetMuonTrack(theStep->GetTrack()->GetTrackID())->SetXposition(Xposition);
 				//std::cout << "muon enter the cavern" <<std::endl;
-				std::cout << "Xposition:" << Xposition <<std::endl;
-				std::cout << "Yposition:" << Yposition <<std::endl;
-				std::cout << "Zposition:" << Zposition <<std::endl;
+				//std::cout << "Xposition:" << Xposition <<std::endl;
+				//std::cout << "Yposition:" << Yposition <<std::endl;
+				//std::cout << "Zposition:" << Zposition <<std::endl;
 
 			}
 		}

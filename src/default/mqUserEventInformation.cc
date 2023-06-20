@@ -16,7 +16,6 @@
 #include "G4PhysicalConstants.hh"
 #include "G4SystemOfUnits.hh"
 #include "G4UnitsTable.hh"
-//#include "/home/collin/CERN/milliQanSim_Ryan_ori/milliQanSim/include/mqSteppingAction.hh"
 #include <vector>
 
 template<class SequenceType>

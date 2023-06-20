@@ -102,14 +102,7 @@ public:
 
 //	void SetScintToPMT(bool in) {scintToPMT = in;}
 //	bool GetScintToPMT()const{return scintToPMT;}
-  void SetXposition(double xp) {this->Xposition = xp;}
-  double GetXposition()const{return Xposition;}
 
-  void SetYposition(double yp) {this->Yposition = yp;}
-  double GetYposition()const{return Yposition;}
-
-  void SetZposition(double zp) {this->Zposition = zp;}
-  double GetZposition()const{return Zposition;}
 
   void SetBarHit (Int_t hit){ this->barHit = hit;}
   Int_t GetBarHit()const{ return barHit;}
@@ -149,9 +142,6 @@ public:
   //std::vector<unsigned long> Seeds;//Seeds of the random number generator for the current event
 private:
 
-  double Yposition;
-  double Zposition;
-  double Xposition;
 
   Int_t eventID;
 

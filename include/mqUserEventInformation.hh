@@ -28,9 +28,6 @@ class mqUserEventInformation : public G4VUserEventInformation
 {
 public:
 
-  double Yposition;
-  double Zposition;
-  double Xposition;
 
   mqUserEventInformation();
   //virtual
@@ -90,14 +87,7 @@ public:
 	void SetScintToPMT (G4bool in){scintToPMT = in;}
 	G4bool GetScintToPMT()const{return scintToPMT;}
 
-  void SetXposition(double xp) {Xposition = xp;}
-  double GetXposition()const{return Xposition;}
 
-  void SetYposition(double yp) {Yposition = yp;}
-  double GetYposition()const{return Yposition;}
-
-  void SetZposition(double zp) {Zposition = zp;}
-  double GetZposition()const{return Zposition;}
 
   void SetBarHit(G4int hit){barHit = hit;}
   G4int GetBarHit()const {return barHit;}
