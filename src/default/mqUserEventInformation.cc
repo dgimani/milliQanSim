@@ -58,13 +58,10 @@ mqUserEventInformation::mqUserEventInformation()
    panelHit(0),
    slabHit(0),
    eventWeight(0),
-   processID(0),
-   Yposition(0),
-   Zposition(0),
-   Xposition(0)
-   
+   processID(0)
 {
 }
+
 
 //_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_
 mqUserEventInformation::~mqUserEventInformation()
@@ -370,9 +367,6 @@ mqROOTEvent* mqUserEventInformation::ConvertToROOTEvent(){
 	myROOTEvent->SetMuonTrigger(this->GetMuonTrigger());
 //	myROOTEvent->SetScintToPMT(this->GetScintToPMT());
 	myROOTEvent->SetEventEnergyDeposit(this->GetEventEnergyDeposit());
-	myROOTEvent->SetXposition(this->GetXposition());
-	myROOTEvent->SetYposition(this->GetYposition());
-	myROOTEvent->SetZposition(this->GetZposition());
 	myROOTEvent->SetBarHit(this->GetBarHit());
 	myROOTEvent->SetSlabHit(this->GetSlabHit());
 	myROOTEvent->SetPanelHit(this->GetPanelHit());
