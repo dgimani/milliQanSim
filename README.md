@@ -53,8 +53,8 @@ The visualization macro is vis.mac. To run with visualization:
 /control/execute specmuonFullPropagated_no_vis.mac (for cosmics/full sim)
 ```
 or
-```
-/control/execute sidegamma_no_vis.mac``` (for NaI)
+
+```/control/execute sidegamma_no_vis.mac``` (for NaI)
 
 When first starting, I suggest seeing how both of cosmics and the NaI geometry work, just to give a sense of what's in here.
 
