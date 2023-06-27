@@ -106,6 +106,36 @@
 #/gps/hist/point 0.0597 36
 #/gps/hist/point 0.0600 0
 
+#Eu 152
+#121.7 28
+#344.2 26
+#1408  21
+#964   14
+#1112  13
+#778.9   12
+#1085.8  10
+
+#/gps/hist/point 0 0
+#/gps/hist/point 0.1215 0
+#/gps/hist/point 0.1217 28
+#/gps/hist/point 0.1220 0
+#/gps/hist/point 0.3440 0
+#/gps/hist/point 0.3442 26
+#/gps/hist/point 0.3445 0
+#/gps/hist/point 0.7787 0
+#/gps/hist/point 0.7789 12
+#/gps/hist/point 0.7792 0
+#/gps/hist/point 0.9638 0
+#/gps/hist/point 0.9640 14
+#/gps/hist/point 0.9643 0
+#/gps/hist/point 1.0856 0
+#/gps/hist/point 1.0858 10
+#/gps/hist/point 1.0861 0
+#/gps/hist/point 1.1118 0
+#/gps/hist/point 1.1120 13
+#/gps/hist/point 1.1123 0
+
+
 
 #/gps/hist/point 0 8.83
 ##/gps/hist/point 0.0599 8.83
