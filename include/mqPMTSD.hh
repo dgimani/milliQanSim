@@ -41,29 +41,29 @@ public:
   G4PhysicsVector GetET9814B_QE(){return et9814bQE;}
 
   //Initialize the arrays to store pmt positions
-  inline void InitPMTs(G4int nPMTs){
-    if(pmtPositionsX)delete pmtPositionsX;
-    if(pmtPositionsY)delete pmtPositionsY;
-    if(pmtPositionsZ)delete pmtPositionsZ;
-    pmtPositionsX=new G4DataVector(nPMTs);
-    pmtPositionsY=new G4DataVector(nPMTs);
-    pmtPositionsZ=new G4DataVector(nPMTs);
+//  inline void InitPMTs(G4int nPMTs){
+//    if(pmtPositionsX)delete pmtPositionsX;
+//    if(pmtPositionsY)delete pmtPositionsY;
+//    if(pmtPositionsZ)delete pmtPositionsZ;
+//    pmtPositionsX=new G4DataVector(nPMTs);
+//    pmtPositionsY=new G4DataVector(nPMTs);
+//    pmtPositionsZ=new G4DataVector(nPMTs);
   
-  }
+//  }
 
   //Store a pmt position
-  inline void SetPMTPos(G4int n,G4double x,G4double y,G4double z){
-    if(pmtPositionsX)pmtPositionsX->insertAt(n,x);
-    if(pmtPositionsY)pmtPositionsY->insertAt(n,y);
-    if(pmtPositionsZ)pmtPositionsZ->insertAt(n,z);
-  }
+//  inline void SetPMTPos(G4int n,G4double x,G4double y,G4double z){
+//    if(pmtPositionsX)pmtPositionsX->insertAt(n,x);
+//    if(pmtPositionsY)pmtPositionsY->insertAt(n,y);
+//    if(pmtPositionsZ)pmtPositionsZ->insertAt(n,z);
+//  }
 
 private:
   mqPMTHitsCollection* pmtHitCollection;
 
-  G4DataVector* pmtPositionsX;
-  G4DataVector* pmtPositionsY;
-  G4DataVector* pmtPositionsZ;
+//  G4DataVector* pmtPositionsX;
+//  G4DataVector* pmtPositionsY;
+//  G4DataVector* pmtPositionsZ;
   G4PhysicsVector r878QE;
   G4PhysicsVector r7725QE;
   G4PhysicsVector et9814bQE;

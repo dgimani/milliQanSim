@@ -61,6 +61,7 @@ mqUserEventInformation::mqUserEventInformation()
 {
 }
 
+
 //_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_
 mqUserEventInformation::~mqUserEventInformation()
 {
@@ -256,12 +257,11 @@ void mqUserEventInformation::AddMCPTrack(mqMCPTrack *ntrack) {
 }
 
 mqMCPTrack* mqUserEventInformation::GetMCPTrack(G4int trackID){
-
 	G4int ID = -1;
-	for (G4int i = 0; i < MCPTracks.size(); i++){
-		 if (this->MCPTracks.at(i)->GetTrackID() == trackID)
+		for (G4int i = 0; i < MCPTracks.size(); i++){
+			if (this->MCPTracks.at(i)->GetTrackID() == trackID)
 
-			 ID = i;
+				ID = i;
 	}
 	return this->MCPTracks.at(ID);
 

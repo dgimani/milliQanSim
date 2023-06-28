@@ -103,6 +103,7 @@ public:
 //	void SetScintToPMT(bool in) {scintToPMT = in;}
 //	bool GetScintToPMT()const{return scintToPMT;}
 
+
   void SetBarHit (Int_t hit){ this->barHit = hit;}
   Int_t GetBarHit()const{ return barHit;}
 
@@ -140,6 +141,7 @@ public:
 
   //std::vector<unsigned long> Seeds;//Seeds of the random number generator for the current event
 private:
+
 
   Int_t eventID;
 

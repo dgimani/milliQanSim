@@ -8,10 +8,10 @@
 #include "G4LogicalVolume.hh"
 #include "G4VPhysicalVolume.hh"
 #include "G4PhysicsVector.hh"
-
 #include "G4Material.hh"
 #include "G4Box.hh"
 
+#include "MilliQMonopoleFieldSetup.hh"
 
 class mqDetectorConstruction: public G4VUserDetectorConstruction {
 public:
@@ -32,16 +32,15 @@ public:
 	G4PhysicsVector GetPMTEff_R878();
 	G4PhysicsVector GetPMTEff_R7725();
 	G4PhysicsVector GetPMTEff_ET9814B();
-
+        void SetMagField(G4double, G4double, G4double);
 	void SetDefaults();
 
 private:
 	mqDetectorConstruction & operator=(const mqDetectorConstruction &right);
 	mqDetectorConstruction(const mqDetectorConstruction&);
 
+	MilliQMonopoleFieldSetup* fMonFieldSetup;
 
-	G4MaterialPropertiesTable *SetOpticalPropertiesOfNaI();
-	G4MaterialPropertiesTable *SetOpticalPropertiesOfLYSO();
 	G4MaterialPropertiesTable *SetOpticalPropertiesOfPS();
 	G4MaterialPropertiesTable *SetOpticalPropertiesOfPMT();
 	G4VPhysicalVolume* SetupGeometry();

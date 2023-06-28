@@ -11,7 +11,7 @@ SET(CMAKE_EXE_LINKER_FLAGS
 string(TIMESTAMP timeVar)
 string(REPLACE ":" "_" time ${timeVar})
 EXECUTE_PROCESS(COMMAND "date" "+%d_%m_%Y" ${date})
-set(name    XRD)      # equivalent to "name := exampleN01" in G4 GNUmakefiles
+set(name    MilliQan)      # equivalent to "name := exampleN01" in G4 GNUmakefiles
 set(useROOT true)        # use true or false
 
 ############ What's below should not need to be changed ############ 
@@ -54,7 +54,8 @@ find_package(ROOT 6.00 COMPONENTS Cling Physics)
 #find_package(ROOT 5.30 COMPONENTS Cintex)
 include(${ROOT_USE_FILE})
 
-set(Boost_INCLUDE_DIRS "/cvmfs/cms.cern.ch/slc7_amd64_gcc900/external/boost/1.67.0/include")
+#set(Boost_INCLUDE_DIRS "/cvmfs/cms.cern.ch/slc7_amd64_gcc900/external/boost/1.67.0/include")
+set(Boost_INCLUDE_DIRS "/home/collin/CERN/boost_1_81_0")
 
 option(ANALYSIS_HH_ "Build with ROOT" 1)
 add_definitions(-DG4UI_USE -DG4VIS_USE -DANALYSIS_HH_) 
@@ -108,9 +109,9 @@ set(SRC_DICT ${CMAKE_CURRENT_SOURCE_DIR}/src/mqGammaTrack.cc
 # Use this for ROOT Linkdef 
 #----------------------------------------------------------------------------
 
-ROOT_GENERATE_DICTIONARY(XRDDict ${INCLUDE_DICT} LINKDEF include/EventLinkDef.hh)
+ROOT_GENERATE_DICTIONARY(MilliQanDict ${INCLUDE_DICT} LINKDEF include/EventLinkDef.hh)
 
-add_library(${name}Core SHARED ${SRC_DICT} ${CMAKE_CURRENT_BINARY_DIR}/XRDDict.cxx)
+add_library(${name}Core SHARED ${SRC_DICT} ${CMAKE_CURRENT_BINARY_DIR}/MilliQanDict.cxx)
 
 add_executable(${name} ${name}.cc ${sources})
 

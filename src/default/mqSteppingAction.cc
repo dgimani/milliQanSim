@@ -116,6 +116,13 @@ void mqSteppingAction::UserSteppingAction(const G4Step * theStep){
   //
   // Get information about the start point of the step
   //
+  G4ThreeVector position;
+  G4double Yposition;
+  G4double Zposition;
+  G4double Xposition;
+  G4double Xfposition;
+  G4double Yfposition;
+  G4double Zfposition;
   G4ThreeVector myStartPosition;
   G4ThreeVector myStartDirection;
   G4double myStartXYMagnitude;
@@ -475,6 +482,37 @@ void mqSteppingAction::UserSteppingAction(const G4Step * theStep){
 		//sum energy deposit
 		sumEnergyDep=eventInformation->GetMuonTrack(theStep->GetTrack()->GetTrackID())->GetEnergyDeposit()+myEnergyEDep;
 		eventInformation->GetMuonTrack(theStep->GetTrack()->GetTrackID())->SetEnergyDeposit(sumEnergyDep);
+
+		if((!myStartVolumeName.contains("rockPhysic") && myEndVolumeName.contains("World")))
+		{
+			if (thePrePoint != NULL)
+			{
+				position = thePrePoint->GetPosition();
+				Xposition = position.x();// or getX()
+				Yposition = position.y();
+				Zposition = position.z();
+				eventInformation->GetMuonTrack(theStep->GetTrack()->GetTrackID())->SetZfposition(Zposition);
+				eventInformation->GetMuonTrack(theStep->GetTrack()->GetTrackID())->SetYfposition(Yposition);
+				eventInformation->GetMuonTrack(theStep->GetTrack()->GetTrackID())->SetXfposition(Xposition);
+
+
+			}
+		}
+
+		if((!myStartVolumeName.contains("World") && myEndVolumeName.contains("rockPhysic")))
+		{
+			if (thePrePoint != NULL)
+			{
+				position = thePrePoint->GetPosition();
+				Xfposition = position.x();// or getX()
+				Yfposition = position.y();
+				Zfposition = position.z();
+				eventInformation->GetMuonTrack(theStep->GetTrack()->GetTrackID())->SetZfposition(Zfposition);
+				eventInformation->GetMuonTrack(theStep->GetTrack()->GetTrackID())->SetYfposition(Yfposition);
+				eventInformation->GetMuonTrack(theStep->GetTrack()->GetTrackID())->SetXfposition(Xfposition);
+
+			}
+		}
 /*		
 		//muon enters scintillator
 		if((!myStartVolumeName.contains("scint") && !myStartVolumeName.contains("Scint"))

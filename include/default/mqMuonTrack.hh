@@ -42,6 +42,12 @@ public:
 	void SetFirstPositionZ(Double_t firstPositionZ){ initialPositionZ_m = firstPositionZ; }
 	void SetLastPositionZ(Double_t lastPositionZ){ finalPositionZ_m = lastPositionZ; }
 	void SetTotalTrackLength(Double_t totalTrackLength){ totalTrackLength_m = totalTrackLength; }
+	void SetYposition(Double_t yp) {Yposition = yp;}
+	void SetXposition(Double_t xp) {Xposition = xp;}
+	void SetZposition(Double_t zp) {Zposition = zp;}
+	void SetYfposition(Double_t yfp) {Yfposition = yfp;}
+	void SetXfposition(Double_t xfp) {Xfposition = xfp;}
+	void SetZfposition(Double_t zfp) {Zfposition = zfp;}
 
 	Int_t GetTrackID()const{ return trackID; }
 	TString GetFirstProcessName()const{ return initialProcessName; }
@@ -113,6 +119,12 @@ public:
 	Double_t finalPositionZ_m    ; //The position of the end of the track
 	Double_t totalTrackLength_m  ; //The total track length of the track
 	Double_t totalEnergy_MeV       ; //Energy loss of the track
+	Double_t Xposition; //the position that muon enter  the cavern
+	Double_t Yposition;
+	Double_t Zposition;
+	Double_t Xfposition; //the position that muon exist the Cavern
+	Double_t Yfposition; 
+	Double_t Zfposition;
 	Int_t nbOfElastics         ; //Number of elastic scatterings of the track
 	Int_t nbOfInteractions     ; //Number of interactions of the track
 	Double_t energyDiff; // Muon energy difference between creation and end of track

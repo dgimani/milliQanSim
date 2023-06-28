@@ -54,7 +54,8 @@ find_package(ROOT 6.00 COMPONENTS Cling Physics)
 #find_package(ROOT 5.30 COMPONENTS Cintex)
 include(${ROOT_USE_FILE})
 
-set(Boost_INCLUDE_DIRS "/cvmfs/cms.cern.ch/slc7_amd64_gcc900/external/boost/1.67.0/include")
+#set(Boost_INCLUDE_DIRS "/cvmfs/cms.cern.ch/slc7_amd64_gcc900/external/boost/1.67.0/include")
+set(Boost_INCLUDE_DIRS "/home/collin/CERN/boost_1_81_0")
 
 option(ANALYSIS_HH_ "Build with ROOT" 1)
 add_definitions(-DG4UI_USE -DG4VIS_USE -DANALYSIS_HH_) 

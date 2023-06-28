@@ -40,9 +40,8 @@ mqBarParameterisation::mqBarParameterisation(
         G4int    nBarX,
         G4int    nBarY,
         G4double startZ,          //  Z of center of grid. Always set to zero for now
-        G4double angleDelta,        //  angular separation between bars
-	G4double sourceDist,      //distance to interaction point
-	G4double halfWidthBar,       //bars are square in cross-section, this gives length
+        G4double XYspacing,        //  spacing of axis centers of bars
+        G4double halfWidthBar,       //bars are square in cross-section, this gives length
         G4double halfLengthBar)      //bar length
  : G4VPVParameterisation()
 {
@@ -50,10 +49,9 @@ mqBarParameterisation::mqBarParameterisation(
    fnBarsX = nBarX;
    fnBarsY = nBarY;
    fStartZ     =  startZ; 
-   fAngleDelta    =  angleDelta;
-   fSourceDist = sourceDist;
-   fHalfWidth  =  halfWidthBar; //barSpacingXY
-   fHalfLength =  halfLengthBar; //rotAng
+   fXYSpacing    =  XYspacing;
+   fHalfWidth  =  halfWidthBar;
+   fHalfLength =  halfLengthBar;
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
@@ -66,19 +64,16 @@ mqBarParameterisation::~mqBarParameterisation()
 void mqBarParameterisation::ComputeTransformation
 (const G4int copyNo, G4VPhysicalVolume* physVol) const
 {
-
-	// Note: copyNo will start with zero!
-  double fXSpacing = 16.4*cm; //from Sam's model
-  double fYSpacing = 13.7*cm; //from Sam's model
-  //calculate x,y pos
-  G4double Xposition = ((copyNo % fnBarsX) % fnBarsX)*fXSpacing   - (fnBarsX-1)*fXSpacing/2;
-  G4double Yposition = ((copyNo / fnBarsX) % fnBarsX)*fYSpacing   - (fnBarsX-1)*fYSpacing/2;
-  G4double Zposition = fStartZ;//+(copyNo % fnBarsX)*barSpacingXY/std::tan(rotAng); // gives offset look
-
-//  G4int nBarsPerLayer = fnBarsX*fnBarsY;
-
+  // Note: copyNo will start with zero!
+  G4double Xposition = (copyNo % fnBarsX)*fXYSpacing - (fnBarsX-1)*fXYSpacing/2;
+  G4double Yposition = (copyNo/fnBarsX)*fXYSpacing   - (fnBarsY-1)*fXYSpacing/2;
+  //G4double Yposition = ((copyNo/fnBarsX) % fnBarsX)*fXYSpacing   - (fnBarsX-1)*fXYSpacing/2;
+  G4int nBarsPerLayer = fnBarsX*fnBarsY;
+  //G4double Zposition = fStartZ+(copyNo/nBarsPerLayer)*fZSpacing - (fnLayers-1)*fZSpacing/2;
+  G4double Zposition = fStartZ;
   G4ThreeVector origin(Xposition,Yposition,Zposition);
   physVol->SetTranslation(origin);
+  physVol->SetRotation(0);
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......

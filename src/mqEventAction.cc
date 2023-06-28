@@ -4,7 +4,7 @@
  *  Created on: 18.09.2012
  *      Author: schmitz
  */
-
+#include <iostream>
 #include "mqEventAction.hh"
 #include "mqPMTHit.hh"
 #include "mqScintHit.hh"
@@ -23,14 +23,34 @@
 #include "G4ios.hh"
 #include "G4UImanager.hh"
 
-
 //_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_
-mqEventAction::mqEventAction(mqHistoManager* histo):
-  histoManager(histo),saveThreshold(0),pmtCollID(-1),crystalCollID(-1),verbose(0),
-   pmtThreshold(1),forcedrawphotons(false),forcenophotons(false), pmtnb(0),//crystalnb(0),
-   storePMTHit(true),storeCrystalHit(true)
+mqEventAction::mqEventAction(mqHistoManager* histo, G4int eventOffset, G4double eventWeight, G4int processID):
+  histoManager(histo),fEventOffset(eventOffset),saveThreshold(0),pmtCollID(-1), fEventWeight(eventWeight), fProcessID(processID),
+  scintCollID(-1),verbose(0),pmtThreshold(1),forcedrawphotons(false),forcenophotons(false), pmtnb(0),
+   storePMTHit(true),storeScintHit(true)
 {
+/* //should be unnecessary now, since we read in event weight from an argument
+//read in event weight (and everything else). Might be able to do in PrimaryGenAction, but this is a workaround
+  std::ifstream infile;
 
+  std::cout << std::endl << "opening " << fPathname << fFilename << " for event weights" << std::endl;
+
+  infile.open(fPathname.append(fFilename).c_str());
+  G4String line;
+  G4double fe, fq, fm, fx, fy, fz, fpx, fpy, fpz, fw;
+  while (std::getline(infile, line)) {
+
+    std::istringstream iss(line);
+    iss.clear();
+    iss.str(line);
+
+    if (!(iss >> fq >> fm >> fx >> fy >> fz >> fpx >> fpy >> fpz >> fw))
+      break;
+    eventWeight.push_back( fw );
+  }
+
+  std::cout << std::endl << "found " << eventWeight.size() << " events" << std::endl;
+*/
 }
 
 //_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_
@@ -55,12 +75,13 @@ void mqEventAction::BeginOfEventAction(const G4Event* anEvent){
 
   }
 
-  if( crystalCollID < 0 ){
+  if( scintCollID < 0 ){
 
-      crystalCollID=SDman->GetCollectionID("scintCollection");
+      scintCollID=SDman->GetCollectionID("scintCollection");
   }
   
 G4int eventID = -1;
+
 
 	//Get event ID
 	if (anEvent != NULL) {
@@ -71,17 +92,24 @@ G4int eventID = -1;
 	}
 
 	// get User event information and reset it as it is the beginning of the event
-
 	mqUserEventInformation* eventInformation
       =(mqUserEventInformation*)anEvent->GetUserInformation();
 
-//	eventInformation->Reset();
-
+	eventInformation->Reset();
 	eventInformation->SetEventID(eventID);
 	eventInformation->SetPhotonLastTrackID(-1);
 	eventInformation->SetGammaLastTrackID(-1);
 	eventInformation->SetNeutronLastTrackID(-1);
 	eventInformation->SetMuonLastTrackID(-1);
+	eventInformation->SetElectronLastTrackID(-1);
+	eventInformation->SetMCPLastTrackID(-1);
+	eventInformation->SetEventWeight(fEventWeight);
+	eventInformation->SetProcessID(fProcessID);
+	// get event weight and assign it
+//	eventInformation->SetEventWeight(eventWeight[eventID+fEventOffset]);
+
+	//can also assign process names if contained/read in
+	//eventInformation->SetProcessName(eventWeight[eventID+fEventOffset]);
 
 	if (verbose >= 1) {
 		G4cout << ">> Enter event #" << eventID << G4endl;
@@ -110,21 +138,21 @@ void mqEventAction::EndOfEventAction(const G4Event* anEvent){
   if(HCE){
 
     if(pmtCollID>=0) PHC = (mqPMTHitsCollection*)(HCE->GetHC(pmtCollID));
-    if(crystalCollID>=0) THC = (mqScintHitsCollection*)(HCE->GetHC(crystalCollID));
+    if(scintCollID>=0) THC = (mqScintHitsCollection*)(HCE->GetHC(scintCollID));
 
 
   }
 
   //=======================================================================================
-  //Crystal hit collection
+  //Scint hit collection
   //=======================================================================================
 
 
   if(THC){
 	  //
-	  //add crystal hit vector to the eventInformation
+	  //add scint hit vector to the eventInformation
 	  //
-	  if (storeCrystalHit){
+	  if (storeScintHit){
 		  mqScintHitVector myScintHitsVec = *(THC->GetVector());
 
 		  for (unsigned int j = 0; j < myScintHitsVec.size(); j++) {
@@ -240,15 +268,16 @@ void mqEventAction::EndOfEventAction(const G4Event* anEvent){
   //
   //fill ntuple via HistoManager for chosen characteristics of the event
   //
+  	mqROOTEvent* rootEvent = eventInformation->ConvertToROOTEvent();
 
-  mqROOTEvent* rootEvent = eventInformation->ConvertToROOTEvent();
+  	rootEvent->Finalize();
 
-  rootEvent->Finalize();
- if(eventInformation->GetPMTHits()->size()>0){ 
- 	histoManager->FillEventNtuple(rootEvent);
- }
-//  rootEvent->Reset();
-//  eventInformation->Reset();
+// if(eventInformation->GetPMTHits()->size()){ 
+  	histoManager->FillEventNtuple(rootEvent);
+// }
+ // 	delete rootEvent;
+  	rootEvent->Reset();
+	eventInformation->Reset();
 }
 
 //_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_

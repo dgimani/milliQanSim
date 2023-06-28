@@ -19,7 +19,7 @@ class mqHistoManager;
 class mqEventAction : public G4UserEventAction
 {
 public:
-  mqEventAction(mqHistoManager*);
+  mqEventAction(mqHistoManager*,G4int,G4double,G4int);
   ~mqEventAction();
 
 public:
@@ -45,7 +45,7 @@ private:
 
   G4int  pmtCollID;
 
-  G4int  crystalCollID;
+  G4int  scintCollID;
 
   G4int  verbose;
 
@@ -57,12 +57,19 @@ private:
 
   G4int pmtnb;
 
-//  G4int crystalnb;
+//  G4int scintnb;
 
   G4bool storePMTHit;
 
-  G4bool storeCrystalHit;
+  G4bool storeScintHit;
 
+  G4int fEventOffset;
+
+  G4double fEventWeight;
+
+  G4int fProcessID;
+
+//  std::vector<G4double> eventWeight;
 };
 
 

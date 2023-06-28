@@ -36,48 +36,53 @@ class mqScintHit : public G4VHit
     void Print();
 
     void SetTrackID(G4int track){ trackID = track; };
+    G4int    GetTrackID()const{ return trackID; };
+    
     void SetParentID(G4int pid){ parentID  = pid; };
+    G4int    GetParentID()const{ return parentID; };
+    
+    void SetHitEnergy(G4double ed){ hitEnergy    = ed;    };
+    G4double GetHitEnergy()const{ return hitEnergy; };
+    
+    void SetExitEnergy(G4double ed){ exitEnergy    = ed;    };
+    G4double GetExitEnergy()const{ return exitEnergy; };
+    
+//    void SetTrackLength(G4double tl){ trackLength    = tl;    };
+//    G4double GetTrackLength()const{ return trackLength; };
+    
+    void SetHitTime(G4double tm){ hitTime    = tm;    };
+    G4double GetHitTime()const{ return hitTime; };
+    
+    void SetExitTime(G4double tm){ exitTime    = tm;    };
+    G4double GetExitTime()const{ return exitTime; };
+
+    void SetParticleName(G4String pn){ particleName   = pn;    };
+    G4String GetParticleName()const{ return particleName; };
 
     void SetCopyNo(G4int nb){ copyNo  = nb;   };
     G4int    GetCopyNo()const{ return copyNo; };
 
-    void SetEDep(G4double ed){ EDep    = ed;    };
-    void AddEDep(G4double de){ EDep   += de;    };
-
-    void SetEDepRecoil(G4double er){ EDepRecoil    = er;    };
-    void AddEDepRecoil(G4double der){ EDepRecoil   += der;   };
-
-    void SetInitialHitTime(G4double tm){ initialHitTime    = tm;    };
-    void SetParticleName(G4String pn){ particleName   = pn;    };
-
-    //void SetScintNb(G4int bn){ scintNb  = bn;    };
     void SetHitPosition     (G4ThreeVector xyz){ hitPosition     = xyz;   };
-
-    G4int    GetTrackID()const{ return trackID; };
-    G4int    GetParentID()const{ return parentID; };
-    G4double GetEDep()const{ return EDep; };
-    G4double GetEDepRecoil()const{ return EDepRecoil; };
-
-    G4double GetInitialHitTime()const{ return initialHitTime; };
-    G4String GetParticleName()const{ return particleName; };
-
-    //G4int    GetScintNb()const{ return scintNb; };
     G4ThreeVector GetHitPosition()const{ return hitPosition; };
-
-
-    static bool compareHits(mqScintHit* const &a, mqScintHit* const &b);
+    
+    void SetExitPosition     (G4ThreeVector xyz){ exitPosition     = xyz;   };
+    G4ThreeVector GetExitPosition()const{ return exitPosition; };
+    
     mqScintRHit* ConvertToROOTHit() const;
+
   private:
 
     G4int         trackID;
     G4int         parentID;
-    //G4int         scintNb;
-    G4double      EDep;
-    G4int 	  copyNo;
-    G4double      EDepRecoil;
-    G4double      initialHitTime;
+    G4double      hitEnergy;
+    G4double      exitEnergy;
+//    G4double	  trackLength;
+    G4double      hitTime;
+    G4double      exitTime;
     G4String      particleName;
+    G4int         copyNo;
     G4ThreeVector hitPosition;
+    G4ThreeVector exitPosition;
 
 };
 

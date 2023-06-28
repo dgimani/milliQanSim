@@ -27,6 +27,8 @@ const int numDetectors = 31;
 class mqUserEventInformation : public G4VUserEventInformation
 {
 public:
+
+
   mqUserEventInformation();
   //virtual
   ~mqUserEventInformation();
@@ -84,6 +86,8 @@ public:
 
 	void SetScintToPMT (G4bool in){scintToPMT = in;}
 	G4bool GetScintToPMT()const{return scintToPMT;}
+
+
 
   void SetBarHit(G4int hit){barHit = hit;}
   G4int GetBarHit()const {return barHit;}

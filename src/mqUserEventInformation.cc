@@ -10,6 +10,8 @@
 #include "mqGammaTrack.hh"
 #include "mqNeutronTrack.hh"
 #include "mqMuonTrack.hh"
+#include "mqElectronTrack.hh"
+#include "mqMCPTrack.hh"
 #include "mqROOTEvent.hh"
 #include "G4PhysicalConstants.hh"
 #include "G4SystemOfUnits.hh"
@@ -30,35 +32,35 @@ mqUserEventInformation::mqUserEventInformation()
    NeutronTracks(0),NbOfNeutronTracks(0),
    PhotonTracks(0),NbOfPhotonTracks(0),
    MuonTracks(0),NbOfMuonTracks(0),
+   ElectronTracks(0),NbOfElectronTracks(0),
+   MCPTracks(0),NbOfMCPTracks(0),
    PMTHits(0),NbOfPMTHits(0),
    ScintHits(0), NbOfScintHits(0),
    peCountPMT(0),absorptionCount(0),boundaryAbsorptionCount(0),
-   totalEDepInCrystals(0.),totalNREDepInCrystals(0.),
    pmtsAboveThreshold(0),
    photonCount_Scint(0),
    photonCount(0),
    photonCount_Cheren(0),
    //primMutrackLength(0.),
-   Edep_MeV_Si1(0.),
-   Edep_MeV_Si2(0.),
-   Edep_MeV_Si3(0.),
-   Edep_MeV_Si4(0.),
-   Edep_MeV_Si5(0.),
-   Edep_MeV_Abs1(0.),
-   Edep_MeV_Abs2(0.),
-   Edep_MeV_Abs3(0.),
-   Edep_MeV_Abs4(0.),
-   Edep_MeV_ScintVeto(0.),
+   Edep_MeV(0.),
    runID(-1), eventID(-1),
-   photonLastTrackID(-1),gammaLastTrackID(-1), neutronLastTrackID(-1),muonLastTrackID(-1),
-   //tankDistance(0.),
+   photonLastTrackID(-1),
+	gammaLastTrackID(-1),
+	neutronLastTrackID(-1),
+	muonLastTrackID(-1),
+	electronLastTrackID(-1),
+	mcpLastTrackID(-1),
    gammaOutScintillator(false),
    muonTrig(false),
    scintToPMT(false),
-   energyEnterScinti_MeV(0.),energyExitScinti_MeV(0.),
-   barHit(0)
+   barHit(0),
+   panelHit(0),
+   slabHit(0),
+   eventWeight(0),
+   processID(0)
 {
 }
+
 
 //_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_
 mqUserEventInformation::~mqUserEventInformation()
@@ -70,7 +72,7 @@ void mqUserEventInformation::Initialize() {
 }
 void mqUserEventInformation::Finalize() {
 
-
+/*
 	// Sort the track collection, so that time(track_n)<time(track_n+1), because this ordering is needed in the offline analysis
 	std::sort(PhotonTracks.begin(), PhotonTracks.end(),
 				mqPhotonTrack::compareHits);
@@ -84,29 +86,40 @@ void mqUserEventInformation::Finalize() {
 	std::sort(MuonTracks.begin(), MuonTracks.end(),
 				mqMuonTrack::compareHits);
 	
+	std::sort(ElectronTracks.begin(), ElectronTracks.end(),
+				mqElectronTrack::compareHits);
+	
+	std::sort(MCPTracks.begin(), MCPTracks.end(),
+				mqMCPTrack::compareHits);
+	
 	// Sort the hit collection, so that time(hit_n)<time(hit_n+1), because this ordering is needed in the offline analysis
 	std::sort(PMTHits.begin(), PMTHits.end(),
 			mqPMTHit::compareHits);
 
 	// Sort the hit collection, so that time(hit_n)<time(hit_n+1), because this ordering is needed in the offline analysis
-	std::sort(ScintHits.begin(), ScintHits.end(),
-			mqScintHit::compareHits);
-
+//	std::sort(ScintHits.begin(), ScintHits.end(),
+//			mqScintHit::compareHits);
+*/
 	NbOfNeutronTracks = NeutronTracks.size();
 	NbOfGammaTracks = GammaTracks.size();
 	NbOfPhotonTracks = PhotonTracks.size();
 	NbOfMuonTracks = MuonTracks.size();
+	NbOfElectronTracks = ElectronTracks.size();
+	NbOfMCPTracks = MCPTracks.size();
 	NbOfPMTHits = PMTHits.size();
 	NbOfScintHits = ScintHits.size();
 }
 
 void mqUserEventInformation::Reset() {
-	//Calls the destructor of the elements of the vector. Afterwards the elements are removed from the vector
 
-	DeleteAll(GammaTracks);
-	DeleteAll(NeutronTracks);
-	DeleteAll(PhotonTracks);
-	DeleteAll(MuonTracks);
+//        if(!GammaTracks.empty()) DeleteAll(GammaTracks);
+//        if(!NeutronTracks.empty()) DeleteAll(NeutronTracks);
+//        if(!PhotonTracks.empty()) DeleteAll(PhotonTracks);
+//        if(!MuonTracks.empty()) DeleteAll(MuonTracks);
+//        if(!ElectronTracks.empty()) DeleteAll(ElectronTracks);
+//        if(!MCPTracks.empty()) {DeleteAll(MCPTracks);}
+//        if(!PMTHits.empty()) {std::cout << "deleting PMTHits" << std::endl; DeleteAll(PMTHits);}
+//        if(!ScintHits.empty()) DeleteAll(ScintHits);
 
 	PMTHits.clear(); // G4VHit takes care of the delete
 	ScintHits.clear();// G4VHit takes care of the delete
@@ -115,6 +128,8 @@ void mqUserEventInformation::Reset() {
 	NbOfGammaTracks   = 0;
 	NbOfPhotonTracks = 0;
 	NbOfMuonTracks   = 0;
+	NbOfElectronTracks   = 0;
+	NbOfMCPTracks   = 0;
 	NbOfPMTHits      = 0;
 	NbOfScintHits     = 0;
 }
@@ -209,6 +224,54 @@ mqMuonTrackVector* mqUserEventInformation::GetMuonTracks(){
 }
 
 
+////////////////////////electron///////////////////////////
+
+void mqUserEventInformation::AddElectronTrack(mqElectronTrack *ntrack) {
+
+	this->ElectronTracks.push_back(ntrack);
+}
+
+mqElectronTrack* mqUserEventInformation::GetElectronTrack(G4int trackID){
+
+	G4int ID = -1;
+	for (G4int i = 0; i < ElectronTracks.size(); i++){
+		 if (this->ElectronTracks.at(i)->GetTrackID() == trackID)
+
+			 ID = i;
+
+	}
+	return this->ElectronTracks.at(ID);
+
+}
+
+mqElectronTrackVector* mqUserEventInformation::GetElectronTracks(){
+	return &ElectronTracks;
+}
+
+
+////////////////////////mCP///////////////////////////
+
+void mqUserEventInformation::AddMCPTrack(mqMCPTrack *ntrack) {
+
+	this->MCPTracks.push_back(ntrack);
+}
+
+mqMCPTrack* mqUserEventInformation::GetMCPTrack(G4int trackID){
+	G4int ID = -1;
+		for (G4int i = 0; i < MCPTracks.size(); i++){
+			if (this->MCPTracks.at(i)->GetTrackID() == trackID)
+
+				ID = i;
+	}
+	return this->MCPTracks.at(ID);
+
+}
+
+mqMCPTrackVector* mqUserEventInformation::GetMCPTracks(){
+	return &MCPTracks;
+}
+
+
 ////////////////////photon////////////////////////////
 
 void mqUserEventInformation::AddPhotonTrack(mqPhotonTrack *ptrack) {
@@ -274,41 +337,41 @@ mqROOTEvent* mqUserEventInformation::ConvertToROOTEvent(){
 	myROOTEvent->SetGammaTracks(this->GetGammaTracks());
 	myROOTEvent->SetNeutronTracks(this->GetNeutronTracks());
 	myROOTEvent->SetMuonTracks(this->GetMuonTracks());
-	myROOTEvent->SetPMTHitCount(this->GetPECountPMT());
+	myROOTEvent->SetElectronTracks(this->GetElectronTracks());
+	myROOTEvent->SetMCPTracks(this->GetMCPTracks());
+//	myROOTEvent->SetPMTHitCount(this->GetPECountPMT());
 	//convert G4hits into ROOT hits:
 
 	for (Int_t i = 0; i < this->PMTHits.size(); i++){
-
 		 myROOTEvent->AddPMTRHit(this->PMTHits.at(i)->ConvertToROOTHit());
+	//	 mqPMTRHit* hit = this->PMTHits.at(i)->ConvertToROOTHit();
+	//	 myROOTEvent->AddPMTRHit(hit);
+	//	 delete hit;
 	}
 
 
 	//convert G4hits into ROOT hits:
 
 	for (Int_t i = 0; i < this->ScintHits.size(); i++){
-
-		 myROOTEvent->AddScintRHit(this->ScintHits.at(i)->ConvertToROOTHit());
+		 myROOTEvent->AddScintRHit(this->ScintHits.at(i)->ConvertToROOTHit()); 
+		 //mqScintRHit* scinthit = this->ScintHits.at(i)->ConvertToROOTHit();
+		 //myROOTEvent->AddScintRHit(scinthit);
+		 //delete scinthit;
 	}
 	myROOTEvent->SetPMTSAboveThreshold(this->GetPMTSAboveThreshold());
 	myROOTEvent->SetPhotonCountCeren(this->GetPhotonCount_Cheren());
 	myROOTEvent->SetPhotonCountScint(this->GetPhotonCount_Scint());
 	myROOTEvent->SetPhotonTracks(this->GetPhotonTracks());
-	myROOTEvent->SetGammaOutScintillator(this->GetGammaOutScintillator());
+//	myROOTEvent->SetGammaOutScintillator(this->GetGammaOutScintillator());
 	myROOTEvent->SetMuonTrigger(this->GetMuonTrigger());
-	myROOTEvent->SetScintToPMT(this->GetScintToPMT());
-	myROOTEvent->SetEnergyEnterScinti(this->GetEnergyEnterScinti());
-	myROOTEvent->SetEnergyExitScinti(this->GetEnergyExitScinti());
-	myROOTEvent->SetEventEnergyDepositSi1(this->GetEventEnergyDepositSi1());
-	myROOTEvent->SetEventEnergyDepositSi2(this->GetEventEnergyDepositSi2());
-	myROOTEvent->SetEventEnergyDepositSi3(this->GetEventEnergyDepositSi3());
-	myROOTEvent->SetEventEnergyDepositSi4(this->GetEventEnergyDepositSi4());
-	myROOTEvent->SetEventEnergyDepositSi5(this->GetEventEnergyDepositSi5());
-	myROOTEvent->SetEventEnergyDepositAbs1(this->GetEventEnergyDepositAbs1());
-	myROOTEvent->SetEventEnergyDepositAbs2(this->GetEventEnergyDepositAbs2());
-	myROOTEvent->SetEventEnergyDepositAbs3(this->GetEventEnergyDepositAbs3());
-	myROOTEvent->SetEventEnergyDepositAbs4(this->GetEventEnergyDepositAbs4());
-	myROOTEvent->SetEventEnergyDepositScintVeto(this->GetEventEnergyDepositScintVeto());
+//	myROOTEvent->SetScintToPMT(this->GetScintToPMT());
+	myROOTEvent->SetEventEnergyDeposit(this->GetEventEnergyDeposit());
 	myROOTEvent->SetBarHit(this->GetBarHit());
+	myROOTEvent->SetSlabHit(this->GetSlabHit());
+	myROOTEvent->SetPanelHit(this->GetPanelHit());
+	myROOTEvent->SetEventWeight(this->GetEventWeight());
+	//process name is empty; fill by adding process names to read in files, setting in mqEventAction
+	myROOTEvent->SetProcessID(this->GetProcessID());
   return myROOTEvent;
 
 }
