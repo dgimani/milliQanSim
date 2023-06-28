@@ -29,6 +29,9 @@ mqMuonTrack::mqMuonTrack() :
 			Zposition(0.),
 			Xposition(0.),
 			Yposition(0.),
+			Zfposition(0.),
+			Xfposition(0.),
+			Yfposition(0.),
 			muonTrigUp(false),
 			muonTrigLow(false)
 			{
@@ -67,6 +70,9 @@ const mqMuonTrack& mqMuonTrack::operator=(const mqMuonTrack &right){
 	Xposition          = right.Xposition         ;
 	Yposition          = right.Yposition         ;
 	Zposition          = right.Zposition         ;
+	Xfposition         = right.Xfposition         ;
+	Yfposition         = right.Yfposition         ;
+	Zfposition         = right.Zfposition         ;
 	return *this;
 }
 

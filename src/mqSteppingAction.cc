@@ -114,6 +114,9 @@ void mqSteppingAction::UserSteppingAction(const G4Step * theStep){
   G4double Yposition;
   G4double Zposition;
   G4double Xposition;
+  G4double Xfposition;
+  G4double Yfposition;
+  G4double Zfposition;
   G4ThreeVector myStartPosition;
   G4ThreeVector myStartDirection;
   G4double myStartXYMagnitude;
@@ -499,6 +502,21 @@ void mqSteppingAction::UserSteppingAction(const G4Step * theStep){
 				//std::cout << "Xposition:" << Xposition <<std::endl;
 				//std::cout << "Yposition:" << Yposition <<std::endl;
 				//std::cout << "Zposition:" << Zposition <<std::endl;
+
+			}
+		}
+
+		if((!myStartVolumeName.contains("World") && myEndVolumeName.contains("rockPhysic")))
+		{
+			if (thePrePoint != NULL)
+			{
+				position = thePrePoint->GetPosition();
+				Xfposition = position.x();// or getX()
+				Yfposition = position.y();
+				Zfposition = position.z();
+				eventInformation->GetMuonTrack(theStep->GetTrack()->GetTrackID())->SetZfposition(Zfposition);
+				eventInformation->GetMuonTrack(theStep->GetTrack()->GetTrackID())->SetYfposition(Yfposition);
+				eventInformation->GetMuonTrack(theStep->GetTrack()->GetTrackID())->SetXfposition(Xfposition);
 
 			}
 		}
