@@ -1627,8 +1627,8 @@ if(SupportStructure){
 	myPMTSD->SetET9814B_QE(GetPMTEff_ET9814B());
 	phCathLog->SetSensitiveDetector(myPMTSD); //change HERE for PMT Scenario
 
-   G4String SDnameOfScintDetector = "Rock_SD";
-   //G4String SDnameOfScintDetector = "Scint_SD";
+   //G4String SDnameOfScintDetector = "Rock_SD";
+   G4String SDnameOfScintDetector = "Scint_SD";
    mqScintSD* myScintSD = new mqScintSD(SDnameOfScintDetector);
 
    G4SDManager::GetSDMpointer()->AddNewDetector(myScintSD);

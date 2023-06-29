@@ -365,20 +365,10 @@ void mqSteppingAction::UserSteppingAction(const G4Step * theStep){
 
 
 ////////////// use this to check on particle energies and hit times in specific detectors/////////
-///*
-                 if(particleName.contains("monopole") //monopolemu 
-                 //if(particleName.contains("mu") //mumonopole 
-//                 if((particleName.contains("e-") || particleName.contains("gamma") || particleName.contains("e+"))//mumonopole if(particleName.contains("mu") //mumonopole 
+                 if((particleName.contains("mu") || particleName.contains("neutron") || particleName.contains("e-") || particleName.contains("gamma") || particleName.contains("e+"))//mumonopole if(particleName.contains("mu") //mumonopole 
 			&& (!myStartVolumeName.contains("plScin") && !myStartVolumeName.contains("slab_physic") && !myStartVolumeName.contains("panel_physic"))
 			&& (myEndVolumeName.contains("plScin") || myEndVolumeName.contains("slab_physic") || myEndVolumeName.contains("panel_physic"))
-//			&& (myStartVolumeName.contains("barStack") || myStartVolumeName.contains("World"))	//particle started in the stack, or came from the world
-//			&& (myEndVolumeName.contains("barParam")
-//				|| myEndVolumeName.contains("panel")
-//				|| myEndVolumeName.contains("Panel")
-//				|| myEndVolumeName.contains("slab")
-//				|| myEndVolumeName.contains("Slab")) //particle ends up in one of the bar wrapping layers, somewhere, afterwards
-//			&& (postCopyNo < 18) //hit bar
-			){ //also, particle entered one of the middle layers
+			){
 //			&& theStep->GetPostStepPoint()->GetTouchable()->GetVolume()->GetName().back()-48==1){ //particle does so in the middlemost layer in particular
 			
 			
@@ -388,64 +378,41 @@ void mqSteppingAction::UserSteppingAction(const G4Step * theStep){
 			eventTime = theStep->GetPostStepPoint()->GetGlobalTime()/ns;
 			G4cout << "Event time is " << eventTime << " ns" << G4endl;
 
+			const G4Event* evt = G4RunManager::GetRunManager()->GetCurrentEvent();
 			G4cout << "Event number is " << evt->GetEventID() << G4endl;
 
 			G4cout << "Track ID is " << trackID << G4endl;
 
 			G4cout << "Start Volume name is : " << myStartVolumeName << G4endl;
 			G4cout << "End Volume name is : " << myEndVolumeName << G4endl;
-			/*
-			G4ThreeVector volpos(0.0,0.0,0.0);
-			const G4VTouchable* touch=thePostPoint->GetTouchable();
-			int i=0;
-
-			while(touch->GetVolume(i)->GetName() != "World"){
-				volpos += touch->GetVolume(i)->GetTranslation();
-				i++;
-			}
-
-			G4cout << "Scint Volume Position is: " << G4endl
-						<< "X: " << volpos.x()/m << G4endl
-						<< "Y: " << volpos.y()/m << G4endl
-						<< "Z: " << volpos.z()/m << G4endl;
-			*/
-/*
-			G4int barCopyNum = theStep->GetPostStepPoint()->GetTouchable()
-						->GetCopyNumber(2);
-			if(barCopyNum<(4*4*2*2+1)){
-				G4cout << "Particle " << particleName << " hit bar!" << G4endl;
-				eventInformation->SetBarHit(eventInformation->GetBarHit()+1);
-			} else if(barCopyNum<(4*4*2*2+5)){
-				G4cout << "Particle " << particleName << " hit slab!" << G4endl;
-				eventInformation->SetSlabHit(eventInformation->GetSlabHit()+1);
-			} else {
-				G4cout << "Particle " << particleName << " hit panel!" << G4endl;
-				eventInformation->SetPanelHit(eventInformation->GetPanelHit()+1);
-			}
-*/  
-			G4String sdScintName="Scint_SD";
+  			G4String sdScintName="Scint_SD";
   			scintSD = (mqScintSD*)G4SDManager::GetSDMpointer()->FindSensitiveDetector(sdScintName);
 			scintSD->ProcessHitsEnter(theStep,NULL);
-//			std::ofstream particleBarHit;
-//			particleBarHit.open("/media/ryan/Storage/computing/mqFullSim/data/particleHitData_midLayerMuon.txt",std::ofstream::out | std::ofstream::app);
-//			int barNum = postCopyNo;
-//			particleBarHit << evt->GetEventID() << "	" << trackID << "	" << barNum << "	" << particleName << "	" << totalEnergy << "	" << eventTime << "	" << G4endl;
-//			particleBarHit.close();
 		       }
-//*/
-//                 if(particleName.contains("mu") //mumonopole 
-                 //if((particleName.contains("e-") || particleName.contains("gamma") || particleName.contains("e+"))//mumonopole if(particleName.contains("mu") //mumonopole 
-                 if(particleName.contains("monopole") //monopolemu 
+		       else if((!particleName.contains("opticalphoton")) && (!myStartVolumeName.contains("plScin") && !myStartVolumeName.contains("slab_physic") && !myStartVolumeName.contains("panel_physic"))
+                        && (myEndVolumeName.contains("plScin") || myEndVolumeName.contains("slab_physic") || myEndVolumeName.contains("panel_physic"))
+                        ){
+			       G4cout << "Weird particle enter! Name is " << particleName << G4endl;
+			 }
+                 
+                 if((particleName.contains("e-") || particleName.contains("neutron") || particleName.contains("gamma") || particleName.contains("e+") || particleName.contains("mu")) //mumonopole 
+                 //if(particleName.contains("monopole") //monopolemu 
 			&& (myStartVolumeName.contains("plScin") || myStartVolumeName.contains("slab_physic") || myStartVolumeName.contains("panel_physic"))
 			&& (!myEndVolumeName.contains("plScin") && !myEndVolumeName.contains("slab_physic") && !myEndVolumeName.contains("panel_physic"))
-			){ //also, particle entered one of the middle layers
+			){
 
   			G4String sdScintName="Scint_SD";
   			scintSD = (mqScintSD*)G4SDManager::GetSDMpointer()->FindSensitiveDetector(sdScintName);
-			G4cout << "exiting scint! copy number is " << preCopyNo << G4endl;
+			//G4cout << "exiting scint! copy number is " << preCopyNo << G4endl;
 			scintSD->ProcessHitsExit(theStep,NULL);
 			G4cout << "========================================================================" << G4endl;
-		 	}
+		 	} else if((!particleName.contains("opticalphoton")) && (myStartVolumeName.contains("plScin") || myStartVolumeName.contains("slab_physic") || myStartVolumeName.contains("panel_physic"))
+			&& (!myEndVolumeName.contains("plScin") && !myEndVolumeName.contains("slab_physic") && !myEndVolumeName.contains("panel_physic"))
+			){
+			       G4cout << "Weird particle exit! Name is " << particleName << G4endl;
+				
+			}
+///*
 
 //		if(particleName.contains("mu") && myStartVolumeName.contains("plScin"))
 //			{G4cout << "muon in bars!" << G4endl;}

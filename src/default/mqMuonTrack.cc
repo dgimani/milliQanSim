@@ -26,12 +26,12 @@ mqMuonTrack::mqMuonTrack() :
 			nbOfElastics(-1),
 			nbOfInteractions(-1),
 			energyDiff(0.),
-			Zposition(0.),
-			Xposition(0.),
-			Yposition(0.),
-			Zfposition(0.),
-			Xfposition(0.),
-			Yfposition(0.),
+			Zposition(-100),
+			Xposition(-100),
+			Yposition(-100),
+			Zfposition(100),
+			Xfposition(100),
+			Yfposition(100),
 			muonTrigUp(false),
 			muonTrigLow(false)
 			{

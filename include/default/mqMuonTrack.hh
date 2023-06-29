@@ -60,6 +60,12 @@ public:
 	Double_t GetEnergyDeposit()const{ return energyDeposit_MeV; }
 	Double_t GetFinalEnergy()const{ return finalEnergy_MeV; }
 	Double_t GetTotalEnergy() const{return totalEnergy_MeV; }
+	Double_t GetYposition() {return Yposition;}
+	Double_t GetXposition() {return Xposition;}
+	Double_t GetZposition() {return Zposition;}
+	Double_t GetYfposition() {return Yfposition;}
+	Double_t GetXfposition() {return Xfposition;}
+	Double_t GetZfposition() {return Zfposition;}
 
 	Int_t 	 GetParentID()const{ return parentID; }
 	Double_t GetFirstPositionX()const{ return initialPositionX_m; }

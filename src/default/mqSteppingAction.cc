@@ -372,18 +372,10 @@ void mqSteppingAction::UserSteppingAction(const G4Step * theStep){
 ////////////// use this to check on particle energies and hit times in specific detectors/////////
 ///*
                  //if(particleName.contains("monopole") //monopolemu 
-                 //if(particleName.contains("mu") //mumonopole 
-                 if((particleName.contains("e-") || particleName.contains("gamma") || particleName.contains("e+"))//mumonopole if(particleName.contains("mu") //mumonopole 
+                 if((particleName.contains("mu") || particleName.contains("neutron") || particleName.contains("e-") || particleName.contains("gamma") || particleName.contains("e+"))//mumonopole if(particleName.contains("mu") //mumonopole 
 			&& (!myStartVolumeName.contains("plScin") && !myStartVolumeName.contains("slab_physic") && !myStartVolumeName.contains("panel_physic"))
 			&& (myEndVolumeName.contains("plScin") || myEndVolumeName.contains("slab_physic") || myEndVolumeName.contains("panel_physic"))
-//			&& (myStartVolumeName.contains("barStack") || myStartVolumeName.contains("World"))	//particle started in the stack, or came from the world
-//			&& (myEndVolumeName.contains("barParam")
-//				|| myEndVolumeName.contains("panel")
-//				|| myEndVolumeName.contains("Panel")
-//				|| myEndVolumeName.contains("slab")
-//				|| myEndVolumeName.contains("Slab")) //particle ends up in one of the bar wrapping layers, somewhere, afterwards
-//			&& (postCopyNo < 18) //hit bar
-			){ //also, particle entered one of the middle layers
+			){
 //			&& theStep->GetPostStepPoint()->GetTouchable()->GetVolume()->GetName().back()-48==1){ //particle does so in the middlemost layer in particular
 			
 			
@@ -393,66 +385,40 @@ void mqSteppingAction::UserSteppingAction(const G4Step * theStep){
 			eventTime = theStep->GetPostStepPoint()->GetGlobalTime()/ns;
 			G4cout << "Event time is " << eventTime << " ns" << G4endl;
 
+			const G4Event* evt = G4RunManager::GetRunManager()->GetCurrentEvent();
 			G4cout << "Event number is " << evt->GetEventID() << G4endl;
 
 			G4cout << "Track ID is " << trackID << G4endl;
 
 			G4cout << "Start Volume name is : " << myStartVolumeName << G4endl;
 			G4cout << "End Volume name is : " << myEndVolumeName << G4endl;
-			/*
-			G4ThreeVector volpos(0.0,0.0,0.0);
-			const G4VTouchable* touch=thePostPoint->GetTouchable();
-			int i=0;
-
-			while(touch->GetVolume(i)->GetName() != "World"){
-				volpos += touch->GetVolume(i)->GetTranslation();
-				i++;
-			}
-
-			G4cout << "Scint Volume Position is: " << G4endl
-						<< "X: " << volpos.x()/m << G4endl
-						<< "Y: " << volpos.y()/m << G4endl
-						<< "Z: " << volpos.z()/m << G4endl;
-			*/
-			G4int barCopyNum = theStep->GetPostStepPoint()->GetTouchable()
-						->GetCopyNumber(2);
-			if(barCopyNum<70 || barCopyNum>100){
-				G4cout << "Particle " << particleName << " hit bar!" << G4endl;
-				eventInformation->SetBarHit(eventInformation->GetBarHit()+1);
-			} else if(barCopyNum>90){
-				G4cout << "Particle " << particleName << " hit slab!" << G4endl;
-				eventInformation->SetSlabHit(eventInformation->GetSlabHit()+1);
-			} else {
-				G4cout << "Particle " << particleName << " hit panel!" << G4endl;
-				eventInformation->SetPanelHit(eventInformation->GetPanelHit()+1);
-			}
   			G4String sdScintName="Scint_SD";
   			scintSD = (mqScintSD*)G4SDManager::GetSDMpointer()->FindSensitiveDetector(sdScintName);
 			scintSD->ProcessHitsEnter(theStep,NULL);
-/////////// want to save information from a hit into a file? do that here /////////////////////////////
-//			std::ofstream particleBarHit;
-//			particleBarHit.open("/media/ryan/Storage/computing/mqFullSim/data/particleHitData_midLayerMuon.txt",std::ofstream::out | std::ofstream::app);
-//			int barNum = postCopyNo;
-//			particleBarHit << evt->GetEventID() << "	" << trackID << "	" << barNum << "	" << particleName << "	" << totalEnergy << "	" << eventTime << "	" << G4endl;
-//			particleBarHit.close();
 		       }
-//*/
-                 //if(particleName.contains("mu") //mumonopole 
-                 if((particleName.contains("e-") || particleName.contains("gamma") || particleName.contains("e+"))//mumonopole if(particleName.contains("mu") //mumonopole 
+		       else if((!particleName.contains("opticalphoton")) && (!myStartVolumeName.contains("plScin") && !myStartVolumeName.contains("slab_physic") && !myStartVolumeName.contains("panel_physic"))
+                        && (myEndVolumeName.contains("plScin") || myEndVolumeName.contains("slab_physic") || myEndVolumeName.contains("panel_physic"))
+                        ){
+			       G4cout << "Weird particle enter! Name is " << particleName << G4endl;
+			 }
+                 
+                 if((particleName.contains("e-") || particleName.contains("neutron") || particleName.contains("gamma") || particleName.contains("e+") || particleName.contains("mu")) //mumonopole 
                  //if(particleName.contains("monopole") //monopolemu 
 			&& (myStartVolumeName.contains("plScin") || myStartVolumeName.contains("slab_physic") || myStartVolumeName.contains("panel_physic"))
 			&& (!myEndVolumeName.contains("plScin") && !myEndVolumeName.contains("slab_physic") && !myEndVolumeName.contains("panel_physic"))
-			){ //also, particle entered one of the middle layers
+			){
 
   			G4String sdScintName="Scint_SD";
   			scintSD = (mqScintSD*)G4SDManager::GetSDMpointer()->FindSensitiveDetector(sdScintName);
 			//G4cout << "exiting scint! copy number is " << preCopyNo << G4endl;
 			scintSD->ProcessHitsExit(theStep,NULL);
 			G4cout << "========================================================================" << G4endl;
-		 	}
-
-//		if(particleName.contains("mu") && myStartVolumeName.contains("plScin"))
-//			{G4cout << "muon in bars!" << G4endl;}
+		 	} else if((!particleName.contains("opticalphoton")) && (myStartVolumeName.contains("plScin") || myStartVolumeName.contains("slab_physic") || myStartVolumeName.contains("panel_physic"))
+			&& (!myEndVolumeName.contains("plScin") && !myEndVolumeName.contains("slab_physic") && !myEndVolumeName.contains("panel_physic"))
+			){
+			       G4cout << "Weird particle exit! Name is " << particleName << G4endl;
+				
+			}
 //////////////////////////////////////////////////////////////////////////////////////////////
 /*
  //using this to kill muons that we don't want to hit the detector, since we trigger on muons and I don't want to waste sim runtime
@@ -478,41 +444,37 @@ void mqSteppingAction::UserSteppingAction(const G4Step * theStep){
 	}
 */
 /////////// muon interaction manager ///////////////
-	if( particleName.contains("mu") ){
-		//sum energy deposit
-		sumEnergyDep=eventInformation->GetMuonTrack(theStep->GetTrack()->GetTrackID())->GetEnergyDeposit()+myEnergyEDep;
-		eventInformation->GetMuonTrack(theStep->GetTrack()->GetTrackID())->SetEnergyDeposit(sumEnergyDep);
+        if( particleName.contains("mu") ){
+                //sum energy deposit
+                sumEnergyDep=eventInformation->GetMuonTrack(theStep->GetTrack()->GetTrackID())->GetEnergyDeposit()+myEnergyEDep;
+                eventInformation->GetMuonTrack(theStep->GetTrack()->GetTrackID())->SetEnergyDeposit(sumEnergyDep);
+                if((myStartVolumeName.contains("rockPhysic") && myEndVolumeName.contains("World") && eventInformation->GetMuonTrack(theStep->GetTrack()->GetTrackID())->GetXposition()==-100))
+                {
+                                position = myEndPosition;
+                                Xposition = position.x();// or getX()
+                                Yposition = position.y();
+                                Zposition = position.z();
 
-		if((!myStartVolumeName.contains("rockPhysic") && myEndVolumeName.contains("World")))
-		{
-			if (thePrePoint != NULL)
-			{
-				position = thePrePoint->GetPosition();
-				Xposition = position.x();// or getX()
-				Yposition = position.y();
-				Zposition = position.z();
-				eventInformation->GetMuonTrack(theStep->GetTrack()->GetTrackID())->SetZfposition(Zposition);
-				eventInformation->GetMuonTrack(theStep->GetTrack()->GetTrackID())->SetYfposition(Yposition);
-				eventInformation->GetMuonTrack(theStep->GetTrack()->GetTrackID())->SetXfposition(Xposition);
+                                eventInformation->GetMuonTrack(theStep->GetTrack()->GetTrackID())->SetZposition(Zposition/m);
+                                eventInformation->GetMuonTrack(theStep->GetTrack()->GetTrackID())->SetYposition(Yposition/m);
+                                eventInformation->GetMuonTrack(theStep->GetTrack()->GetTrackID())->SetXposition(Xposition/m);
+                                //std::cout << "muon enter the cavern" <<std::endl;
+                                //std::cout << "Xposition:" << Xposition <<std::endl;
+                                //std::cout << "Yposition:" << Yposition <<std::endl;
+                                //std::cout << "Zposition:" << Zposition <<std::endl;
+                }
 
+                if((myStartVolumeName.contains("World") && myEndVolumeName.contains("rockPhysic") && eventInformation->GetMuonTrack(theStep->GetTrack()->GetTrackID())->GetXposition()>-100))
+                {
+                                position = myEndPosition;
+                                Xfposition = position.x();// or getX()
+                                Yfposition = position.y();
+                                Zfposition = position.z();
+                                eventInformation->GetMuonTrack(theStep->GetTrack()->GetTrackID())->SetZfposition(Zfposition/m);
+                                eventInformation->GetMuonTrack(theStep->GetTrack()->GetTrackID())->SetYfposition(Yfposition/m);
+                                eventInformation->GetMuonTrack(theStep->GetTrack()->GetTrackID())->SetXfposition(Xfposition/m);
+                }
 
-			}
-		}
-
-		if((!myStartVolumeName.contains("World") && myEndVolumeName.contains("rockPhysic")))
-		{
-			if (thePrePoint != NULL)
-			{
-				position = thePrePoint->GetPosition();
-				Xfposition = position.x();// or getX()
-				Yfposition = position.y();
-				Zfposition = position.z();
-				eventInformation->GetMuonTrack(theStep->GetTrack()->GetTrackID())->SetZfposition(Zfposition);
-				eventInformation->GetMuonTrack(theStep->GetTrack()->GetTrackID())->SetYfposition(Yfposition);
-				eventInformation->GetMuonTrack(theStep->GetTrack()->GetTrackID())->SetXfposition(Xfposition);
-
-			}
-		}
 /*		
 		//muon enters scintillator
 		if((!myStartVolumeName.contains("scint") && !myStartVolumeName.contains("Scint"))
