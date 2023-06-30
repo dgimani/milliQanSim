@@ -14,17 +14,28 @@
 #side
 #/gps/position 67 0 0 mm
 #outside
-/gps/position 228.5 0 0 mm
+#/gps/position 228.5 0 0 mm
 #/gps/position 231.5 0 0 mm
 #/gps/position 251.5 0 0 mm
+
+#Slab Postitions
+#Center 5cm above
+#/gps/position -1260 0 -1250 mm
+
+#5cm in front of PMT, 5cm above
+/gps/position -1260 105 -1000 mm
+
+#Split between PMTs, 5cm above/in front
+#/gps/position -1260 105 -1250 mm
+
 
 #Mono
 #/gps/ene/type Mono
 #/gps/ene/mono 100 keV
 
 #Na22
-/gps/ene/type Mono
-/gps/ene/mono 511 keV
+#/gps/ene/type Mono
+#/gps/ene/mono 511 keV
 
 #Mn-54
 #/gps/ene/type Mono
@@ -194,9 +205,39 @@
 
 ######################################
 
+#Eu152
+/gps/hist/point 0 0
+/gps/hist/point 0.28576 0
+/gps/hist/point 0.28586 122
+/gps/hist/point 0.28596 0
+/gps/hist/point 0.26440 0
+/gps/hist/point 0.26540 344
+/gps/hist/point 0.26640 0
+/gps/hist/point 0.20995 0
+/gps/hist/point 0.21005 1408
+/gps/hist/point 0.21015 0
+/gps/hist/point 0.14595 0
+/gps/hist/point 0.14605 964
+/gps/hist/point 0.14615 0
+/gps/hist/point 0.13634 0
+/gps/hist/point 0.13644 1112
+/gps/hist/point 0.13654 0
+/gps/hist/point 0.12932 0
+/gps/hist/point 0.12942 779
+/gps/hist/point 0.12952 0
+/gps/hist/point 0.10207 0
+/gps/hist/point 0.10207 1086
+/gps/hist/point 0.10207 0
+/gps/hist/point 0.07583 0
+/gps/hist/point 0.07583 245
+/gps/hist/point 0.07583 0
+
+
+######################################
+
 #switch between isotropic and pencil beam sources here
-/gps/ang/type iso
-#/gps/direction -1 0 0
+#/gps/ang/type iso
+/gps/direction -1 0 0
 
 
 
@@ -204,5 +245,5 @@
 #/run/fname /media/ryan/Storage/computing/beamRadSim/data/60keV1MeVMixed_mixedAbsAuAgScint_5stack/
 #/run/fname /media/ryan/Storage/computing/beamRadSim/data/electron/
 #/run/beamOn 1000000
-/run/beamOn 50
+/run/beamOn 5000
 /vis/viewer/save
