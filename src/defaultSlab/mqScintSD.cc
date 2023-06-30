@@ -74,12 +74,12 @@ G4bool mqScintSD::ProcessHitsEnter(const G4Step* aStep,G4TouchableHistory*)
 G4bool mqScintSD::ProcessHitsExit(const G4Step* aStep,G4TouchableHistory*)
 {
 
-  const G4VTouchable* touchable = aStep->GetPostStepPoint()->GetTouchable();
+  const G4VTouchable* touchable = aStep->GetPreStepPoint()->GetTouchable();
 
 //  const G4VProcess* process = aStep->GetPostStepPoint()->GetProcessDefinedStep();
 
-  G4int volCopyNo = touchable->GetCopyNumber();
-  //G4int volCopyNo = touchable->GetCopyNumber(2);
+  //G4int volCopyNo = touchable->GetCopyNumber();
+  G4int volCopyNo = touchable->GetCopyNumber(2);
   G4int copyNo=0;
   if(false){
 //  if(volCopyNo<6){
