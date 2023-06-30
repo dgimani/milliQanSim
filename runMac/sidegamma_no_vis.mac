@@ -23,10 +23,10 @@
 #/gps/position -1260 0 -1250 mm
 
 #5cm in front of PMT, 5cm above
-/gps/position -1260 105 -1000 mm
+#/gps/position -1260 105 -1000 mm
 
 #Split between PMTs, 5cm above/in front
-#/gps/position -1260 105 -1250 mm
+/gps/position -1260 0 -1000 mm
 
 
 #Mono
@@ -245,5 +245,5 @@
 #/run/fname /media/ryan/Storage/computing/beamRadSim/data/60keV1MeVMixed_mixedAbsAuAgScint_5stack/
 #/run/fname /media/ryan/Storage/computing/beamRadSim/data/electron/
 #/run/beamOn 1000000
-/run/beamOn 5000
+/run/beamOn 10000
 /vis/viewer/save
