@@ -634,28 +634,28 @@ G4SubtractionSolid* ScintSlabWrapSolid3 = new G4SubtractionSolid("ScintSlabWrapS
 					wrap_PMT_hole,
 					rotSlab,
 					G4ThreeVector(
-						      ScintSlabWrapX-(airGapThickness+wrapThickness)/2,-pmtOffsetY+shiftY,0));	
+						      ScintSlabWrapX-(airGapThickness+wrapThickness)/2,pmtOffsetY-shiftY,0));	
 
 G4SubtractionSolid* ScintSlabWrapSolid2 = new G4SubtractionSolid("ScintSlabWrapSolid2",
 					ScintSlabWrapSolid3,
 					wrap_PMT_hole,
 					rotSlab,
 					G4ThreeVector(
-						      ScintSlabWrapX-(airGapThickness+wrapThickness)/2,pmtOffsetY+shiftY,0));	
+						      ScintSlabWrapX-(airGapThickness+wrapThickness)/2,-pmtOffsetY-shiftY,0));	
 
 G4SubtractionSolid* ScintSlabWrapSolid1 = new G4SubtractionSolid("ScintSlabWrapSolid1",
 					ScintSlabWrapSolid2,
 					wrap_PMT_hole,
 					rotSlab,
 					G4ThreeVector(
-						      -ScintSlabWrapX+(airGapThickness+wrapThickness)/2,pmtOffsetY+shiftY,0));	
+						      -ScintSlabWrapX+(airGapThickness+wrapThickness)/2,-pmtOffsetY-shiftY,0));	
 
 G4SubtractionSolid* ScintSlabWrapSolid = new G4SubtractionSolid("ScintSlabWrapSolid",
 					ScintSlabWrapSolid1,
 					wrap_PMT_hole,
 					rotSlab,
 					G4ThreeVector(
-						      -ScintSlabWrapX+(airGapThickness+wrapThickness)/2,-pmtOffsetY+shiftY,0));	
+						      -ScintSlabWrapX+(airGapThickness+wrapThickness)/2,pmtOffsetY-shiftY,0));	
 
 G4LogicalVolume* ScintSlabWrapLogic = new G4LogicalVolume(
 					ScintSlabWrapSolid,
@@ -673,28 +673,28 @@ G4SubtractionSolid* ScintSlabAirGapSolid3 = new G4SubtractionSolid("ScintSlabAir
 					airgap_PMT_hole,
 					rotSlab,
 					G4ThreeVector(
-						      ScintSlabAirGapX-airGapThickness/2,pmtOffsetY+shiftY,0));	
+						      ScintSlabAirGapX-airGapThickness/2,-pmtOffsetY-shiftY,0));	
 
 G4SubtractionSolid* ScintSlabAirGapSolid2 = new G4SubtractionSolid("ScintSlabAirGapSolid2",
 					ScintSlabAirGapSolid3,
 					airgap_PMT_hole,
 					rotSlab,
 					G4ThreeVector(
-						      ScintSlabAirGapX-airGapThickness/2,-pmtOffsetY+shiftY,0));	
+						      ScintSlabAirGapX-airGapThickness/2,pmtOffsetY-shiftY,0));	
 
 G4SubtractionSolid* ScintSlabAirGapSolid1 = new G4SubtractionSolid("ScintSlabAirGapSolid1",
 					ScintSlabAirGapSolid2,
 					airgap_PMT_hole,
 					rotSlab,
 					G4ThreeVector(
-						      -ScintSlabAirGapX+airGapThickness/2,pmtOffsetY+shiftY,0));	
+						      -ScintSlabAirGapX+airGapThickness/2,-pmtOffsetY-shiftY,0));	
 
 G4SubtractionSolid* ScintSlabAirGapSolid = new G4SubtractionSolid("ScintSlabAirGapSolid",
 					ScintSlabAirGapSolid1,
 					airgap_PMT_hole,
 					rotSlab,
 					G4ThreeVector(
-						      -ScintSlabAirGapX+airGapThickness/2,-pmtOffsetY+shiftY,0));	
+						      -ScintSlabAirGapX+airGapThickness/2,pmtOffsetY-shiftY,0));	
 
 
 
