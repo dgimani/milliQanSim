@@ -4,9 +4,9 @@
 /gps/particle mu-
 /gps/pos/type Plane
 /gps/pos/shape Rectangle
-/gps/pos/centre 340 0 -8.5 cm
-/gps/pos/halfx 340 cm
-/gps/pos/halfy 500 cm
+/gps/pos/centre -1440 -151.4 -1010 mm
+/gps/pos/halfx 2.5 cm
+/gps/pos/halfy 2 cm
 /gps/pos/rot1 0 1 0
 /gps/pos/rot2 0 0 1
 
@@ -121,5 +121,5 @@
 /gps/ene/type Mono
 /gps/ene/mono 3 GeV
 
-/run/fname /media/ryan/Storage/computing/milliQanDemoSim/data/muon45test/
-/run/beamOn 100000
+#/run/fname /media/ryan/Storage/computing/milliQanDemoSim/data/muon45test/
+/run/beamOn 100
