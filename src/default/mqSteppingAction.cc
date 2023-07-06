@@ -258,9 +258,9 @@ void mqSteppingAction::UserSteppingAction(const G4Step * theStep){
 	//Trigger sensitive detector manually
 
 	//determine cosine of angle of incidence  
-        cosDetect= abs(myStartDirection.dot(G4ThreeVector(0.935,0,1)));
+        cosDetect= std::abs(myStartDirection.dot(G4ThreeVector(0.935,0,1)));
 	myEndVolumeName=theStep->GetPostStepPoint()->GetPhysicalVolume()->GetName();
-	if(myEndVolumeName.contains("ScintSlabPMT")) cosDetect=abs(myStartDirection.dot(G4ThreeVector(1,0,-0.935)));
+	if(myEndVolumeName.contains("ScintSlabPMT")) cosDetect=std::abs(myStartDirection.dot(G4ThreeVector(1,0,-0.935)));
 	//determine angle of incidence
 	angleDetect=acos(cosDetect)*180/M_PI; //should always be less than 90 degrees
 

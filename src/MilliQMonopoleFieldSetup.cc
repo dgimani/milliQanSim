@@ -121,7 +121,7 @@ void MilliQMonopoleFieldSetup::SetMagField(G4double fieldValueX, G4double fieldV
   //apply a global uniform magnetic field along Z axis  
   if (fMagneticField) { delete fMagneticField; }  //delete the existing magn field
 
-  if (abs(fieldValueX)+abs(fieldValueY)+abs(fieldValueZ) != 0.)     // create a new one if non nul
+  if (std::abs(fieldValueX)+std::abs(fieldValueY)+std::abs(fieldValueZ) != 0.)     // create a new one if non nul
     {
       fMagneticField = new G4UniformMagField(G4ThreeVector(fieldValueX,fieldValueY,fieldValueZ));
       InitialiseAll();

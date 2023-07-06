@@ -244,7 +244,7 @@ void mqSteppingAction::UserSteppingAction(const G4Step * theStep){
 	//Trigger sensitive detector manually
 ///*
 	//determine cosine of angle of incidence  
-        cosDetect= abs(myStartDirection.dot(G4ThreeVector(1,0,0)));
+        cosDetect= std::abs(myStartDirection.dot(G4ThreeVector(1,0,0)));
 	//G4cout << "pos: " << myEndPosition.x() << " " << myEndPosition.y() << " " << myEndPosition.z() << " angle: " << cosDetect << G4endl;	
 	 // G4cout << "absorbed: " << thePostPV->GetName() << " and x: " << myEndPosition.x() << G4endl;
 	//G4cout << " angle: " << myStartDirection.x() << " " << myStartDirection.y() << " " << myStartDirection.z() << G4endl;	
