@@ -380,10 +380,9 @@ void mqSteppingAction::UserSteppingAction(const G4Step * theStep){
 ////////////// use this to check on particle energies and hit times in specific detectors/////////
 ///*
                  //if(particleName.contains("monopole") //monopolemu 
-                 if((particleName.contains("mu") || particleName.contains("neutron") || particleName.contains("e-") || particleName.contains("gamma") || particleName.contains("e+"))//mumonopole if(particleName.contains("mu") //mumonopole 
-			&& (!myStartVolumeName.contains("plScin") && !myStartVolumeName.contains("slab_physic") && !myStartVolumeName.contains("panel_physic"))
-			&& (myEndVolumeName.contains("plScin") || myEndVolumeName.contains("slab_physic") || myEndVolumeName.contains("panel_physic"))
-			){ //also, particle entered one of the middle layers
+		   if((!particleName.contains("opticalphoton")) && (!myStartVolumeName.contains("plScin") && !myStartVolumeName.contains("slab_physic") && !myStartVolumeName.contains("panel_physic"))
+                        && (myEndVolumeName.contains("plScin") || myEndVolumeName.contains("slab_physic") || myEndVolumeName.contains("panel_physic"))
+			){
 //			&& theStep->GetPostStepPoint()->GetTouchable()->GetVolume()->GetName().back()-48==1){ //particle does so in the middlemost layer in particular
 			
 			
@@ -404,28 +403,18 @@ void mqSteppingAction::UserSteppingAction(const G4Step * theStep){
   			scintSD = (mqScintSD*)G4SDManager::GetSDMpointer()->FindSensitiveDetector(sdScintName);
 			scintSD->ProcessHitsEnter(theStep,NULL);
 		       }
-		       else if((!particleName.contains("opticalphoton")) && (!myStartVolumeName.contains("plScin") && !myStartVolumeName.contains("slab_physic") && !myStartVolumeName.contains("panel_physic"))
-                        && (myEndVolumeName.contains("plScin") || myEndVolumeName.contains("slab_physic") || myEndVolumeName.contains("panel_physic"))
-                        ){
-			       G4cout << "Weird particle enter! Name is " << particleName << G4endl;
-			 }
                  
-                 if((particleName.contains("e-") || particleName.contains("neutron") || particleName.contains("gamma") || particleName.contains("e+") || particleName.contains("mu")) //mumonopole 
+                 //if((particleName.contains("e-") || particleName.contains("neutron") || particleName.contains("gamma") || particleName.contains("e+") || particleName.contains("mu")) //mumonopole 
                  //if(particleName.contains("monopole") //monopolemu 
-			&& (myStartVolumeName.contains("plScin") || myStartVolumeName.contains("slab_physic") || myStartVolumeName.contains("panel_physic"))
+		 if((!particleName.contains("opticalphoton")) && (myStartVolumeName.contains("plScin") || myStartVolumeName.contains("slab_physic") || myStartVolumeName.contains("panel_physic"))
 			&& (!myEndVolumeName.contains("plScin") && !myEndVolumeName.contains("slab_physic") && !myEndVolumeName.contains("panel_physic"))
-			){ //also, particle entered one of the middle layers
+			){
 
   			G4String sdScintName="Scint_SD";
   			scintSD = (mqScintSD*)G4SDManager::GetSDMpointer()->FindSensitiveDetector(sdScintName);
 			//G4cout << "exiting scint! copy number is " << preCopyNo << G4endl;
 			scintSD->ProcessHitsExit(theStep,NULL);
 			G4cout << "========================================================================" << G4endl;
-		 	} else if((!particleName.contains("opticalphoton")) && (myStartVolumeName.contains("plScin") || myStartVolumeName.contains("slab_physic") || myStartVolumeName.contains("panel_physic"))
-			&& (!myEndVolumeName.contains("plScin") && !myEndVolumeName.contains("slab_physic") && !myEndVolumeName.contains("panel_physic"))
-			){
-			       G4cout << "Weird particle exit! Name is " << particleName << G4endl;
-				
 			}
 
 //////////////////////////////////////////////////////////////////////////////////////////////
