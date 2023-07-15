@@ -26,7 +26,9 @@ mqScintHit::mqScintHit():
 	exitEnergy(0.),
 //	trackLength(0.),
         copyNo(0),
-//	particleName(""),
+	particleName(0),
+	procName(""),
+	creatorVolName(""),
 	hitTime(0.),
 	exitTime(0.),
 	hitPosition(0.,0.,0.),
@@ -47,9 +49,10 @@ mqScintHit::mqScintHit(const mqScintHit& right)
     parentID        = right.parentID       ;
     hitEnergy            = right.hitEnergy           ;
     exitEnergy            = right.exitEnergy           ;
-    copyNo          = right.copyNo         ;
 //    trackLength            = right.trackLength   ;
-//    particleName    = right.particleName   ;
+    copyNo          = right.copyNo         ;
+    particleName    = right.particleName   ;
+    creatorVolName    = right.creatorVolName   ;
     hitTime  = right.hitTime ;
     exitTime  = right.exitTime ;
     hitPosition     = right.hitPosition    ;
@@ -67,7 +70,8 @@ const mqScintHit& mqScintHit::operator=(const mqScintHit& right)
     exitEnergy            = right.exitEnergy           ;
 //    trackLength            = right.trackLength           ;
     copyNo          = right.copyNo         ;
-//    particleName    = right.particleName   ;
+    particleName    = right.particleName   ;
+    creatorVolName    = right.creatorVolName   ;
     hitTime  = right.hitTime ;
     exitTime  = right.exitTime ;
     hitPosition     = right.hitPosition    ;
@@ -121,22 +125,24 @@ mqScintRHit* mqScintHit::ConvertToROOTHit() const{
 
   myROOTHit->SetEDep(this->GetHitEnergy()/MeV-this->GetExitEnergy()/MeV);
   
-  G4ThreeVector hitVec = this->GetHitPosition();
-  G4ThreeVector exitVec = this->GetExitPosition();
+//  G4ThreeVector hitVec = this->GetHitPosition();
+//  G4ThreeVector exitVec = this->GetExitPosition();
 
-  G4ThreeVector tLength = hitVec-exitVec;
-  myROOTHit->SetTrackLength(tLength.mag()/cm);
+//  G4ThreeVector tLength = hitVec-exitVec;
+//  myROOTHit->SetTrackLength(tLength.mag()/cm);
   myROOTHit->SetCopyNo(this->GetCopyNo());
-//  myROOTHit->SetHitPositionX(this->GetHitPosition().getX()/m);
-//  myROOTHit->SetHitPositionY(this->GetHitPosition().getY()/m);
-//  myROOTHit->SetHitPositionZ(this->GetHitPosition().getZ()/m);
-//  myROOTHit->SetExitPositionX(this->GetExitPosition().getX()/m);
-//  myROOTHit->SetExitPositionY(this->GetExitPosition().getY()/m);
-//  myROOTHit->SetExitPositionZ(this->GetExitPosition().getZ()/m);
+  myROOTHit->SetHitPositionX(this->GetHitPosition().getX()/m);
+  myROOTHit->SetHitPositionY(this->GetHitPosition().getY()/m);
+  myROOTHit->SetHitPositionZ(this->GetHitPosition().getZ()/m);
+  myROOTHit->SetExitPositionX(this->GetExitPosition().getX()/m);
+  myROOTHit->SetExitPositionY(this->GetExitPosition().getY()/m);
+  myROOTHit->SetExitPositionZ(this->GetExitPosition().getZ()/m);
   myROOTHit->SetHitTime(this->GetHitTime()/ns);
   myROOTHit->SetExitTime(this->GetExitTime()/ns);
   myROOTHit->SetParentID(this->GetParentID());
-//  myROOTHit->SetParticleName(this->GetParticleName());
+  myROOTHit->SetParticleName(this->GetParticleName());
+  myROOTHit->SetProcName(this->GetProcName());
+  myROOTHit->SetCreatorVolName(this->GetCreatorVolName());
   myROOTHit->SetTrackID(this->GetTrackID());
 
 

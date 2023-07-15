@@ -35,8 +35,8 @@ class mqScintRHit : public TObject
 //    void AddEDep(Double_t de){ EDep_MeV   += de;    };
     Double_t GetEDep()const{ return EDep_MeV; };
 
-    void SetTrackLength(Double_t tl){ trackLength_cm    = tl;    };
-    Double_t GetTrackLength()const{ return trackLength_cm; };
+//    void SetTrackLength(Double_t tl){ trackLength_cm    = tl;    };
+//    Double_t GetTrackLength()const{ return trackLength_cm; };
 
     void SetCopyNo(Int_t n){ copyNo = n;};
     Int_t GetCopyNo()const{ return copyNo;};
@@ -47,16 +47,27 @@ class mqScintRHit : public TObject
 
     void SetExitTime(Double_t tm){ exitTime_ns    = tm;    };
     Double_t GetExitTime()const{ return exitTime_ns; };
-//    void SetParticleName(TString pn){ particleName   = pn;    };
-//    TString GetParticleName(){ return particleName; };
+    void SetParticleName(Int_t pn){ particleName   = pn;    };
+    Int_t GetParticleName(){ return particleName; };
+    void SetProcName(TString pn){ procName   = pn;    };
+    TString GetProcName(){ return procName; };
+    void SetCreatorVolName(TString vn){ creatorVolName   = vn;    };
+    TString GetCreatorVolName(){ return creatorVolName; };
 
 
-//    void SetHitPositionX(Double_t x){ hitPositionX_cm     =  x;   };
-//    void SetHitPositionY(Double_t y){ hitPositionY_cm     =  y;   };
-//    void SetHitPositionZ(Double_t z){ hitPositionZ_cm     =  z;   };
-//    Double_t GetHitPositionX()const{ return hitPositionX_cm; };
-//    Double_t GetHitPositionY()const{ return hitPositionY_cm; };
-//    Double_t GetHitPositionZ()const{ return hitPositionZ_cm; };
+    void SetHitPositionX(Double_t x){ hitPositionX_cm     =  x;   };
+    void SetHitPositionY(Double_t y){ hitPositionY_cm     =  y;   };
+    void SetHitPositionZ(Double_t z){ hitPositionZ_cm     =  z;   };
+    Double_t GetHitPositionX()const{ return hitPositionX_cm; };
+    Double_t GetHitPositionY()const{ return hitPositionY_cm; };
+    Double_t GetHitPositionZ()const{ return hitPositionZ_cm; };
+
+    void SetExitPositionX(Double_t x){ exitPositionX_cm     =  x;   };
+    void SetExitPositionY(Double_t y){ exitPositionY_cm     =  y;   };
+    void SetExitPositionZ(Double_t z){ exitPositionZ_cm     =  z;   };
+    Double_t GetExitPositionX()const{ return exitPositionX_cm; };
+    Double_t GetExitPositionY()const{ return exitPositionY_cm; };
+    Double_t GetExitPositionZ()const{ return exitPositionZ_cm; };
 
   private:
 
@@ -67,12 +78,17 @@ class mqScintRHit : public TObject
     Int_t    copyNo;
     Double_t hitTime_ns;
     Double_t exitTime_ns;
-//    TString  particleName;
-//    Double_t hitPositionX_cm;
-//    Double_t hitPositionY_cm;
-//    Double_t hitPositionZ_cm;
+    Int_t    particleName;
+    TString  procName;
+    TString  creatorVolName;
+    Double_t hitPositionX_cm;
+    Double_t hitPositionY_cm;
+    Double_t hitPositionZ_cm;
+    Double_t exitPositionX_cm;
+    Double_t exitPositionY_cm;
+    Double_t exitPositionZ_cm;
 
-    ClassDef(mqScintRHit,9);
+    ClassDef(mqScintRHit,11);
 
 };
 

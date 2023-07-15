@@ -48,10 +48,7 @@ mqSteppingAction::mqSteppingAction(mqHistoManager* histo)
 
 //_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_
 mqSteppingAction::~mqSteppingAction()
-{
-//  delete steppingMessenger;
-  //delete histoManager;
-}
+{}
 
 //_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_
 void mqSteppingAction::UserSteppingAction(const G4Step * theStep){
@@ -82,13 +79,12 @@ void mqSteppingAction::UserSteppingAction(const G4Step * theStep){
   G4OpBoundaryProcessStatus boundaryStatus = Undefined;
   static G4OpBoundaryProcess* boundary     = NULL;
 
-  G4ProcessManager* pm;
-  G4ProcessVector* pv;
   //find the boundary process only once
   if(!boundary){
-    pm = theStep->GetTrack()->GetDefinition()->GetProcessManager();
+    G4ProcessManager* pm
+      = theStep->GetTrack()->GetDefinition()->GetProcessManager();
     G4int nprocesses = pm->GetProcessListLength();
-    pv = pm->GetProcessList();
+    G4ProcessVector* pv = pm->GetProcessList();
     G4int i;
     for( i=0;i<nprocesses;i++){
       if((*pv)[i]->GetProcessName()=="OpBoundary"){
@@ -104,15 +100,16 @@ void mqSteppingAction::UserSteppingAction(const G4Step * theStep){
   G4double eventTime = 0.0;
   G4double totalEnergy = 0.0;
   G4String particleName = "";
-
+  
+  mqPMTSD* pmtSD;
+  mqScintSD* scintSD;
+  
   particleName = theTrack->GetDefinition()->GetParticleName();
   myEnergyEDep = theStep->GetTotalEnergyDeposit();
   myEnergyDelta = theStep->GetDeltaEnergy();
   G4int stepID = theStep->GetTrack()->GetCurrentStepNumber();
   G4int eventID = eventInformation->GetEventID();
-  mqScintSD* scintSD;
-  mqPMTSD* pmtSD;
-  //  if(eventID % 1000==0) G4cout << "Event ID is: " << eventID << G4endl;
+//  if(eventID % 1000==0) G4cout << "Event ID is: " << eventID << G4endl;
   //
   // Get information about the start point of the step
   //
@@ -132,7 +129,6 @@ void mqSteppingAction::UserSteppingAction(const G4Step * theStep){
 
   G4int preCopyNo = thePrePoint->GetTouchable()->GetCopyNumber(); //also using these two
   G4int postCopyNo = thePostPoint->GetTouchable()->GetCopyNumber();
-  const G4Event* evt = G4RunManager::GetRunManager()->GetCurrentEvent();
   
   G4double myStartTime = -1.0;
   G4ThreeVector myStartMomentumDirection;
@@ -159,11 +155,11 @@ void mqSteppingAction::UserSteppingAction(const G4Step * theStep){
   
   }
 
-    G4TrackVector* fSecondary;
+
   if(theTrack->GetParentID()==0){
     //This is a primary track
 
-    fSecondary=fpSteppingManager->GetfSecondary();
+    G4TrackVector* fSecondary=fpSteppingManager->GetfSecondary();
     G4int tN2ndariesTot = fpSteppingManager->GetfN2ndariesAtRestDoIt()
       + fpSteppingManager->GetfN2ndariesAlongStepDoIt()
       + fpSteppingManager->GetfN2ndariesPostStepDoIt();
@@ -180,6 +176,8 @@ void mqSteppingAction::UserSteppingAction(const G4Step * theStep){
 
   G4ParticleDefinition* particleType = theTrack->GetDefinition();
 
+
+//////////////// optional speedups for photon tracking ////////////////////
   // kill optical photons which are below pmt sensitivity
   // for now kill photons which were created after 10^20 ns
   //if(killPhoton && (particleType==G4OpticalPhoton::OpticalPhotonDefinition()) && theTrack->GetGlobalTime() > pow(10.,15.)* ns)//(theTrack->GetTotalEnergy() < 1.9*eV))
@@ -191,6 +189,7 @@ void mqSteppingAction::UserSteppingAction(const G4Step * theStep){
   //kill photons which are reflected internally (i.e. dielectric-dielectric) more than 200 times
   //if(trackInformation->GetInternalReflectionCount() > 1000)
   //	  theTrack->SetTrackStatus(fStopAndKill);
+///////////////////////////////////////////////////////////////////////////
 
 
   if((particleType==G4OpticalPhoton::OpticalPhotonDefinition())){
@@ -202,6 +201,9 @@ void mqSteppingAction::UserSteppingAction(const G4Step * theStep){
       eventInformation->IncAbsorption();
       trackInformation->AddTrackStatusFlag(absorbed);
     }
+  
+    //kill photons which enter the PMT deadzone near the edge
+    //if(myEndVolumeName.contains("pmtLog")) theTrack->SetTrackStatus(fStopAndKill);
 
 
 
@@ -250,42 +252,47 @@ void mqSteppingAction::UserSteppingAction(const G4Step * theStep){
     	  eventInformation->IncBoundaryAbsorption();
 	  //G4cout << thePostPV->GetName() << G4endl;
 	break;
-      case Detection:
-	{       
-	//Note, this assumes that the volume causing detection
+      case Detection: //Note, this assumes that the volume causing detection
                       //is the photocathode because it is the only one with
 	                  //non-zero efficiency
 	//Trigger sensitive detector manually
 
-	//determine cosine of angle of incidence  
-        cosDetect= std::abs(myStartDirection.dot(G4ThreeVector(0.935,0,1)));
-	myEndVolumeName=theStep->GetPostStepPoint()->GetPhysicalVolume()->GetName();
-	if(myEndVolumeName.contains("ScintSlabPMT")) cosDetect=std::abs(myStartDirection.dot(G4ThreeVector(1,0,-0.935)));
+	//std::cout << postCopyNo << std::endl;
+	//determine cosine of angle of incidence
+	
+        //if(postCopyNo==18)
+	cosDetect= std::abs(myStartDirection.dot(G4ThreeVector(0,0,1)));
+	//std::cout << myStartDirection.getX() << " " << myStartDirection.getY() << " " << myStartDirection.getZ() << std::endl;
+	//else cosDetect= std::abs(myStartDirection.dot(G4ThreeVector(0,1,0)));
+		
 	//determine angle of incidence
 	angleDetect=acos(cosDetect)*180/M_PI; //should always be less than 90 degrees
 
         //using a 6th degree polynomial fit based on the data in OpticalData/PMTAngularSpec.txt. Using 6th degree because detections are infrequent compared to total # of steps so it's not that expensive
-        polyAngleFitResult=3.93E-11*pow(angleDetect,6)-9.69E-09*pow(angleDetect,5)+9.10E-07*pow(angleDetect,4)-4.26E-05*pow(angleDetect,3)+9.17E-04*pow(angleDetect,2)-8.22E-03*angleDetect+9.98E-01;	
+        polyAngleFitResult=-2.01E-12*pow(angleDetect,6)+7.8E-09*pow(angleDetect,4)+5.5E-05*pow(angleDetect,2)+0.493;
 
-	//if we don't think we're optimally coupled, this second 62 degrees term below is the glass-scintillator critical angle correction. Specifically, it's the correction for silicone oil-to-scintillator. The borosilicate glass-to-scintillator correction is 72.9 degrees. Enabling this cutoff for silicone oil for now since we're doing the optical coupling manually and it could possibly be a poor coupling, but it should mostly not matter for a bar since the detection angles are much sharper than 62 degrees most of the time
-	if(G4UniformRand()<polyAngleFitResult && angleDetect<62){
+        //if we don't think we're optimally coupled, this second 62 degrees term below is the glass-scintillator critical angle correction. Specifically, it's the correction for silicone oil-to-scintillator. The borosilicate glass-to-scintillator correction is 72.9 degrees. Enabling this cutoff for silicone oil for now since we're doing the optical coupling manually and it could possibly be a poor coupling, but it should mostly not matter for a bar since the detection angles are much sharper than 62 degrees most of the time
+//      if(true){
+//      if(G4UniformRand()<polyAngleFitResult && angleDetect<39.3){
+        if(G4UniformRand()<polyAngleFitResult){ //full range
 
-	    //G4cout << "hit registered!" << G4endl;
-	    //G4cout << theStep->GetPostStepPoint()->GetPhysicalVolume()->GetName() << G4endl;
-	    //if(G4UniformRand()<cosDetect){                               //if we think we did a good job coupling, then just use this relationship (which falls off at high theta anyways)
-	    //if(G4UniformRand()<0.01) G4cout << "Cosine is " << cosDetect << G4endl;
-//		if (myEndVolumeName.contains("PMTParamPhys") || myEndVolumeName.contains("ScintSlabPMT") || myEndVolumeName.contains("ScintPanelPMT") || myEndVolumeName.contains("PMTFourth")){
-	    G4String sdPMTName="PMT_SD";
-	    pmtSD = (mqPMTSD*)G4SDManager::GetSDMpointer()->FindSensitiveDetector(sdPMTName);
-	    //pmtSD->GetCollectionName(1);
-	    if(pmtSD){
-	        pmtSD->ProcessHits_constStep(theStep,NULL);
-	    //  G4cout << "Process Hits PMT" << G4endl;
-	        }
-	    trackInformation->AddTrackStatusFlag(hitPMT);
-//		}
-	}
-	}
+//	G4cout << "hit registered!" << G4endl;
+	//G4cout << theStep->GetPostStepPoint()->GetPhysicalVolume()->GetName() << G4endl;
+	//if(G4UniformRand()<cosDetect){                               //if we think we did a good job coupling, then just use this relationship (which falls off at high theta anyways)
+//		if(G4UniformRand()<0.01) G4cout << "Cosine is " << cosDetect << G4endl;
+		myEndVolumeName=theStep->GetPostStepPoint()->GetPhysicalVolume()->GetName();
+		//if (true){
+	  G4String sdPMTName="PMT_SD";
+
+	  pmtSD = (mqPMTSD*)G4SDManager::GetSDMpointer()->FindSensitiveDetector(sdPMTName);
+	  //pmtSD->GetCollectionName(1);
+	  if(pmtSD){
+	    pmtSD->ProcessHits_constStep(theStep,NULL);
+	  //  G4cout << "Process Hits PMT" << G4endl;
+	    }
+	  trackInformation->AddTrackStatusFlag(hitPMT);
+
+		}
 	  break;
       case FresnelReflection:
 	  trackInformation->IncReflections();
@@ -294,6 +301,7 @@ void mqSteppingAction::UserSteppingAction(const G4Step * theStep){
 	  break;
       case TotalInternalReflection:
 	  if(G4UniformRand()<0.01) theTrack->SetTrackStatus(fStopAndKill);
+	  //if(G4UniformRand()<1.1) theTrack->SetTrackStatus(fStopAndKill);
 	  trackInformation->IncReflections();
 	  trackInformation->IncInternalReflections();
     	  break;
@@ -372,7 +380,6 @@ void mqSteppingAction::UserSteppingAction(const G4Step * theStep){
 ////////////// use this to check on particle energies and hit times in specific detectors/////////
 ///*
                  //if(particleName.contains("monopole") //monopolemu 
-                 //if((particleName.contains("mu") || particleName.contains("neutron") || particleName.contains("e-") || particleName.contains("gamma") || particleName.contains("e+"))//mumonopole if(particleName.contains("mu") //mumonopole 
 		   if((!particleName.contains("opticalphoton")) && (!myStartVolumeName.contains("plScin") && !myStartVolumeName.contains("slab_physic") && !myStartVolumeName.contains("panel_physic"))
                         && (myEndVolumeName.contains("plScin") || myEndVolumeName.contains("slab_physic") || myEndVolumeName.contains("panel_physic"))
 			){
@@ -409,10 +416,11 @@ void mqSteppingAction::UserSteppingAction(const G4Step * theStep){
 			scintSD->ProcessHitsExit(theStep,NULL);
 			G4cout << "========================================================================" << G4endl;
 			}
+
 //////////////////////////////////////////////////////////////////////////////////////////////
 /*
  //using this to kill muons that we don't want to hit the detector, since we trigger on muons and I don't want to waste sim runtime
-///////////////////// trigger check for simulating cosmic muon triggers in a particular layer ////////////////////////////
+///////////////////// trigger check ////////////////////////////
 		if(particleName.contains("mu") && myStartVolumeName.contains("World")
 				&& (myEndVolumeName.contains("barParam") || myEndVolumeName.contains("Panel"))
 				&& !(eventInformation->GetMuonTrigger())) {theStep->GetTrack()->SetTrackStatus(fStopAndKill);
@@ -433,38 +441,37 @@ void mqSteppingAction::UserSteppingAction(const G4Step * theStep){
 		}
 	}
 */
-/////////// muon interaction manager ///////////////
-        if( particleName.contains("mu") ){
-                //sum energy deposit
-                sumEnergyDep=eventInformation->GetMuonTrack(theStep->GetTrack()->GetTrackID())->GetEnergyDeposit()+myEnergyEDep;
-                eventInformation->GetMuonTrack(theStep->GetTrack()->GetTrackID())->SetEnergyDeposit(sumEnergyDep);
-                if((myStartVolumeName.contains("rockPhysic") && myEndVolumeName.contains("World") && eventInformation->GetMuonTrack(theStep->GetTrack()->GetTrackID())->GetXposition()==-100))
-                {
-                                position = myEndPosition;
-                                Xposition = position.x();// or getX()
-                                Yposition = position.y();
-                                Zposition = position.z();
 
-                                eventInformation->GetMuonTrack(theStep->GetTrack()->GetTrackID())->SetZposition(Zposition/m);
-                                eventInformation->GetMuonTrack(theStep->GetTrack()->GetTrackID())->SetYposition(Yposition/m);
-                                eventInformation->GetMuonTrack(theStep->GetTrack()->GetTrackID())->SetXposition(Xposition/m);
-                                //std::cout << "muon enter the cavern" <<std::endl;
-                                //std::cout << "Xposition:" << Xposition <<std::endl;
-                                //std::cout << "Yposition:" << Yposition <<std::endl;
-                                //std::cout << "Zposition:" << Zposition <<std::endl;
-                }
+	if( particleName.contains("mu") ){
+		//sum energy deposit
+		sumEnergyDep=eventInformation->GetMuonTrack(theStep->GetTrack()->GetTrackID())->GetEnergyDeposit()+myEnergyEDep;
+		eventInformation->GetMuonTrack(theStep->GetTrack()->GetTrackID())->SetEnergyDeposit(sumEnergyDep);
+		if((myStartVolumeName.contains("rockPhysic") && myEndVolumeName.contains("World") && eventInformation->GetMuonTrack(theStep->GetTrack()->GetTrackID())->GetXposition()==-100))
+		{
+				position = myEndPosition;
+				Xposition = position.x();// or getX()
+				Yposition = position.y();
+				Zposition = position.z();
 
-                if((myStartVolumeName.contains("World") && myEndVolumeName.contains("rockPhysic") && eventInformation->GetMuonTrack(theStep->GetTrack()->GetTrackID())->GetXposition()>-100))
-                {
-                                position = myEndPosition;
-                                Xfposition = position.x();// or getX()
-                                Yfposition = position.y();
-                                Zfposition = position.z();
-                                eventInformation->GetMuonTrack(theStep->GetTrack()->GetTrackID())->SetZfposition(Zfposition/m);
-                                eventInformation->GetMuonTrack(theStep->GetTrack()->GetTrackID())->SetYfposition(Yfposition/m);
-                                eventInformation->GetMuonTrack(theStep->GetTrack()->GetTrackID())->SetXfposition(Xfposition/m);
-                }
+				eventInformation->GetMuonTrack(theStep->GetTrack()->GetTrackID())->SetZposition(Zposition/m);
+				eventInformation->GetMuonTrack(theStep->GetTrack()->GetTrackID())->SetYposition(Yposition/m);
+				eventInformation->GetMuonTrack(theStep->GetTrack()->GetTrackID())->SetXposition(Xposition/m);
+				//std::cout << "muon enter the cavern" <<std::endl;
+				//std::cout << "Xposition:" << Xposition <<std::endl;
+				//std::cout << "Yposition:" << Yposition <<std::endl;
+				//std::cout << "Zposition:" << Zposition <<std::endl;
+		}
 
+		if((myStartVolumeName.contains("World") && myEndVolumeName.contains("rockPhysic") && eventInformation->GetMuonTrack(theStep->GetTrack()->GetTrackID())->GetXposition()>-100))
+		{
+				position = myEndPosition;
+				Xfposition = position.x();// or getX()
+				Yfposition = position.y();
+				Zfposition = position.z();
+				eventInformation->GetMuonTrack(theStep->GetTrack()->GetTrackID())->SetZfposition(Zfposition/m);
+				eventInformation->GetMuonTrack(theStep->GetTrack()->GetTrackID())->SetYfposition(Yfposition/m);
+				eventInformation->GetMuonTrack(theStep->GetTrack()->GetTrackID())->SetXfposition(Xfposition/m);
+		}
 /*		
 		//muon enters scintillator
 		if((!myStartVolumeName.contains("scint") && !myStartVolumeName.contains("Scint"))
@@ -476,7 +483,7 @@ void mqSteppingAction::UserSteppingAction(const G4Step * theStep){
 			scintSD->ProcessHitsEnter(theStep,NULL);
 		}
 */
-		//muon exits scintillator
+		//muon enters scintillator
 /*		
 		if((myStartVolumeName.contains("scint") || myStartVolumeName.contains("Scint"))
 			&& (!myEndVolumeName.contains("scint") && !myEndVolumeName.contains("Scint"))){
@@ -500,8 +507,6 @@ void mqSteppingAction::UserSteppingAction(const G4Step * theStep){
 	}
 */
 //
-
-/////////////// electron debugging ////////////////	
 /*
 	if(particleName.contains("e+") || particleName.contains("e-")){
 		if(theTrack->GetCurrentStepNumber()==1) G4cout << "Electron track creator process is: " << theTrack->GetCreatorProcess()->GetProcessName() << " and energy is " << theTrack->GetTotalEnergy() << G4endl;// " *and kinetic energy is* " << theTrack->GetKineticEnergy() << G4endl;
@@ -509,7 +514,35 @@ void mqSteppingAction::UserSteppingAction(const G4Step * theStep){
 
 */		sumEnergyDep=eventInformation->GetEventEnergyDeposit()+myEnergyEDep;
 		eventInformation->SetEventEnergyDeposit(sumEnergyDep);
-
+//		G4cout << "End Volume: " << myEndVolumeName << " particle name: " << particleName <<  G4endl;
+/*
+///////////////////// trigger check ////////////////////////////	
+//	if(particleName.contains("mu") && myStartVolumeName.contains("World") && myEndVolumeName=="trigPad_physic_up"){ //muon hits trigger paddle
+		if((myStartVolumeName.contains("barStack") || myStartVolumeName.contains("World")) //particle started in the stack, or came from the world
+			&& myEndVolumeName.contains("barParam") //particle ends up in one of the bar wrapping layers, somewhere, afterwards
+			&& particleName.contains("mu")
+			&& ((postCopyNo == 2) || (postCopyNo == 5))){ //also, particle entered one of the middle layers
+//			&& theStep->GetPostStepPoint()->GetTouchable()->GetVolume()->GetName().back()-48==1){ //particle does so in the middlemost layer in particular
+			
+		eventInformation->GetMuonTrack(theStep->GetTrack()->GetTrackID())->SetMuonTriggerUp(true);	
+		if(eventInformation->GetMuonTrack(theStep->GetTrack()->GetTrackID())->GetMuonTriggerLow()) eventInformation->SetMuonTrigger(true);
+	}
+	//if(particleName.contains("mu") && myStartVolumeName.contains("World") && myEndVolumeName=="trigPad_physic_low"){ //muon hits trigger paddle
+		if((myStartVolumeName.contains("barStack") || myStartVolumeName.contains("World")) //particle started in the stack, or came from the world
+			&& myEndVolumeName.contains("barParam") //particle ends up in one of the bar wrapping layers, somewhere, afterwards
+			&& particleName.contains("mu")
+			&& ((postCopyNo == 0) || (postCopyNo == 3))){ //also, particle entered one of the middle layers
+//			&& theStep->GetPostStepPoint()->GetTouchable()->GetVolume()->GetName().back()-48==1){ //particle does so in the middlemost layer in particular
+		eventInformation->GetMuonTrack(theStep->GetTrack()->GetTrackID())->SetMuonTriggerLow(true);
+		if(eventInformation->GetMuonTrack(theStep->GetTrack()->GetTrackID())->GetMuonTriggerUp()) eventInformation->SetMuonTrigger(true);
+	}
+///////////////////////////////////////////////////////////////
+*/	
+/*	
+	if(particleName.contains("gamma") && myStartVolumeName=="plScin_physic" && myEndVolumeName.contains("World")){ //gamma exiting scintillator to the world
+		eventInformation->GetGammaTrack(theStep->GetTrack()->GetTrackID())->SetGammaOutScintillator(true);
+	}
+  */
   
 }
 

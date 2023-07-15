@@ -47,17 +47,14 @@ class mqScintHit : public G4VHit
     void SetExitEnergy(G4double ed){ exitEnergy    = ed;    };
     G4double GetExitEnergy()const{ return exitEnergy; };
     
-//    void SetTrackLength(G4double tl){ trackLength    = tl;    };
-//    G4double GetTrackLength()const{ return trackLength; };
-    
     void SetHitTime(G4double tm){ hitTime    = tm;    };
     G4double GetHitTime()const{ return hitTime; };
     
     void SetExitTime(G4double tm){ exitTime    = tm;    };
     G4double GetExitTime()const{ return exitTime; };
 
-    void SetParticleName(G4String pn){ particleName   = pn;    };
-    G4String GetParticleName()const{ return particleName; };
+    void SetParticleName(G4int pn){ particleName   = pn;    };
+    G4int GetParticleName()const{ return particleName; };
 
     void SetCopyNo(G4int nb){ copyNo  = nb;   };
     G4int    GetCopyNo()const{ return copyNo; };
@@ -68,6 +65,12 @@ class mqScintHit : public G4VHit
     void SetExitPosition     (G4ThreeVector xyz){ exitPosition     = xyz;   };
     G4ThreeVector GetExitPosition()const{ return exitPosition; };
     
+    void SetProcName(G4String pn){ procName   = pn;    };
+    G4String GetProcName()const{ return procName; };
+
+    void SetCreatorVolName(G4String vn){ creatorVolName   = vn;    };
+    G4String GetCreatorVolName()const{ return creatorVolName; };
+
     mqScintRHit* ConvertToROOTHit() const;
 
   private:
@@ -76,14 +79,14 @@ class mqScintHit : public G4VHit
     G4int         parentID;
     G4double      hitEnergy;
     G4double      exitEnergy;
-//    G4double	  trackLength;
     G4double      hitTime;
     G4double      exitTime;
-    G4String      particleName;
-    G4int         copyNo;
     G4ThreeVector hitPosition;
     G4ThreeVector exitPosition;
-
+    G4int         particleName;
+    G4String      procName;
+    G4String      creatorVolName;
+    G4int         copyNo;
 };
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......

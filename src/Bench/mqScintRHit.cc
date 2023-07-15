@@ -16,10 +16,12 @@ mqScintRHit::mqScintRHit():
 	trackID(-1), parentID(-1),
 	EDep_MeV(0.), trackLength_cm(0.),
 	copyNo(0),
-	hitTime_ns(0.), exitTime_ns(0.)
-	//EDepRecoil_keV(0.),
-//	particleName(""),
-//	hitPositionX_cm(0.),hitPositionY_cm(0.),hitPositionZ_cm(0.)
+	hitTime_ns(0.), exitTime_ns(0.),
+	particleName(0),
+	procName(""),
+	creatorVolName(""),
+	hitPositionX_cm(0.),hitPositionY_cm(0.),hitPositionZ_cm(0.),
+	exitPositionX_cm(0.),exitPositionY_cm(0.),exitPositionZ_cm(0.)
 
 {}
 
@@ -37,12 +39,17 @@ mqScintRHit::mqScintRHit(const mqScintRHit& right):
     EDep_MeV        = right.EDep_MeV          ;
     trackLength_cm        = right.trackLength_cm          ;
     copyNo          = right.copyNo;
-//    particleName    = right.particleName   ;
+    particleName    = right.particleName   ;
+    procName    = right.procName   ;
+    creatorVolName    = right.creatorVolName   ;
     hitTime_ns  = right.hitTime_ns;
     exitTime_ns  = right.exitTime_ns;
-//    hitPositionX_cm    = right.hitPositionX_cm   ;
-//    hitPositionY_cm    = right.hitPositionY_cm   ;
-//    hitPositionZ_cm    = right.hitPositionZ_cm   ;
+    hitPositionX_cm    = right.hitPositionX_cm   ;
+    hitPositionY_cm    = right.hitPositionY_cm   ;
+    hitPositionZ_cm    = right.hitPositionZ_cm   ;
+    exitPositionX_cm    = right.exitPositionX_cm   ;
+    exitPositionY_cm    = right.exitPositionY_cm   ;
+    exitPositionZ_cm    = right.exitPositionZ_cm   ;
 
 }
 
@@ -55,9 +62,17 @@ const mqScintRHit& mqScintRHit::operator=(const mqScintRHit& right)
     EDep_MeV        = right.EDep_MeV          ;
     trackLength_cm        = right.trackLength_cm          ;
     copyNo          = right.copyNo;
-//    particleName    = right.particleName   ;
+    particleName    = right.particleName   ;
+    procName    = right.procName   ;
+    creatorVolName    = right.creatorVolName   ;
     hitTime_ns  = right.hitTime_ns;
     exitTime_ns  = right.exitTime_ns;
+    hitPositionX_cm    = right.hitPositionX_cm   ;
+    hitPositionY_cm    = right.hitPositionY_cm   ;
+    hitPositionZ_cm    = right.hitPositionZ_cm   ;
+    exitPositionX_cm    = right.exitPositionX_cm   ;
+    exitPositionY_cm    = right.exitPositionY_cm   ;
+    exitPositionZ_cm    = right.exitPositionZ_cm   ;
 
     return *this;
 }
