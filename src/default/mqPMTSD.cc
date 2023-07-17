@@ -87,9 +87,11 @@ G4bool mqPMTSD::ProcessHits_constStep(const G4Step* aStep,
 
   char layerNumberChar = aStep->GetPostStepPoint()->GetTouchable()->GetVolume()->GetName().back();
   G4int layerNumber = layerNumberChar-48;
-  G4int subStackCopyNo = aStep->GetPostStepPoint()->GetTouchable()->GetCopyNumber(1);
+  G4int subStackCopyNo = aStep->GetPostStepPoint()->GetTouchable()->GetCopyNumber();
+//  G4String subStackName = aStep->GetPostStepPoint()->GetTouchable()->GetVolume()->GetName();
+//  G4cout << "substackCopyNoName : " << subStackName << G4endl;
   copyNo = nBarPerLayer*layerNumber + volCopyNo + 4*subStackCopyNo;
-//  G4cout << "copyNo parts: " << aStep->GetPostStepPoint()->GetTouchable()->GetVolume()->GetName() << " " << volCopyNo << " " << subStackCopyNo << G4endl;
+//  G4cout << "copyNo parts: " << layerNumber << " " << aStep->GetPostStepPoint()->GetTouchable()->GetVolume()->GetName() << " " << volCopyNo << " " << subStackCopyNo << G4endl;
   } else {copyNo = volCopyNo;}
 
   G4double particleEnergy=aStep->GetTrack()->GetTotalEnergy();
