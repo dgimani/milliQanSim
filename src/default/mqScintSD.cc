@@ -65,9 +65,33 @@ G4bool mqScintSD::ProcessHits(G4Step* ,G4TouchableHistory* ){
 G4bool mqScintSD::ProcessHitsEnter(const G4Step* aStep,G4TouchableHistory*)
 {
 
-  const G4VTouchable* touchable = aStep->GetPostStepPoint()->GetTouchable();
-  G4int volCopyNo = touchable->GetCopyNumber(2);
-  G4int copyNo=volCopyNo;
+
+//  G4int copyNo=volCopyNo;
+
+  G4int volCopyNo = aStep->GetPostStepPoint()->GetTouchable()->GetCopyNumber(2);
+  G4int copyNo=0;
+  if(volCopyNo<6){
+
+  //get the detector to retrieve layer information
+//  mqDetectorConstruction* detector = (mqDetectorConstruction*)G4RunManager::GetRunManager()
+//                                            ->GetUserDetectorConstruction();
+  //get number of bars per layer
+//  G4int nBarPerLayer = detector->GetNBarPerLayer();
+
+  G4int nBarPerLayer = 9*6*4;
+
+  char layerNumberChar = aStep->GetPostStepPoint()->GetTouchable()->GetVolume(2)->GetName().back();
+  G4int layerNumber = layerNumberChar-48;
+  G4int subStackCopyNo = aStep->GetPostStepPoint()->GetTouchable()->GetCopyNumber(4);
+  
+  copyNo = nBarPerLayer*layerNumber + volCopyNo + 4*subStackCopyNo;
+  } else {copyNo = volCopyNo;}
+
+  G4cout << "Exiting scint! Copy Number is: " << copyNo << G4endl;
+
+
+
+
 
   const G4VProcess* creaProc= aStep->GetTrack()->GetCreatorProcess();
   G4String creaProcName;
@@ -100,10 +124,25 @@ G4bool mqScintSD::ProcessHitsEnter(const G4Step* aStep,G4TouchableHistory*)
 G4bool mqScintSD::ProcessHitsExit(const G4Step* aStep,G4TouchableHistory*)
 {
 
-  const G4VTouchable* touchable = aStep->GetPreStepPoint()->GetTouchable();
+  G4int volCopyNo = aStep->GetPreStepPoint()->GetTouchable()->GetCopyNumber(2);
+  G4int copyNo=0;
+  if(volCopyNo<6){
 
-  G4int volCopyNo = touchable->GetCopyNumber(2);
-  G4int copyNo=volCopyNo;
+  //get the detector to retrieve layer information
+//  mqDetectorConstruction* detector = (mqDetectorConstruction*)G4RunManager::GetRunManager()
+//                                            ->GetUserDetectorConstruction();
+  //get number of bars per layer
+//  G4int nBarPerLayer = detector->GetNBarPerLayer();
+
+  G4int nBarPerLayer = 9*6*4;
+
+  char layerNumberChar = aStep->GetPreStepPoint()->GetTouchable()->GetVolume(2)->GetName().back();
+  G4int layerNumber = layerNumberChar-48;
+  G4int subStackCopyNo = aStep->GetPreStepPoint()->GetTouchable()->GetCopyNumber(4);
+  copyNo = nBarPerLayer*layerNumber + volCopyNo + 4*subStackCopyNo;
+  } else {copyNo = volCopyNo;}
+
+  G4cout << "Exiting scint! Copy Number is: " << copyNo << G4endl;
 
   const G4VProcess* creaProc= aStep->GetTrack()->GetCreatorProcess();
   G4String creaProcName;
