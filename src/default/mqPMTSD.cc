@@ -87,7 +87,7 @@ G4bool mqPMTSD::ProcessHits_constStep(const G4Step* aStep,
 
   char layerNumberChar = aStep->GetPostStepPoint()->GetTouchable()->GetVolume()->GetName().back();
   G4int layerNumber = layerNumberChar-48;
-  G4int subStackCopyNo = aStep->GetPostStepPoint()->GetTouchable()->GetCopyNumber();
+  G4int subStackCopyNo = aStep->GetPostStepPoint()->GetTouchable()->GetCopyNumber(2);
 //  G4String subStackName = aStep->GetPostStepPoint()->GetTouchable()->GetVolume()->GetName();
 //  G4cout << "substackCopyNoName : " << subStackName << G4endl;
   copyNo = nBarPerLayer*layerNumber + volCopyNo + 4*subStackCopyNo;
