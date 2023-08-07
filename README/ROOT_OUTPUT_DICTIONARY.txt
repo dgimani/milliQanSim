@@ -1,54 +1,41 @@
 Here is an overview of the parameters contained in the ROOT outputs from the sim.
+
+
 The sample file here concerns mCPs, but for runs with muons the Gamma/Electron/Muon datastructures will populate with relevant data
 
-TRACK LEVEL INFORMATION:
-trackID: unique identifier (per-event) for a single track. Primaries are always 1, I believe, with parentID 0.
+=============================================================================================
+
+TRACK LEVEL INFORMATION: (e.g. MuonTrack)
+
+trackID: unique identifier (per-event) for a single track. Primaries are always 1 with parentID 0.
 
 initial/finalProcessName: Generating process name (as a TString) for the particle
 
 initial/finalVolumeName: Volume name at creation/destruction
 
-====================================================================
+initial/finalCopyNo: Initial and final copy number of the particle
 
-initial/finalCopyNo: Unique identifier for each scintillator/airgap/wrapping object in the simulation. The world volume always has copyNo of 0, while each of the bars, the slabs, and the panels all have a unique copy number. The bars are numbered 0-17, the slabs 18-21, and the panels 22-30.
+initialTime/finalTime: Initial and final Geant4 event time of the creation/destruction of the track
 
-The bars have the following numbering convention: ////////////////// OUTDATED, TRUE ONLY FOR DEMONSTRATOR  ////////////////////////////
-The first layer is indexed 0-5, the second 6-11, the third 12-17.
-Within a layer, the bars are indexed like so (from the perspective of an incident particle, with the view in this case pointing in the +z direction down the axis of the detector):
- _______
-|   |   |
-| 2 | 5 |
-|___|___|
-|   |   |
-| 1 | 4 |
-|___|___|
-|   |   |
-| 0 | 3 |
-|___|___|
+initial/finalEnergy: Initial and final energy of the track in MeV
 
-Add 6 for subsequent layers.
-The slabs are indexed 18-21, with 18 in front of the first layer and 21 behind the last.
-The panels are indexed 22-30, with the left panel in the first layer (from the perspective above) numbered 22, the top panel numbered 23, and the right panel numbered 24. Add 3 for subsequent layers.
+energyDeposit_MeV: Scored energy deposit of the track. Note that deposited energy in Geant has a very specific meaning that is not just "energy lost". To avoid EM divergence at low energies, would-be low-energy particles that would propagate for shorter than the default step length in the current material (0.7 mm by default) are just integrated over and the total energy is subtracted from the energy of the parent track. Deposited energy is used to accumulate these implicit energy deposits; to get total energy lost, add the deposited energy to the energy of any explicitly generated particles created by the parent.
 
-Note that the default copy number is 0. If you see something weird going on with copy number 0 having too many entries, it's possible that you're looking at a volume that's not parameterized or is not a bar/slab/panel, like the Pb slab or the Al support structure.
+parentID: Like trackID but for the parent particle
 
-=====================================================================
+initial/finalPosition: Initial and final position of the track
 
-The initial and final times: Time at creation and destruction of the particle track
+totalTrackLength: Length between creation and destruction of the track. For particles that leave the sim boundaries without being absorbed somewhere, this ~20m long or more
 
-Initial/Final Energy: Kinetic energy of particle at creation and destruction
+Xposition/Yposition/Zposition: The entry position of muons into the milliQan cavern
 
-Energy Deposit: Not being used now. Note that deposited energy in Geant has a very specific meaning that is not just "energy lost". To avoid EM divergence at low energies, would-be low-energy particles that would propagate for shorter than the default step length in the current material (0.7 mm by default) are just integrated over and the total energy is subtracted from the energy of the parent track. Deposited energy is used to accumulate these implicit energy deposits; to get total energy lost, add the deposited energy to the energy of any explicitly generated particles created by the parent.
+Xf/Yf/Zfposition: The exit position of muons out of the milliQan cavern
 
-ParentID: Track ID of the particle's generating track (0 for the case of primaries)
+nbOfElastics,nbOfInteractions: Currently unused interaction counting parameters
 
-InitialPositionX/Y/Z: Spatial coordinates of the initial vertex for the particle
+energyDiff: Differnce between the initial and final energy of the track (should double check that is how this is defined)
 
-TotalTrackLength: Total length, from creation to destruction, of a particle track
-
-totalEnergy: Total energy at the end of the particle's track (including KE and mass)
-
-nbOfElastics/nbOfInteractions: Not being used now, but can track the total number of distinct interactions of a certain type underwent by a particle
+muonTrigUp/Low: Currently unused muon telescope triggering parameter
 
 ==============================================================================================
 HIT LEVEL INFORMATION:
@@ -59,22 +46,41 @@ PMTHit populates when photons pass the quantum efficiency of a PMT (i.e. are det
 
 ScintHit populates when a user-specified particle (muon or mCP is the typical choice, depending on the type of primary being generated) enters and exits a scintillator volume. The class is populated with temp values when the particle enters a bar/panel/slab, and registers a hit when that same particle successfully makes it out of the scintillator. There is no detection efficiency involved; this is a kind of MCTruth parameter we use to track particle passage through the detector more explicitly
 
+===========================================
+
 PMT HIT INFORMATION:
 
-pmtNumber: Exactly the same as copyNumber described above, but assigned to corresponding PMTs.
+pmtNumber: Copy number for each PMT. For bars, this will be the same number as the bar. For slabs (with 4 PMTs per slab), the numbering is different. See attached files for slab and bar numbering.
+
 initialHitTime: Time of the hit in the PMT
+
 trackID: Identifier for the track which generated the hit
+
 parentID: Identifier for the parent of the track which generated the hit
+
+============================================
 
 SCINT HIT INFORMATION:
 
+Whenever a particle enters or exists the scintillator, a hit will be generated containing that particle's energy (stored in EDep_MeV). Sum all the hits for each scintillator to get the scint's energy deposit for that event.
+
 trackID: Track of particle which passed through the scint
+
 parentID: Track ID for the parent of the track which generated the hit
+
 EDep_MeV: Total energy loss (initial-final) of the particle from entry to exit
+
 trackLength: Length of scintillator the track passed through from entry to exit
-copyNo: Same as above
+
+copyNo: Same as above. See attached files for slab and bar numbering.
+
 hitTime: Initial time when the particle entered the scintillator
+
 exitTime: Time when the particle exited the scintillator
+
+particleName: Name of the particle (e+, neutron) that caused the hit
+
+hitPosition, exitPosition: X,Y,Z of the entry and exit positions of the hit
 
 =============================================================================================
 EVENT LEVEL INFORMATION:
@@ -95,9 +101,10 @@ pmtsAboveTrigger: Empty now, can be used if one wants to define a trigger thresh
 
 Edep_MeV: a sum of all energy deposits (i.e. implicit energy loss, NOT explicit loss) by a given particle type (or all particles as it is now) over the course of the sim. Currently not being used usefully; just populating all energy deposits for all particle types right now
 
-barHit/slabHit/panelHit: Number of times a primary of interest (the same one which populates ScintHit) enters a bar, slab, or panel, respectively
+barHit/slabHit/panelHit: Number of times a primary of interest (the same one which populates ScintHit) enters a bar, slab, or panel, respectively. Currently unused, originally was used for demonstrator. Could activate again.
 
 muonTrig: Not used now, but could be used as a trigger on e.g. geometric passage rather than some sort of PE cut if you want to design a trigger at runtime
 
 eventWeight: Event Weight of the generator process (used when inputting fourvectors)
+
 ProcessID: Type of generator process (used when inputting fourvectors)
