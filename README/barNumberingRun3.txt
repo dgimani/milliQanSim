@@ -33,5 +33,7 @@ The PMT numbering has the following pattern:
  Top panel near ceiling: Slab number 81, PMT number 81
  Left panel near ceiling: Slab number 82, PMT number 82
  Right panel near ceiling: Slab number 83, PMT number 83
- Small slab in front of detector near ground: Slab number 97, PMT numbers 97 and 99
- Small slab on back of detector near ceiling: Slab number 96, PMT numbers 96 and 98 
+ Small slab in front of detector near ground: Slab number 67, PMT numbers 97
+ Small slab on back of detector near ceiling: Slab number 68, PMT numbers 96
+
+(yes, I know the numbering looks super arbitrary, and it is... a few bookkeeping mistakes were made at times. But it has the advantage of working well once you use this mapping, so hopefully that's good enough)
