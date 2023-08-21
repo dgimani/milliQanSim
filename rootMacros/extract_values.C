@@ -46,7 +46,8 @@ void extract_values() {
       double Py = hit_p_p4->Py();
       double Pz = hit_p_p4->Pz();
 
-      file << charge << " " << mass << " " << X << " " << Y << " " << Z << " " << Px << " " << Py << " " << Pz << " " << weight << std::endl;
+      file << charge << " " << mass << " " << Z << " " << Y << " " << -1*X << " " << Pz << " " << Py << " " << -1*Px << " " << weight << std::endl;
+      //file << charge << " " << mass << " " << X << " " << Y << " " << Z << " " << Px << " " << Py << " " << Pz << " " << weight << std::endl;
     }
     std::cout << "File had " << nEntries << " entries" << std::endl;    
     nFiles++;
