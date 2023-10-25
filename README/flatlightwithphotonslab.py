@@ -47,10 +47,12 @@ def slabSimToDataPMT(simChannel):
 
     
 # Function to populate the vectors in the flattened tree for ScintHits
-def populate_vectors_scint(input_tree, scint_copyNo, scint_layer, scint_nPE, scint_time):
+def populate_vectors_scint(input_tree, scint_copyNo, scint_layer, scint_row, scint_column, scint_nPE, scint_time):
     # Clear the vectors
     scint_copyNo.clear()
     scint_layer.clear()
+    scint_row.clear()
+    scint_column.clear()
     scint_nPE.clear()
     scint_time.clear()
 
@@ -87,22 +89,28 @@ def populate_vectors_scint(input_tree, scint_copyNo, scint_layer, scint_nPE, sci
             dataChan = slabSimToDataScint(j)
             scint_copyNo.push_back(int(dataChan))
             scint_layer.push_back(int(dataChan/12))
+            scint_row.push_back(int(dataChan%4)+1)
+            scint_column.push_back(int(dataChan/4)+1)
 
 # Function to create the branches in the new tree for ScintHits
-def create_branches_scint(output_tree, scint_copyNo, scint_layer, scint_nPE, scint_time):
+def create_branches_scint(output_tree, scint_copyNo, scint_layer, scint_row, scint_column, scint_nPE, scint_time):
     # Create the branch for the flattened data
     output_tree.Branch("chan", scint_copyNo)
     output_tree.Branch("layer", scint_layer)
+    output_tree.Branch("row", scint_row)
+    output_tree.Branch("column", scint_column)
     output_tree.Branch("nPE", scint_nPE)
     output_tree.Branch("time", scint_time)
 
 # Function to create the branches in the new tree for PMTHits
-def create_branches_pmt(output_tree, pmt_nPE, pmt_copyNo, pmt_time, pmt_layer):
+def create_branches_pmt(output_tree, pmt_nPE, pmt_copyNo, pmt_time, pmt_layer, pmt_row, pmt_column):
     # Create the branch for the flattened data
     output_tree.Branch("pmt_nPE", pmt_nPE)
     output_tree.Branch("pmt_chan", pmt_copyNo)
     output_tree.Branch("pmt_time", pmt_time)
     output_tree.Branch("pmt_layer", pmt_layer)
+    output_tree.Branch("pmt_row", pmt_row)
+    output_tree.Branch("pmt_column", pmt_column)
 
 def create_branches_event(output_tree, eventID, runNumber):
     output_tree.Branch("eventID", eventID)
@@ -116,11 +124,13 @@ def populate_vectors_event(input_tree, eventID, runNumber):
     eventID.push_back(event.GetEventID())
     runNumber.push_back(1)
 
-def populate_vectors_pmt(input_tree, pmt_nPE, pmt_copyNo, pmt_time, pmt_layer):
+def populate_vectors_pmt(input_tree, pmt_nPE, pmt_copyNo, pmt_time, pmt_layer, pmt_row, pmt_column):
     pmt_nPE.clear()
     pmt_copyNo.clear()
     pmt_time.clear()
     pmt_layer.clear()
+    pmt_row.clear()
+    pmt_column.clear()
 
     # make an array of length 1000 to store temporary nPE values
     temp_nPE = [0]*1000
@@ -147,6 +157,9 @@ def populate_vectors_pmt(input_tree, pmt_nPE, pmt_copyNo, pmt_time, pmt_layer):
             dataChan = slabSimToDataPMT(j)
             pmt_copyNo.push_back(int(dataChan))
             pmt_layer.push_back(int(dataChan/12))
+            pmt_row.push_back(int(dataChan%4)+1)
+            pmt_column.push_back(int(dataChan/4)+1)
+            
 ##################################################################################################################
 # Main script
 # Load the custom dictionary
@@ -174,6 +187,8 @@ output_tree = ROOT.TTree("t", "A flat, lightweight tree for MilliQan sim data")
 # Scint variables to hold flattened data
 scint_copyNo = ROOT.std.vector('int')()
 scint_layer = ROOT.std.vector('int')()
+scint_row = ROOT.std.vector('int')()
+scint_column = ROOT.std.vector('int')()
 scint_nPE = ROOT.std.vector('float')()
 scint_time = ROOT.std.vector('float')()
 
@@ -182,6 +197,8 @@ pmt_nPE = ROOT.std.vector('float')()
 pmt_copyNo = ROOT.std.vector('int')()
 pmt_time = ROOT.std.vector('float')()
 pmt_layer = ROOT.std.vector('int')()
+pmt_row = ROOT.std.vector('int')()
+pmt_column = ROOT.std.vector('int')()
 
 # Variables to hold event-level data
 eventID = ROOT.std.vector('int')()
@@ -202,8 +219,8 @@ runNumber = ROOT.std.vector('int')()
 
 # Create the branches in the new tree
 create_branches_event(output_tree, eventID, runNumber)
-create_branches_scint(output_tree, scint_copyNo, scint_layer, scint_nPE, scint_time)
-create_branches_pmt(output_tree, pmt_nPE, pmt_copyNo, pmt_time, pmt_layer)
+create_branches_scint(output_tree, scint_copyNo, scint_layer, scint_row, scint_column, scint_nPE, scint_time)
+create_branches_pmt(output_tree, pmt_nPE, pmt_copyNo, pmt_time, pmt_layer, pmt_row, pmt_column)
 
 # Loop over entries in the input tree
 n_entries = input_tree.GetEntries()
@@ -212,8 +229,8 @@ for i in range(n_entries):
 
     # Populate the vectors with flattened data
     populate_vectors_event(input_tree, eventID, runNumber)
-    populate_vectors_scint(input_tree, scint_copyNo, scint_layer, scint_nPE, scint_time)
-    populate_vectors_pmt(input_tree, pmt_nPE, pmt_copyNo, pmt_time, pmt_layer)
+    populate_vectors_scint(input_tree, scint_copyNo, scint_layer, scint_row, scint_column, scint_nPE, scint_time)
+    populate_vectors_pmt(input_tree, pmt_nPE, pmt_copyNo, pmt_time, pmt_layer, pmt_row, pmt_column)
     
     # Fill the new tree with the flattened data
     output_tree.Fill()
