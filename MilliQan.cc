@@ -35,7 +35,21 @@ int main(int argc, char** argv) {
 
   	boost::property_tree::ptree pt;
         boost::property_tree::ptree particlePTree;
-	std::string configFile = "config/onepc.ini";
+
+
+	//declare configFile
+	std::string configFile;
+
+	//check argv[2] for config number
+	//if not specified, use default	
+	if(argc == 3) {
+		//convert argv[2] to string
+		std::string configNumber = argv[2];
+		configFile = "config/onepc" + configNumber + ".ini";
+	}
+	else {
+		configFile = "config/onepc.ini";
+	}
 
 	  try {
 	    boost::property_tree::ini_parser::read_ini(configFile, pt); // std::string, ptree
@@ -107,8 +121,8 @@ int main(int argc, char** argv) {
 	runManager->SetUserAction(new mqSteppingAction(histo));
 	
 	//CHANGE HERE to switch between no fourvectors and /gps/ (mqPrimGen) and loading in fourvectors and /gun/ (MilliQPrimaryGen)
-     runManager->SetUserAction(new mqPrimaryGeneratorAction(detector));
-   //runManager->SetUserAction(new MilliQPrimaryGeneratorAction(pt,eventOffset));
+     //runManager->SetUserAction(new mqPrimaryGeneratorAction(detector));
+   runManager->SetUserAction(new MilliQPrimaryGeneratorAction(pt,eventOffset));
 	
 	runManager->SetUserAction(new mqTrackingAction(histo));
 	runManager->SetUserAction(new mqStackingAction);
@@ -134,7 +148,7 @@ int main(int argc, char** argv) {
 		delete session;
 	}
 	//Full batch mode
-	if (argc == 2) {
+	else if (argc <= 3) {
 		G4cout << "MilliQan> Enter full batch mode" << G4endl;
 		//Full batch mode
 		G4String command = "/control/execute ";
@@ -142,33 +156,9 @@ int main(int argc, char** argv) {
 		G4cout << "apply mac file " << command + fileName << G4endl;
 		UI->ApplyCommand(command + fileName);
 	}
-	//Run macro file and then switch to interactive mode
-	if (argc == 3) {
-		G4cout << "MilliQan> Enter batch mode." << G4endl;
-		if ((strcmp(argv[2], "-GUI") == 0) || (strcmp(argv[1], "-GUI") == 0)) {
-			//Graphical batch mode
-			G4UIsession * session = 0;
-#ifdef G4UI_USE_TCSH
-			session = new G4UIterminal(new G4UItcsh);
-#else
-			session = new G4UIterminal();
-#endif
-			G4String command = "/control/execute ";
-			G4String fileName = "";
-			//if GUI is the 2nd argument then the filename is the 1st ...
-			if (strcmp(argv[2], "-GUI") == 0) {
-				fileName = argv[1];
-			}
-			//... and vice versa
-			if (strcmp(argv[1], "-GUI") == 0) {
-				fileName = argv[2];
-			}
-			UI->ApplyCommand(command + fileName);
-			session->SessionStart();
-			delete session;
-		}
+	else {
+		G4cout << "MilliQan> ERROR: Too many arguments." << G4endl;
 	}
-
 
 	/*Free the store-------------------------------------------------------*/
 	//user actions, physics_list and detector_description are
