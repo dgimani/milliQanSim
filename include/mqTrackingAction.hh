@@ -35,6 +35,7 @@ private:
   G4int parentID;
   G4String particleName;
   G4ThreeVector initialPosition;
+  G4ThreeVector initialMomentum;
   G4String initialVolumeName;
   G4int initialCopyNo;
   G4String initialProcessName;

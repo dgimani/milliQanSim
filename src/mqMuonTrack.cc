@@ -22,6 +22,10 @@ mqMuonTrack::mqMuonTrack() :
 			initialPositionX_m(0.),finalPositionX_m(0.),
 			initialPositionY_m(0.),finalPositionY_m(0.),
 			initialPositionZ_m(0.),finalPositionZ_m(0.),
+			initialMomentumX_MeV(0.),finalMomentumX_MeV(0.),
+			initialMomentumY_MeV(0.),finalMomentumY_MeV(0.),
+			initialMomentumZ_MeV(0.),finalMomentumZ_MeV(0.),
+			genPt(0.),genEta(0.),genPhi(0.),
 			totalTrackLength_m(0.0),
 			nbOfElastics(-1),
 			nbOfInteractions(-1),
@@ -55,12 +59,25 @@ const mqMuonTrack& mqMuonTrack::operator=(const mqMuonTrack &right){
 	energyDeposit_MeV  = right.energyDeposit_MeV ;
 	totalEnergy_MeV    = right.totalEnergy_MeV   ;
 	parentID           = right.parentID          ;
+
 	initialPositionX_m = right.initialPositionX_m;
 	finalPositionX_m   = right.finalPositionX_m  ;
 	initialPositionY_m = right.initialPositionY_m;
 	finalPositionY_m   = right.finalPositionY_m  ;
 	initialPositionZ_m = right.initialPositionZ_m;
 	finalPositionZ_m   = right.finalPositionZ_m  ;
+
+	initialMomentumX_MeV = right.initialMomentumX_MeV;
+	finalMomentumX_MeV   = right.finalMomentumX_MeV  ;
+	initialMomentumY_MeV = right.initialMomentumY_MeV;
+	finalMomentumY_MeV   = right.finalMomentumY_MeV  ;
+	initialMomentumZ_MeV = right.initialMomentumZ_MeV;
+	finalMomentumZ_MeV   = right.finalMomentumZ_MeV  ;
+
+	genPt    	   = right.genPt             ;
+	genEta    	   = right.genEta            ;
+	genPhi    	   = right.genPhi            ;
+
 	totalTrackLength_m = right.totalTrackLength_m;
 	nbOfElastics       = right.nbOfElastics      ;
 	nbOfInteractions   = right.nbOfInteractions  ;

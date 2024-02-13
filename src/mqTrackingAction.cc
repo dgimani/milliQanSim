@@ -39,6 +39,7 @@ mqTrackingAction::mqTrackingAction(mqHistoManager* histo):
 	initialCopyNo(-1),
 	initialProcessName(""),
 	initialPosition(0.,0.,0.),
+	initialMomentum(0.,0.,0.),
 	initialEnergy(0.),
 	initialTime(0.)
 {
@@ -179,6 +180,8 @@ void mqTrackingAction::PreUserTrackingAction(const G4Track* aTrack)
 
 	initialPosition = aTrack->GetVertexPosition();
 	initialEnergy = aTrack->GetVertexKineticEnergy();
+	
+	
 	initialTime = aTrack->GetGlobalTime();
 
 	particleName = aTrack->GetDefinition()->GetParticleName();
@@ -239,6 +242,11 @@ void mqTrackingAction::PreUserTrackingAction(const G4Track* aTrack)
 	//	
 	if( (particleName.contains("mu")) //&& (eventInformation->GetMuonLastTrackID() != trackID)
 				&& muonTrackStorage){
+	        initialMomentum = aTrack->GetMomentum();
+	G4cout << "Initial momentum X: " << initialMomentum.getX() << G4endl;
+	G4cout << "Initial momentum Y: " << initialMomentum.getY() << G4endl;
+	G4cout << "Initial momentum Z: " << initialMomentum.getZ() << G4endl;
+
 		eventInformation->SetMuonLastTrackID(trackID);
 
 
@@ -252,6 +260,9 @@ void mqTrackingAction::PreUserTrackingAction(const G4Track* aTrack)
 		muonTrack->SetFirstPositionX(initialPosition.getX()/m);
 		muonTrack->SetFirstPositionY(initialPosition.getY()/m);
 		muonTrack->SetFirstPositionZ(initialPosition.getZ()/m);
+		muonTrack->SetFirstMomentumX(initialMomentum.getX()/MeV);
+		muonTrack->SetFirstMomentumY(initialMomentum.getY()/MeV);
+		muonTrack->SetFirstMomentumZ(initialMomentum.getZ()/MeV);
 		muonTrack->SetFirstVolume(initialVolumeName);
 		muonTrack->SetFirstProcessName(initialProcessName);
 		muonTrack->SetFirstCopyNo(initialCopyNo);
@@ -356,6 +367,7 @@ void mqTrackingAction::PostUserTrackingAction(const G4Track* aTrack){
 	G4String finalVolumeName="";
 	G4int finalCopyNo=0;
 	G4ThreeVector finalPosition = aTrack->GetPosition();
+	G4ThreeVector finalMomentum = aTrack->GetMomentum();
 	G4ThreeVector finalDirection = aTrack->GetMomentumDirection();
 	G4double finalEnergy = aTrack->GetKineticEnergy();
 	G4double totalEnergy = aTrack->GetTotalEnergy();
@@ -430,6 +442,9 @@ void mqTrackingAction::PostUserTrackingAction(const G4Track* aTrack){
 		eventInformation->GetMuonTrack(trackID)->SetLastPositionX(finalPosition.getX()/m);
 		eventInformation->GetMuonTrack(trackID)->SetLastPositionY(finalPosition.getY()/m);
 		eventInformation->GetMuonTrack(trackID)->SetLastPositionZ(finalPosition.getZ()/m);
+		eventInformation->GetMuonTrack(trackID)->SetLastMomentumX(finalMomentum.getX()/MeV);
+		eventInformation->GetMuonTrack(trackID)->SetLastMomentumY(finalMomentum.getY()/MeV);
+		eventInformation->GetMuonTrack(trackID)->SetLastMomentumZ(finalMomentum.getZ()/MeV);
 		eventInformation->GetMuonTrack(trackID)->SetFinalEnergy(finalEnergy/MeV);
 		eventInformation->GetMuonTrack(trackID)->SetTotalEnergy(totalEnergy/MeV);
 		eventInformation->GetMuonTrack(trackID)->SetTotalTrackLength(finalTrackLength/m);

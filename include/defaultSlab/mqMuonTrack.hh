@@ -41,6 +41,18 @@ public:
 	void SetLastPositionY(Double_t lastPositionY) { finalPositionY_m = lastPositionY; }
 	void SetFirstPositionZ(Double_t firstPositionZ){ initialPositionZ_m = firstPositionZ; }
 	void SetLastPositionZ(Double_t lastPositionZ){ finalPositionZ_m = lastPositionZ; }
+	void SetFirstMomentumX(Double_t firstMomentumX){ initialMomentumX_MeV = firstMomentumX; }
+	void SetLastMomentumX(Double_t lastMomentumX){ finalMomentumX_MeV = lastMomentumX; }
+	void SetFirstMomentumY(Double_t firstMomentumY){ initialMomentumY_MeV = firstMomentumY; }
+	void SetLastMomentumY(Double_t lastMomentumY){ finalMomentumY_MeV = lastMomentumY; }
+	void SetFirstMomentumZ(Double_t firstMomentumZ){ initialMomentumZ_MeV = firstMomentumZ; }
+	void SetLastMomentumZ(Double_t lastMomentumZ){ finalMomentumZ_MeV = lastMomentumZ; }
+
+
+	void SetGenPt(Double_t genPt){ genPt = genPt; }
+	void SetGenEta(Double_t genEta){ genEta = genEta; }
+	void SetGenPhi(Double_t genPhi){ genPhi = genPhi; }
+
 	void SetTotalTrackLength(Double_t totalTrackLength){ totalTrackLength_m = totalTrackLength; }
 	void SetYposition(Double_t yp) {Yposition = yp;}
 	void SetXposition(Double_t xp) {Xposition = xp;}
@@ -75,6 +87,18 @@ public:
 	Double_t GetFirstPositionZ()const{ return initialPositionZ_m; };
 	Double_t GetLastPositionZ()const{ return finalPositionZ_m; }
 	Double_t GetTotalTrackLength()const{ return totalTrackLength_m; }
+	Double_t GetFirstMomentumX()const{ return initialMomentumX_MeV; }
+	Double_t GetLastMomentumX()const{ return finalMomentumX_MeV; }
+	Double_t GetFirstMomentumY()const{ return initialMomentumY_MeV; }
+	Double_t GetLastMomentumY()const{ return finalMomentumY_MeV; }
+	Double_t GetFirstMomentumZ()const{ return initialMomentumZ_MeV; }
+	Double_t GetLastMomentumZ()const{ return finalMomentumZ_MeV; }
+
+
+
+	Double_t GetGenPt()const{ return genPt; }
+	Double_t GetGenEta()const{ return genEta; }
+	Double_t GetGenPhi()const{ return genPhi; }
 
         void SetFirstCopyNo(Int_t firstCopyNo){ initialCopyNo = firstCopyNo; }
         void SetLastCopyNo(Int_t lastCopyNo){ finalCopyNo = lastCopyNo; }
@@ -123,6 +147,16 @@ public:
 	Double_t finalPositionY_m    ; //The position of the end of the track
 	Double_t initialPositionZ_m  ; //The position of the vertex of the track
 	Double_t finalPositionZ_m    ; //The position of the end of the track
+	Double_t initialMomentumX_MeV    ; //The momentum of the track at the vertex
+	Double_t finalMomentumX_MeV      ; //The momentum of the track at the end
+	Double_t initialMomentumY_MeV    ; //The momentum of the track at the vertex
+	Double_t finalMomentumY_MeV      ; //The momentum of the track at the end
+	Double_t initialMomentumZ_MeV    ; //The momentum of the track at the vertex
+	Double_t finalMomentumZ_MeV      ; //The momentum of the track at the end
+
+	Double_t genPt; //The transverse momentum of the track
+	Double_t genEta; //The pseudorapidity of the track
+	Double_t genPhi; //The azimuthal angle of the track
 	Double_t totalTrackLength_m  ; //The total track length of the track
 	Double_t totalEnergy_MeV       ; //Energy loss of the track
 	Double_t Xposition; //the position that muon enter  the cavern
