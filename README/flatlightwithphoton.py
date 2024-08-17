@@ -396,7 +396,13 @@ outname = "BeamsimFlat_" + sys.argv[2] + ".root"
 #in beam muon sim, since the each file come with unique setting, there is no need to use filenumber to identify the file like I did in cosmic background sim
 #so I set the filenumber to 0. 
 
-fileNumber = int(sys.argv[2])
+
+try:
+    fileNumber = int(sys.argv[2])  #E.g. cosmic file
+except ValueError:
+    fileNumber = int(0)  #handle the case of file name is string. E.g. beam file
+
+
 
 
 input_file = ROOT.TFile(filename, "READ")
