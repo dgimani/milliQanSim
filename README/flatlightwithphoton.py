@@ -159,7 +159,7 @@ def populate_vectors_scint(input_tree, scint_copyNo, scint_layer, scint_nPE, sci
 
 
         # if the hit time in the channel is lower than the current time, replace the current time with the new time
-        if(temp_time[tempCopyNo] == 0 or hit.GetHitTime() < temp_time[tempCopyNo]):
+        if(temp_time[tempCopyNo] == 0 or  ((hit.GetHitTime() >0)  and  (hit.GetHitTime() < temp_time[tempCopyNo])) ):
             temp_time[tempCopyNo] = hit.GetHitTime()
 
     # loop over the temporary arrays and add the values to the vectors
@@ -301,7 +301,7 @@ def populate_vectors_pmt(input_tree, pmt_nPE, pmt_copyNo, pmt_time, pmt_layer,pm
             simToDataScale = cali[transferChan]/11
         temp_nPE[hit.GetPMTNumber()] = temp_nPE[hit.GetPMTNumber()] + simToDataScale
         # if the hit time in the channel is lower than the current time, replace the current time with the new time
-        if(temp_time[hit.GetPMTNumber()] == 0 or hit.GetFirstHitTime() < temp_time[hit.GetPMTNumber()]):
+        if(temp_time[hit.GetPMTNumber()] == 0 or ((hit.GetFirstHitTime() >0) and (hit.GetFirstHitTime() < temp_time[hit.GetPMTNumber()])) ):
             temp_time[hit.GetPMTNumber()] = hit.GetFirstHitTime()
 
     # loop over the temporary arrays and add the values to the vectors
@@ -395,7 +395,14 @@ outname = "BeamsimFlat_" + sys.argv[2] + ".root"
 #get the file number
 #in beam muon sim, since the each file come with unique setting, there is no need to use filenumber to identify the file like I did in cosmic background sim
 #so I set the filenumber to 0. 
-fileNumber = int(0)
+
+
+try:
+    fileNumber = int(sys.argv[2])  #E.g. cosmic file
+except ValueError:
+    fileNumber = int(0)  #handle the case of file name is string. E.g. beam file
+
+
 
 
 input_file = ROOT.TFile(filename, "READ")
