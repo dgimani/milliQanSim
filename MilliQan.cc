@@ -121,8 +121,8 @@ int main(int argc, char** argv) {
 	runManager->SetUserAction(new mqSteppingAction(histo));
 	
 	//CHANGE HERE to switch between no fourvectors and /gps/ (mqPrimGen) and loading in fourvectors and /gun/ (MilliQPrimaryGen)
-     //runManager->SetUserAction(new mqPrimaryGeneratorAction(detector));
-   runManager->SetUserAction(new MilliQPrimaryGeneratorAction(pt,eventOffset));
+     runManager->SetUserAction(new mqPrimaryGeneratorAction(detector));
+   //runManager->SetUserAction(new MilliQPrimaryGeneratorAction(pt,eventOffset));
 	
 	runManager->SetUserAction(new mqTrackingAction(histo));
 	runManager->SetUserAction(new mqStackingAction);
