@@ -90,7 +90,7 @@ def populate_vectors_scint(input_tree, scint_copyNo, scint_layer, scint_row, sci
             scint_copyNo.push_back(int(dataChan))
             scint_layer.push_back(int(dataChan/12))
             scint_row.push_back(int(dataChan%4)+1)
-            scint_column.push_back(int(dataChan/4)+1)
+            scint_column.push_back(int((dataChan%12)/4)+1)
 
 # Function to create the branches in the new tree for ScintHits
 def create_branches_scint(output_tree, scint_copyNo, scint_layer, scint_row, scint_column, scint_nPE, scint_time):
