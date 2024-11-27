@@ -22,7 +22,7 @@ def slabSimToDataScint(simChannel):
     simRow=(subModNum // 2) + (superModNum % 4)*2
     simCol=(subModNum % 2)+(superModNum // 4)*2 #integer division!
     dataRow=simRow
-    dataCol=9-simCol
+    dataCol=simCol
     
     if(subModNum==0): dataModNum=2
     if(subModNum==1): dataModNum=3
@@ -44,7 +44,7 @@ def slabSimToDataPMT(simChannel):
     simRow=(subModNum // 2)+(superModNum % 4)*2
     simCol=(subModNum % 2)+(superModNum // 4)*2 #integer division!
     dataRow=simRow
-    dataCol=9-simCol
+    dataCol=simCol
     
     if(subModNum==0): dataModNum=2
     if(subModNum==1): dataModNum=3
