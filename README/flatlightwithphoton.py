@@ -262,17 +262,19 @@ def create_branches_scint(output_tree, scint_copyNo, scint_layer, scint_nPE, sci
     output_tree.Branch("type",scint_type)
     output_tree.Branch("muonHit",scint_muonHit)
 
-def create_branches_event(output_tree, event, runNumber):
+def create_branches_event(output_tree, event, eventWeight, runNumber):
     output_tree.Branch("event", event,"event/I")
+    output_tree.Branch("eventWeight", eventWeight,"eventWeight/D")
     output_tree.Branch("runNumber", runNumber,"runNumber/I")
 
-def populate_vectors_event(input_tree, event, runNumber, fileNum):
+def populate_vectors_event(input_tree, event, eventWeight, runNumber, fileNum):
     #eventID.clear()
     #runNumber.clear()
 
     evt = input_tree.ROOTEvent
     #eventID.push_back(event.GetEventID())
     event[0] = evt.GetEventID()
+    eventWeight[0] = evt.GetEventWeight()
     #runNumber.push_back(1)
     runNumber[0] = fileNum
 
@@ -440,12 +442,14 @@ pmt_column = ROOT.std.vector('int')()
 #runNumber = ROOT.std.vector('int')()
 
 event = array.array('i', [0])  # 'i' is for integer type
+eventWeight = array.array('d', [0])  # 'd' is for double type
 runNumber = array.array('i', [0])
 
 
 # Create the branches in the new tree
 # want only the following branches with the following names:
 # event - Will be the same as the input tree eventID
+# eventWeight - Will be the same as the input tree weight
 # runNumber - Will use Run 1 for now
 
 # nPE - Will be determined using a sum of scint_EDep and a scaling factor
@@ -458,7 +462,7 @@ runNumber = array.array('i', [0])
 
 # Create the branches in the new tree
 #create_branches_event(output_tree, eventID, runNumber)
-create_branches_event(output_tree, event, runNumber)
+create_branches_event(output_tree, event, eventWeight, runNumber)
 create_branches_pmt(output_tree, pmt_nPE, pmt_copyNo, pmt_time, pmt_layer,pmt_row,pmt_column,pmt_type)
 create_branches_scint(output_tree, scint_copyNo, scint_layer, scint_nPE, scint_time,scint_row,scint_column,scint_type,scint_muonHit)
 
@@ -468,7 +472,7 @@ for i in range(n_entries):
     input_tree.GetEntry(i)
 
     # Populate the vectors with flattened data
-    populate_vectors_event(input_tree, event, runNumber,fileNumber)
+    populate_vectors_event(input_tree, event, eventWeight, runNumber,fileNumber)
     populate_vectors_pmt(input_tree, pmt_nPE, pmt_copyNo, pmt_time, pmt_layer,pmt_row,pmt_column,pmt_type)
     populate_vectors_scint(input_tree, scint_copyNo, scint_layer, scint_nPE, scint_time,scint_row,scint_column,scint_type,scint_muonHit)
     
