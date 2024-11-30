@@ -7,16 +7,8 @@
 /run/initialize
 
 /gps/particle gamma
-#3mm from edge
-#/gps/position 10.5 0 50 mm
-#center
-#/gps/position 34.5 0 50 mm
-#side
-#/gps/position 67 0 0 mm
-#outside
-#/gps/position 228.5 0 0 mm
-/gps/position 40 0 0 mm
-#/gps/position 30 0 -212.5 mm
+# center of slab
+/gps/position -1300 0 -1250 mm
 
 #Na22
 #/gps/ene/type Mono
@@ -40,19 +32,19 @@
 #/gps/hist/point 0.801 0
 
 #Cd109
-#/gps/hist/point 0 0
-#/gps/hist/point 0.003075 0
-#/gps/hist/point 0.003080 9.35
-#/gps/hist/point 0.003085 0
-#/gps/hist/point 0.022095 0
-#/gps/hist/point 0.022100 85.23
-#/gps/hist/point 0.022105 0
-#/gps/hist/point 0.025015 0
-#/gps/hist/point 0.025020 16.86
-#/gps/hist/point 0.025025 0
-#/gps/hist/point 0.088035 0
-#/gps/hist/point 0.088040 3.61
-#/gps/hist/point 0.088045 0
+/gps/hist/point 0 0
+/gps/hist/point 0.003075 0
+/gps/hist/point 0.003080 9.35
+/gps/hist/point 0.003085 0
+/gps/hist/point 0.022095 0
+/gps/hist/point 0.022100 85.23
+/gps/hist/point 0.022105 0
+/gps/hist/point 0.025015 0
+/gps/hist/point 0.025020 16.86
+/gps/hist/point 0.025025 0
+/gps/hist/point 0.088035 0
+/gps/hist/point 0.088040 3.61
+/gps/hist/point 0.088045 0
 
 
 #Ba133
@@ -115,28 +107,28 @@
 #778.9   12
 #1085.8  10
 
-/gps/hist/point 0 0
-/gps/hist/point 0.1215 0
-/gps/hist/point 0.1217 28
-/gps/hist/point 0.1220 0
-/gps/hist/point 0.3440 0
-/gps/hist/point 0.3442 26
-/gps/hist/point 0.3445 0
-/gps/hist/point 0.7787 0
-/gps/hist/point 0.7789 12
-/gps/hist/point 0.7792 0
-/gps/hist/point 0.9638 0
-/gps/hist/point 0.9640 14
-/gps/hist/point 0.9643 0
-/gps/hist/point 1.0856 0
-/gps/hist/point 1.0858 10
-/gps/hist/point 1.0861 0
-/gps/hist/point 1.1118 0
-/gps/hist/point 1.1120 13
-/gps/hist/point 1.1123 0
-/gps/hist/point 1.4078 0
-/gps/hist/point 1.4080 21
-/gps/hist/point 1.4083 0
+#/gps/hist/point 0 0
+#/gps/hist/point 0.1215 0
+#/gps/hist/point 0.1217 28
+#/gps/hist/point 0.1220 0
+#/gps/hist/point 0.3440 0
+#/gps/hist/point 0.3442 26
+#/gps/hist/point 0.3445 0
+#/gps/hist/point 0.7787 0
+#/gps/hist/point 0.7789 12
+#/gps/hist/point 0.7792 0
+#/gps/hist/point 0.9638 0
+#/gps/hist/point 0.9640 14
+#/gps/hist/point 0.9643 0
+#/gps/hist/point 1.0856 0
+#/gps/hist/point 1.0858 10
+#/gps/hist/point 1.0861 0
+#/gps/hist/point 1.1118 0
+#/gps/hist/point 1.1120 13
+#/gps/hist/point 1.1123 0
+#/gps/hist/point 1.4078 0
+#/gps/hist/point 1.4080 21
+#/gps/hist/point 1.4083 0
 
 
 
@@ -154,4 +146,4 @@
 #/run/fname /media/ryan/Storage/computing/beamRadSim/data/60keV1MeVMixed_mixedAbsAuAgScint_5stack/
 #/run/fname /media/ryan/Storage/computing/beamRadSim/data/electron/
 #/run/beamOn 1000000
-/run/beamOn 10000
+/run/beamOn 10
