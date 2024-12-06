@@ -49,12 +49,14 @@ int simToDataPMT(int simChannel) {
     }
 }
 
-void waveinject_v2() {
+void waveinject_v2(TString input, TString output) {
    TChain rootEvents("Events");
-   rootEvents.Add("MilliQan_cosmicSimSample.root");
+   //rootEvents.Add("MilliQan_cosmicSimSample.root");
+   rootEvents.Add(input);
    mqROOTEvent* myROOTEvent = new mqROOTEvent();
    rootEvents.SetBranchAddress("ROOTEvent", &myROOTEvent);
-   TFile* outfile = new TFile("MilliQan_waveinjected_v2.root", "RECREATE");
+   //TFile* outfile = new TFile("MilliQan_waveinjected_v2.root", "RECREATE");
+   TFile* outfile = new TFile(output, "RECREATE");
    
    const int nDigitizers = 5;
    const int nChannelsPerDigitizer = 16;
@@ -77,10 +79,10 @@ void waveinject_v2() {
 
    TRandom3 randGen(0);
    Long64_t nentries = rootEvents.GetEntries();
-   std::cout << "Entries: " << nentries << std::endl;
+   //std::cout << "Entries: " << nentries << std::endl;
 
    for (Long64_t i = 0; i < nentries; i++) {
-      if (i % (nentries / 100) == 0) std::cout << "Processing Event " << i << "..." << std::endl;
+      if (i % (nentries / 100) == 0) //std::cout << "Processing Event " << i << "..." << std::endl;
       rootEvents.GetEntry(i);
       memset(waveform, 0, sizeof(waveform));
 
@@ -156,7 +158,7 @@ void waveinject_v2() {
          } else {
             for (mqPMTRHit* PMTRHit : hits) {
                double initial_hit_time = PMTRHit->GetFirstHitTime();
-               cout << initial_hit_time << endl;
+               //cout << initial_hit_time << endl;
 	       if(initial_hit_time>500) {continue;}
                TH1F* new_waveform = (TH1F*)pulse_shape->Clone();
                double event_area = fit->GetRandom();
