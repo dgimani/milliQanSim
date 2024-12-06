@@ -7,8 +7,8 @@
 #include <fstream>
 #include "TMath.h"
 #include "TChain.h"
-#include "/net/cms26/cms26r0/zheng/barsim/milliQanSim/include/mqROOTEvent.hh"
-#include "/net/cms26/cms26r0/zheng/barsim/milliQanSim/include/mqPMTRHit.hh"
+#include "/home/ryan/test/milliQanSim/include/mqROOTEvent.hh"
+#include "/home/ryan/test/milliQanSim/include/mqPMTRHit.hh"
 #include "TGraph.h"
 #include "TVector.h"
 #include "TVectorD.h"
@@ -21,7 +21,7 @@
 #include <vector>
 #include <map>
 #include <algorithm>
-R__LOAD_LIBRARY(/net/cms26/cms26r0/zheng/barsim/milliQanSim/build/libMilliQanCore.so)
+R__LOAD_LIBRARY(/home/ryan/test/milliQanSim/build/libMilliQanCore.so)
 using namespace std;
 
 int simToDataPMT(int simChannel) {
@@ -173,9 +173,10 @@ void waveinject_v2(TString input, TString output) {
                }
 
                int integer_shift = static_cast<int>(initial_hit_time / binWidth);
-               double fractional_shift = fmod(initial_hit_time, binWidth) / binWidth;
+               cout << "integer shift: " << integer_shift << endl;
+	       double fractional_shift = fmod(initial_hit_time, binWidth) / binWidth;
 
-               for (int bin = 0; bin < nBins; ++bin) waveform[digitizer][channel][bin] = 0.0;
+               //for (int bin = 0; bin < nBins; ++bin) waveform[digitizer][channel][bin] = 0.0;
 
                for (int bin = 0; bin < nBins; ++bin) {
                   int shifted_bin = bin + integer_shift;
@@ -183,18 +184,22 @@ void waveinject_v2(TString input, TString output) {
 
                   double value = (1.0 - fractional_shift) * new_waveform->GetBinContent(shifted_bin + 1) +
                                  fractional_shift * new_waveform->GetBinContent(shifted_bin + 2);
-                  double noise = randGen.Gaus(0, rms_noise);
-                  waveform[digitizer][channel][shifted_bin] += (value + noise);
+		  waveform[digitizer][channel][bin] += (value);
 
-                  if (waveform[digitizer][channel][shifted_bin] > 1250) waveform[digitizer][channel][shifted_bin] = 1250;
-                  if (waveform[digitizer][channel][shifted_bin] < -50) waveform[digitizer][channel][shifted_bin] = -50;
                }
 
                for (int bin = 0; bin < integer_shift; ++bin) waveform[digitizer][channel][bin] = 0.0;
 
                delete new_waveform;
             }
-         }
+                  for (int bin = 0; bin < nBins; bin++) {
+                        double noise = randGen.Gaus(0, rms_noise);
+			waveform[digitizer][channel][bin] += noise;
+                  	if (waveform[digitizer][channel][bin] > 1250) waveform[digitizer][channel][bin] = 1250;
+                  	if (waveform[digitizer][channel][bin] < -50) waveform[digitizer][channel][bin] = -50;
+		  }
+
+	   }
       }
       injectedTree->Fill();
    }
