@@ -7,8 +7,12 @@
 #include <fstream>
 #include "TMath.h"
 #include "TChain.h"
-#include "/home/ryan/test/milliQanSim/include/mqROOTEvent.hh"
-#include "/home/ryan/test/milliQanSim/include/mqPMTRHit.hh"
+#include "/net/cms26/cms26r0/zheng/barsim/milliQanSim/include/mqROOTEvent.hh"
+#include "/net/cms26/cms26r0/zheng/barsim/milliQanSim/include/mqPMTRHit.hh"
+//#include "/net/cms18/cms18r0/cms26r0/zheng/barsim/milliQanSim/include/mqROOTEvent.hh"
+//#include "/net/cms18/cms18r0/cms26r0/zheng/barsim/milliQanSim/include/mqPMTRHit.hh"
+//#include "milliQanSim/include/mqROOTEvent.hh"
+//#include "milliQanSim/include/mqPMTRHit.hh"
 #include "TGraph.h"
 #include "TVector.h"
 #include "TVectorD.h"
@@ -20,9 +24,10 @@
 #include "TMultiGraph.h"
 #include <vector>
 #include <map>
-#include <algorithm>
-R__LOAD_LIBRARY(/home/ryan/test/milliQanSim/build/libMilliQanCore.so)
+//R__LOAD_LIBRARY(/homes/tianjiad/milliQanSim/build/libBenchCore.so)
+R__LOAD_LIBRARY(/net/cms26/cms26r0/zheng/barsim/milliQanSim/build/libMilliQanCore.so)
 using namespace std;
+
 
 int simToDataPMT(int simChannel) {
     if (simChannel == 77) return 68;
@@ -49,12 +54,12 @@ int simToDataPMT(int simChannel) {
     }
 }
 
-void waveinject_v2() {
+void waveinject_v4() {
    TChain rootEvents("Events");
-   rootEvents.Add("MilliQan.root");
+   rootEvents.Add("MilliQan_cosmicSimSample.root");
    mqROOTEvent* myROOTEvent = new mqROOTEvent();
    rootEvents.SetBranchAddress("ROOTEvent", &myROOTEvent);
-   TFile* outfile = new TFile("MilliQan_waveinjected_v2.root", "RECREATE");
+   TFile* outfile = new TFile("MilliQan_cosmicSimSample_waveinjected_v4.root", "RECREATE");
    
    const int nDigitizers = 5;
    const int nChannelsPerDigitizer = 16;
@@ -74,6 +79,23 @@ void waveinject_v2() {
 
    TFile* f = new TFile("modified_waveform.root");
    TH1F* pulse_shape = (TH1F*)f->Get("average_waveform");
+
+   // Calibration array (scaled by dividing by 11)
+   std::vector<double> cali = {9.7, 8.4, 5.0, 3.6, 8.2, 8.2, 6.8, 4.6, 8.7, 7.1, 6.4, 7.5, 8.7, 11.8, 9.7, 8.1,
+                               8.6, 9.1, 6.4, 7.5, 9.8, 8.8, 11, 6.6, 8.6, 11, 7.3, 8.3, 2.6, 6.2, 7.0, 7.2,
+                               8.7, 7.7, 6.8, 7.8, 8.8, 8.5, 3.5, 8.2, 7.6, 6.8, 9.5, 8.5, 6.3, 6.7, 7.6, 7.9,
+                               9.0, 8.3, 8.3, 6.9, 6.0, 8.0, 5.5, 5.5, 6.6, 8.1, 8.4, 8.7, 9.2, 7.6, 5.9, 8.2};
+   for (auto& cal : cali) cal /= 11.0; // Divide each value by 11
+
+std::vector<double> maxValues = {
+    1250, 1250, 1250, 1250, 1025, 1075, 1070, 980, 1250, 1250,
+    1250, 1250, 1250, 1250, 1250, 1250, 1250, 1250, 1250, 1080,
+    1070, 1060, 1080, 1075, 1250, 1180, 1250, 1250, 1250, 1250,
+    1250, 1250, 1250, 1250, 1250, 1250, 1250, 1085, 1075, 1080,
+    1250, 1250, 1075, 1250, 1250, 1250, 1250, 1250, 1250, 1250,
+    1250, 1250, 1080, 1250, 1080, 1080, 1250, 1250, 1250, 1250,
+    1250, 1250, 1250, 1250
+};
 
    TRandom3 randGen(0);
    Long64_t nentries = rootEvents.GetEntries();
@@ -116,10 +138,11 @@ void waveinject_v2() {
          } else {
             median_hit_time = hitTimes[size / 2];
          }
-         if (hits.size() > 50) {
+         double calibration = (remappedPMT < 64) ? cali[remappedPMT] : 0.682;
+	 if (hits.size() > 50) {
             double areaSum = 0.0;
             for (size_t k = 0; k < hits.size(); ++k) {
-                areaSum += fit->GetRandom();
+                if(randGen.Uniform() <= calibration) areaSum += fit->GetRandom();
             }
 
             TH1F* new_waveform = (TH1F*)pulse_shape->Clone();
@@ -146,7 +169,7 @@ void waveinject_v2() {
                 double noise = randGen.Gaus(0, rms_noise);
                 waveform[digitizer][channel][shifted_bin] += (value + noise);
 
-                if (waveform[digitizer][channel][shifted_bin] > 1250) waveform[digitizer][channel][shifted_bin] = 1250;
+                if (waveform[digitizer][channel][shifted_bin] > maxValues[remappedPMT]) waveform[digitizer][channel][shifted_bin] = maxValues[remappedPMT];
                 if (waveform[digitizer][channel][shifted_bin] < -50) waveform[digitizer][channel][shifted_bin] = -50;
             }
 
@@ -155,6 +178,7 @@ void waveinject_v2() {
             delete new_waveform;
          } else {
             for (mqPMTRHit* PMTRHit : hits) {
+               if(randGen.Uniform() > calibration) continue;
                double initial_hit_time = PMTRHit->GetFirstHitTime();
                cout << initial_hit_time << endl;
 	       if(initial_hit_time>500) {continue;}
@@ -193,7 +217,7 @@ void waveinject_v2() {
                   for (int bin = 0; bin < nBins; bin++) {
                         double noise = randGen.Gaus(0, rms_noise);
 			waveform[digitizer][channel][bin] += noise;
-                  	if (waveform[digitizer][channel][bin] > 1250) waveform[digitizer][channel][bin] = 1250;
+                  	if (waveform[digitizer][channel][bin] > maxValues[remappedPMT]) waveform[digitizer][channel][bin] = maxValues[remappedPMT];
                   	if (waveform[digitizer][channel][bin] < -50) waveform[digitizer][channel][bin] = -50;
 		  }
 
