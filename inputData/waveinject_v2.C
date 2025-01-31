@@ -7,8 +7,8 @@
 #include <fstream>
 #include "TMath.h"
 #include "TChain.h"
-#include "/net/cms26/cms26r0/zheng/barsim/milliQanSim/include/mqROOTEvent.hh"
-#include "/net/cms26/cms26r0/zheng/barsim/milliQanSim/include/mqPMTRHit.hh"
+#include "../include/mqROOTEvent.hh"
+#include "../include/mqPMTRHit.hh"
 //#include "/net/cms18/cms18r0/cms26r0/zheng/barsim/milliQanSim/include/mqROOTEvent.hh"
 //#include "/net/cms18/cms18r0/cms26r0/zheng/barsim/milliQanSim/include/mqPMTRHit.hh"
 //#include "milliQanSim/include/mqROOTEvent.hh"
@@ -24,19 +24,23 @@
 #include "TMultiGraph.h"
 #include <vector>
 #include <map>
+#include "TSystem.h"
 //R__LOAD_LIBRARY(/homes/tianjiad/milliQanSim/build/libBenchCore.so)
-R__LOAD_LIBRARY(/net/cms26/cms26r0/zheng/barsim/milliQanSim/build/libMilliQanCore.so)
+//R__LOAD_LIBRARY(/net/cms26/cms26r0/zheng/barsim/milliQanSim/build/libMilliQanCore.so)
+R__LOAD_LIBRARY(milliQanSim/include/libMilliQanCore.so)
+//R__LOAD_LIBRARY(../include/libMilliQanCore.so)
+
 using namespace std;
 
 
 int simToDataPMT(int simChannel) {
     if (simChannel == 77) return 68;
     else if (simChannel == 78) return 70;
-    else if (simChannel == 79) return 69;
-    else if (simChannel == 81) return 72;
-    else if (simChannel == 82) return 74;
+    else if (simChannel == 79) return 72;
+    else if (simChannel == 81) return 69;
+    else if (simChannel == 82) return 71;
     else if (simChannel == 83) return 73;
-    else if (simChannel == 97) return 71;
+    else if (simChannel == 97) return 74;
     else if (simChannel == 96) return 75;
 
     int layerNumber = simChannel / 216;
@@ -54,12 +58,17 @@ int simToDataPMT(int simChannel) {
     }
 }
 
-void waveinject_v4() {
+void waveinject_v2(TString inputFile, TString outputFile, TString waveformFile) {
+
+   std::cout << "Injecting file " << inputFile << std::endl;
+   std::cout << "Outputting file " << outputFile << std::endl;
+   std::cout << "Using waveform template " << waveformFile << std::endl;
+
    TChain rootEvents("Events");
-   rootEvents.Add("MilliQan_cosmicSimSample.root");
+   rootEvents.Add(inputFile);
    mqROOTEvent* myROOTEvent = new mqROOTEvent();
    rootEvents.SetBranchAddress("ROOTEvent", &myROOTEvent);
-   TFile* outfile = new TFile("MilliQan_cosmicSimSample_waveinjected_v4.root", "RECREATE");
+   TFile* outfile = new TFile(outputFile, "RECREATE");
    
    const int nDigitizers = 5;
    const int nChannelsPerDigitizer = 16;
@@ -77,7 +86,7 @@ void waveinject_v4() {
    fit->SetParameter(1, 1.48539e+03);
    fit->SetParameter(2, 2.90976e+02);
 
-   TFile* f = new TFile("modified_waveform.root");
+   TFile* f = new TFile(waveformFile);
    TH1F* pulse_shape = (TH1F*)f->Get("average_waveform");
 
    // Calibration array (scaled by dividing by 11)
@@ -187,7 +196,6 @@ std::vector<double> maxValues = {
             for (mqPMTRHit* PMTRHit : hits) {
                if(randGen.Uniform() > calibration) continue;
                double initial_hit_time = PMTRHit->GetFirstHitTime();
-               cout << initial_hit_time << endl;
 	       if(initial_hit_time>500) {continue;}
                TH1F* new_waveform = (TH1F*)pulse_shape->Clone();
                double event_area = fit->GetRandom();
@@ -202,7 +210,6 @@ std::vector<double> maxValues = {
                }
 
                int integer_shift = static_cast<int>(initial_hit_time / binWidth);
-               cout << "integer shift: " << integer_shift << endl;
 	       double fractional_shift = fmod(initial_hit_time, binWidth) / binWidth;
 
                //for (int bin = 0; bin < nBins; ++bin) waveform[digitizer][channel][bin] = 0.0;
