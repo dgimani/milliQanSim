@@ -36,11 +36,11 @@ using namespace std;
 int simToDataPMT(int simChannel) {
     if (simChannel == 77) return 68;
     else if (simChannel == 78) return 70;
-    else if (simChannel == 79) return 69;
-    else if (simChannel == 81) return 72;
-    else if (simChannel == 82) return 74;
+    else if (simChannel == 79) return 72;
+    else if (simChannel == 81) return 69;
+    else if (simChannel == 82) return 71;
     else if (simChannel == 83) return 73;
-    else if (simChannel == 97) return 71;
+    else if (simChannel == 97) return 74;
     else if (simChannel == 96) return 75;
 
     int layerNumber = simChannel / 216;
