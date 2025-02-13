@@ -77,9 +77,11 @@ void waveinject_v2(TString inputFile, TString outputFile, TString waveformFile) 
    double rms_noise = 1;
 
    Float_t waveform[nDigitizers][nChannelsPerDigitizer][nBins] = {{{0}}};
+   Double_t eventWeight = -1;
 
    TTree* injectedTree = new TTree("Events", "Tree with digitizer waveform data");
    injectedTree->Branch("waveform", waveform, Form("waveform[%d][%d][%d]/F", nDigitizers, nChannelsPerDigitizer, nBins));
+   injectedTree->Branch("eventWeight", &eventWeight, "eventWeight/D");
 
    TF1 *fit = new TF1("fit", "gaus(0)", 0, 5000);
    fit->SetParameter(0, 7.23967e-02);
@@ -121,6 +123,8 @@ std::vector<double> maxValues = {
       if (i % (nentries / 100) == 0) std::cout << "Processing Event " << i << "..." << std::endl;
       rootEvents.GetEntry(i);
       memset(waveform, 0, sizeof(waveform));
+
+      eventWeight = myROOTEvent->GetEventWeight();
 
       std::map<int, std::vector<mqPMTRHit*>> pmtHitsMap;
 
