@@ -303,7 +303,7 @@ def populate_vectors_pmt(input_tree, pmt_nPE, pmt_copyNo, pmt_time, pmt_layer,pm
             simToDataScale = cali[transferChan]/11
 
         if(random.random() < simToDataScale): #test against calibrated PMT quantum efficiency
-            temp_nPE[hit.GetPMTNumber()] = temp_nPE[hit.GetPMTNumber()]
+            temp_nPE[hit.GetPMTNumber()] = temp_nPE[hit.GetPMTNumber()] + 1
             
             # if the hit time in the channel is lower than the current time, replace the current time with the new time
             if(temp_time[hit.GetPMTNumber()] == 0 or ((hit.GetFirstHitTime() >0) and (hit.GetFirstHitTime() < temp_time[hit.GetPMTNumber()])) ):
