@@ -7,8 +7,8 @@
 #include <fstream>
 #include "TMath.h"
 #include "TChain.h"
-#include "/home/ryan/test/milliQanSim/include/mqROOTEvent.hh"
-#include "/home/ryan/test/milliQanSim/include/mqPMTRHit.hh"
+#include "/homes/dgimani/milliQanSim/include/mqROOTEvent.hh"
+#include "/homes/dgimani/milliQanSim/include/mqPMTRHit.hh"
 #include "TGraph.h"
 #include "TVector.h"
 #include "TVectorD.h"
@@ -21,7 +21,7 @@
 #include <vector>
 #include <map>
 #include <algorithm>
-R__LOAD_LIBRARY(/home/ryan/test/milliQanSim/build/libMilliQanCore.so)
+R__LOAD_LIBRARY(/homes/dgimani/milliQanSim/build/libMilliQanCore.so)
 using namespace std;
 
 int simToDataPMT(int simChannel) {
@@ -173,7 +173,7 @@ void waveinject_v2(TString input, TString output) {
                }
 
                int integer_shift = static_cast<int>(initial_hit_time / binWidth);
-               cout << "integer shift: " << integer_shift << endl;
+               //cout << "integer shift: " << integer_shift << endl;
 	       double fractional_shift = fmod(initial_hit_time, binWidth) / binWidth;
 
                //for (int bin = 0; bin < nBins; ++bin) waveform[digitizer][channel][bin] = 0.0;
