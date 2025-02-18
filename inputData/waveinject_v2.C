@@ -9,6 +9,8 @@
 #include "TChain.h"
 #include "/homes/dgimani/milliQanSim/include/mqROOTEvent.hh"
 #include "/homes/dgimani/milliQanSim/include/mqPMTRHit.hh"
+//#include "milliQanSim/include/mqROOTEvent.hh"
+//#include "milliQanSim/include/mqPMTRHit.hh"
 #include "TGraph.h"
 #include "TVector.h"
 #include "TVectorD.h"
@@ -22,16 +24,18 @@
 #include <map>
 #include <algorithm>
 R__LOAD_LIBRARY(/homes/dgimani/milliQanSim/build/libMilliQanCore.so)
+#include "TSystem.h"
 using namespace std;
+
 
 int simToDataPMT(int simChannel) {
     if (simChannel == 77) return 68;
     else if (simChannel == 78) return 70;
-    else if (simChannel == 79) return 69;
-    else if (simChannel == 81) return 72;
-    else if (simChannel == 82) return 74;
+    else if (simChannel == 79) return 72;
+    else if (simChannel == 81) return 69;
+    else if (simChannel == 82) return 71;
     else if (simChannel == 83) return 73;
-    else if (simChannel == 97) return 71;
+    else if (simChannel == 97) return 74;
     else if (simChannel == 96) return 75;
 
     int layerNumber = simChannel / 216;
@@ -49,14 +53,17 @@ int simToDataPMT(int simChannel) {
     }
 }
 
-void waveinject_v2(TString input, TString output) {
+void waveinject_v2(TString inputFile, TString outputFile, TString waveformFile) {
+
+   std::cout << "Injecting file " << inputFile << std::endl;
+   std::cout << "Outputting file " << outputFile << std::endl;
+   std::cout << "Using waveform template " << waveformFile << std::endl;
+
    TChain rootEvents("Events");
-   //rootEvents.Add("MilliQan_cosmicSimSample.root");
-   rootEvents.Add(input);
+   rootEvents.Add(inputFile);
    mqROOTEvent* myROOTEvent = new mqROOTEvent();
    rootEvents.SetBranchAddress("ROOTEvent", &myROOTEvent);
-   //TFile* outfile = new TFile("MilliQan_waveinjected_v2.root", "RECREATE");
-   TFile* outfile = new TFile(output, "RECREATE");
+   TFile* outfile = new TFile(outputFile, "RECREATE");
    
    const int nDigitizers = 5;
    const int nChannelsPerDigitizer = 16;
@@ -65,17 +72,43 @@ void waveinject_v2(TString input, TString output) {
    double rms_noise = 1;
 
    Float_t waveform[nDigitizers][nChannelsPerDigitizer][nBins] = {{{0}}};
+   Double_t eventWeight = -1;
 
    TTree* injectedTree = new TTree("Events", "Tree with digitizer waveform data");
    injectedTree->Branch("waveform", waveform, Form("waveform[%d][%d][%d]/F", nDigitizers, nChannelsPerDigitizer, nBins));
+   injectedTree->Branch("eventWeight", &eventWeight, "eventWeight/D");
 
    TF1 *fit = new TF1("fit", "gaus(0)", 0, 5000);
    fit->SetParameter(0, 7.23967e-02);
    fit->SetParameter(1, 1.48539e+03);
    fit->SetParameter(2, 2.90976e+02);
 
-   TFile* f = new TFile("modified_waveform.root");
+   TFile* f = new TFile(waveformFile);
    TH1F* pulse_shape = (TH1F*)f->Get("average_waveform");
+
+   // Calibration array (scaled by dividing by 11)
+   std::vector<double> cali = {9.7, 8.4, 5.0, 3.6, 8.2, 8.2, 6.8, 4.6, 8.7, 7.1, 6.4, 7.5, 8.7, 11.8, 9.7, 8.1,
+                               8.6, 9.1, 6.4, 7.5, 9.8, 8.8, 11, 6.6, 8.6, 11, 7.3, 8.3, 2.6, 6.2, 7.0, 7.2,
+                               8.7, 7.7, 6.8, 7.8, 8.8, 8.5, 3.5, 8.2, 7.6, 6.8, 9.5, 8.5, 6.3, 6.7, 7.6, 7.9,
+                               9.0, 8.3, 8.3, 6.9, 6.0, 8.0, 5.5, 5.5, 6.6, 8.1, 8.4, 8.7, 9.2, 7.6, 5.9, 8.2};
+   for (auto& cal : cali) cal /= 11.0; // Divide each value by 11
+
+std::vector<double> maxValues = {
+    1250, 1250, 1250, 1250, 1025, 1075, 1070, 980, 1250, 1250,
+    1250, 1250, 1250, 1250, 1250, 1250, 1250, 1250, 1250, 1080,
+    1070, 1060, 1080, 1075, 1250, 1180, 1250, 1250, 1250, 1250,
+    1250, 1250, 1250, 1250, 1250, 1250, 1250, 1085, 1075, 1080,
+    1250, 1250, 1075, 1250, 1250, 1250, 1250, 1250, 1250, 1250,
+    1250, 1250, 1080, 1250, 1080, 1080, 1250, 1250, 1250, 1250,
+    1250, 1250, 1250, 1250,
+    1250, 1250, 1250, 1250,
+    1250, 1250, 1250, 1250,
+    1250, 1250, 1250, 1250,
+    1250, 1250, 1250, 1250,
+    1250, 1250, 1250, 1250,
+    1250, 1250, 1250, 1250,
+    1250, 1250, 1250, 1250,
+};
 
    TRandom3 randGen(0);
    Long64_t nentries = rootEvents.GetEntries();
@@ -85,6 +118,8 @@ void waveinject_v2(TString input, TString output) {
       if (i % (nentries / 100) == 0) //std::cout << "Processing Event " << i << "..." << std::endl;
       rootEvents.GetEntry(i);
       memset(waveform, 0, sizeof(waveform));
+
+      eventWeight = myROOTEvent->GetEventWeight();
 
       std::map<int, std::vector<mqPMTRHit*>> pmtHitsMap;
 
@@ -118,10 +153,11 @@ void waveinject_v2(TString input, TString output) {
          } else {
             median_hit_time = hitTimes[size / 2];
          }
-         if (hits.size() > 50) {
+         double calibration = (remappedPMT < 64) ? cali[remappedPMT] : 0.682;
+	 if (hits.size() > 50) {
             double areaSum = 0.0;
             for (size_t k = 0; k < hits.size(); ++k) {
-                areaSum += fit->GetRandom();
+                if(randGen.Uniform() <= calibration) areaSum += fit->GetRandom();
             }
 
             TH1F* new_waveform = (TH1F*)pulse_shape->Clone();
@@ -148,7 +184,7 @@ void waveinject_v2(TString input, TString output) {
                 double noise = randGen.Gaus(0, rms_noise);
                 waveform[digitizer][channel][shifted_bin] += (value + noise);
 
-                if (waveform[digitizer][channel][shifted_bin] > 1250) waveform[digitizer][channel][shifted_bin] = 1250;
+                if (waveform[digitizer][channel][shifted_bin] > maxValues[remappedPMT]) waveform[digitizer][channel][shifted_bin] = maxValues[remappedPMT];
                 if (waveform[digitizer][channel][shifted_bin] < -50) waveform[digitizer][channel][shifted_bin] = -50;
             }
 
@@ -157,8 +193,8 @@ void waveinject_v2(TString input, TString output) {
             delete new_waveform;
          } else {
             for (mqPMTRHit* PMTRHit : hits) {
+               if(randGen.Uniform() > calibration) continue;
                double initial_hit_time = PMTRHit->GetFirstHitTime();
-               //cout << initial_hit_time << endl;
 	       if(initial_hit_time>500) {continue;}
                TH1F* new_waveform = (TH1F*)pulse_shape->Clone();
                double event_area = fit->GetRandom();
@@ -173,7 +209,6 @@ void waveinject_v2(TString input, TString output) {
                }
 
                int integer_shift = static_cast<int>(initial_hit_time / binWidth);
-               //cout << "integer shift: " << integer_shift << endl;
 	       double fractional_shift = fmod(initial_hit_time, binWidth) / binWidth;
 
                //for (int bin = 0; bin < nBins; ++bin) waveform[digitizer][channel][bin] = 0.0;
@@ -195,7 +230,7 @@ void waveinject_v2(TString input, TString output) {
                   for (int bin = 0; bin < nBins; bin++) {
                         double noise = randGen.Gaus(0, rms_noise);
 			waveform[digitizer][channel][bin] += noise;
-                  	if (waveform[digitizer][channel][bin] > 1250) waveform[digitizer][channel][bin] = 1250;
+                  	if (waveform[digitizer][channel][bin] > maxValues[remappedPMT]) waveform[digitizer][channel][bin] = maxValues[remappedPMT];
                   	if (waveform[digitizer][channel][bin] < -50) waveform[digitizer][channel][bin] = -50;
 		  }
 

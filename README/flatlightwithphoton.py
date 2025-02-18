@@ -13,7 +13,7 @@ import ROOT
 import sys
 import math
 import re
-
+import random
 
 
 # Function to convert sim copy number to data copy number for PMTs
@@ -290,7 +290,7 @@ def populate_vectors_pmt(input_tree, pmt_nPE, pmt_copyNo, pmt_time, pmt_layer,pm
     # make an array of length 1000 to store temporary nPE values
     temp_nPE = [0]*1000
     temp_time = [0]*1000
-
+    
 
     # Populate the vectors with flattened data
     for j in range(input_tree.PMTHits.size()):
@@ -301,10 +301,13 @@ def populate_vectors_pmt(input_tree, pmt_nPE, pmt_copyNo, pmt_time, pmt_layer,pm
         transferChan = simToDataPMT(hit.GetPMTNumber())
         if transferChan <=63 :
             simToDataScale = cali[transferChan]/11
-        temp_nPE[hit.GetPMTNumber()] = temp_nPE[hit.GetPMTNumber()] + simToDataScale
-        # if the hit time in the channel is lower than the current time, replace the current time with the new time
-        if(temp_time[hit.GetPMTNumber()] == 0 or ((hit.GetFirstHitTime() >0) and (hit.GetFirstHitTime() < temp_time[hit.GetPMTNumber()])) ):
-            temp_time[hit.GetPMTNumber()] = hit.GetFirstHitTime()
+
+        if(random.random() < simToDataScale): #test against calibrated PMT quantum efficiency
+            temp_nPE[hit.GetPMTNumber()] = temp_nPE[hit.GetPMTNumber()] + 1
+            
+            # if the hit time in the channel is lower than the current time, replace the current time with the new time
+            if(temp_time[hit.GetPMTNumber()] == 0 or ((hit.GetFirstHitTime() >0) and (hit.GetFirstHitTime() < temp_time[hit.GetPMTNumber()])) ):
+                temp_time[hit.GetPMTNumber()] = hit.GetFirstHitTime()
 
     # loop over the temporary arrays and add the values to the vectors
     for j in range(1000):
