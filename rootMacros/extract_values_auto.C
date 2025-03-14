@@ -41,8 +41,8 @@ double correctionFactor(double pt, double mass, double I_range){
 //void extract_values_auto(const char* mass, const char* mode, const char* nevents) {
 void extract_values_auto(const char* mass, const char* mode) {
   // Set up input and output paths
-  TString inpath = TString::Format("/net/cms26/cms26r0/dgimani/milliq_mcgen/propagated/%s/%s/", mass, mode);
-  TString outpath = TString::Format("/homes/dgimani/milliQanSim/inputData/Run3_G4_mcp_inputs/%s/%s/", mass, mode);
+  TString inpath = TString::Format("/net/cms26/cms26r0/dgimani/milliq_mcgen/propagated/c_0p1/%s/%s/", mass, mode);
+  TString outpath = TString::Format("/homes/dgimani/milliQanSim/inputData/Run3_G4_mcp_inputs/c_0p1/%s/%s/", mass, mode);
   TString outputFile = TString::Format("%soutput_mcp_%s_%s.txt", outpath.Data(), mass, mode);
 
   // Open output file
@@ -136,8 +136,8 @@ void extract_values_auto(const char* mass, const char* mode) {
         double charge = sim_q;
 	bool hit_p = does_hit_p;
 	bool hit_m = does_hit_m;
-	std::cout << "hit_p: " << hit_p << std::endl;
-	std::cout << "hit_m: " << hit_m << std::endl;
+	//std::cout << "hit_p: " << hit_p << std::endl;
+	//std::cout << "hit_m: " << hit_m << std::endl;
 	if(hit_p){
         	mass = hit_p_p4->M();
 		X = hit_p_xyz->X();
@@ -163,20 +163,22 @@ void extract_values_auto(const char* mass, const char* mode) {
 	else {
 		cFactor = 1.0;
 	}
-        weight = xsec * BR_q1 * filter_eff * LUMI / n_events_total;
-	std::cout << "Event: " << event << std::endl;
-	std::cout << "Decay mode: " << decay_mode << std::endl;
-	std::cout << "xsec: " << xsec << std::endl;
-	std::cout << "BR_q1: " << BR_q1 << std::endl;
-	std::cout << "filter_eff: " << filter_eff << std::endl;
-	std::cout << "LUMI: " << LUMI << std::endl;
-	std::cout << "n_events_total: " << n_events_total << std::endl;
-	std::cout << "weight: " << weight << std::endl;
-	std::cout << "decay mode: " << decay_mode << std::endl;
-	std::cout << "parent_M: " << parent_M << std::endl;
-	std::cout << "parent_Pt: " << parent_Pt << std::endl;
-	std::cout << "cFactor: " << cFactor << std::endl;
-        file << event << " " << decay_mode << " " << charge << " " << mass << " " << Z << " " << Y << " " << -1 * X << " " << Pz << " " << Py << " " << -1 * Px << " " << weight << std::endl;
+        weight = xsec * BR_q1 * filter_eff * LUMI * cFactor/ n_events_total;
+	if(weight > 200){
+		std::cout << "Event: " << event << std::endl;
+		std::cout << "Decay mode: " << decay_mode << std::endl;
+		std::cout << "xsec: " << xsec << std::endl;
+		std::cout << "BR_q1: " << BR_q1 << std::endl;
+		std::cout << "filter_eff: " << filter_eff << std::endl;
+		std::cout << "LUMI: " << LUMI << std::endl;
+		std::cout << "n_events_total: " << n_events_total << std::endl;
+		std::cout << "weight: " << weight << std::endl;
+		std::cout << "decay mode: " << decay_mode << std::endl;
+		std::cout << "parent_M: " << parent_M << std::endl;
+		std::cout << "parent_Pt: " << parent_Pt << std::endl;
+		std::cout << "cFactor: " << cFactor << std::endl;
+	} 
+	file << event << " " << decay_mode << " " << charge << " " << mass << " " << Z << " " << Y << " " << -1 * X << " " << Pz << " " << Py << " " << -1 * Px << " " << weight << std::endl;
       }
 
       std::cout << "File had " << nEntries << " entries" << std::endl;
