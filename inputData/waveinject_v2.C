@@ -110,7 +110,7 @@ std::vector<double> maxValues = {
     1250, 1250, 1250, 1250,
 };
 
-   TRandom3 randGen(0);
+   TRandom3 randGen(2004);
    Long64_t nentries = rootEvents.GetEntries();
    //std::cout << "Entries: " << nentries << std::endl;
 
@@ -132,6 +132,9 @@ std::vector<double> maxValues = {
       for (const auto& [PMT_number, hits] : pmtHitsMap) {
          int remappedPMT = simToDataPMT(PMT_number);
          if (remappedPMT == -1) continue;
+         if (remappedPMT == 24) remappedPMT = 78;
+         if (remappedPMT == 25) remappedPMT = 79;
+         if ((remappedPMT == 24) || (remappedPMT == 25)) cout << remappedPMT << endl;
 
          int digitizer = remappedPMT / nChannelsPerDigitizer;
          int channel = remappedPMT % nChannelsPerDigitizer;
@@ -142,19 +145,24 @@ std::vector<double> maxValues = {
             if(hit->GetFirstHitTime() > 500.0 ) continue;
 	    hitTimes.push_back(hit->GetFirstHitTime());
          }
+
+
 	 if(hitTimes.size()==0) continue;
          std::sort(hitTimes.begin(), hitTimes.end());
 
          // Calculate median hit time
-         double median_hit_time;
+/*
+	 double median_hit_time;
          size_t size = hitTimes.size();
          if (size % 2 == 0) {
             median_hit_time = 0.5 * (hitTimes[size / 2 - 1] + hitTimes[size / 2]);
          } else {
             median_hit_time = hitTimes[size / 2];
          }
-         double calibration = (remappedPMT < 64) ? cali[remappedPMT] : 0.682;
-	 if (hits.size() > 50) {
+*/
+         double initial_hit_time = hitTimes[0];
+	 double calibration = (remappedPMT < 64) ? cali[remappedPMT] : 0.682;
+	 if (hits.size() > 5000) {
             double areaSum = 0.0;
             for (size_t k = 0; k < hits.size(); ++k) {
                 if(randGen.Uniform() <= calibration) areaSum += fit->GetRandom();
@@ -164,28 +172,32 @@ std::vector<double> maxValues = {
             //new_waveform->Scale(areaSum * (1077.24 / 828.03) / new_waveform->Integral(480, 640));
             
 	    // Scale only the bins within [500, 660]
-            double scaleFactor = areaSum * (1077.24 / 828.03) / new_waveform->Integral(480, 640);
+            double scaleFactor = areaSum / (828.03) * (44.8573/59.0878); //sample area, then scale by the pulse height for SPEs in data
             for (int bin = 500; bin <= 660; ++bin) {
                 double binContent = new_waveform->GetBinContent(bin);
                 new_waveform->SetBinContent(bin, binContent * scaleFactor);
             }
 
-            int integer_shift = static_cast<int>(median_hit_time / binWidth);
-            double fractional_shift = fmod(median_hit_time, binWidth) / binWidth;
+	    int integer_shift = static_cast<int>(initial_hit_time / binWidth);
+            double fractional_shift = fmod(initial_hit_time, binWidth) / binWidth;
+
+	    //uses median time rather than first for large hits
+	    //int integer_shift = static_cast<int>(median_hit_time / binWidth);
+            //double fractional_shift = fmod(median_hit_time, binWidth) / binWidth;
 
             for (int bin = 0; bin < nBins; ++bin) waveform[digitizer][channel][bin] = 0.0;
 
             for (int bin = 0; bin < nBins; ++bin) {
-                int shifted_bin = bin + integer_shift;
-                if (shifted_bin >= nBins - 1 || shifted_bin < 0) continue;
+                int shifted_bin = bin - integer_shift;
+                if (shifted_bin >= nBins || shifted_bin < 1) continue;
 
-                double value = (1.0 - fractional_shift) * new_waveform->GetBinContent(shifted_bin + 1) +
-                               fractional_shift * new_waveform->GetBinContent(shifted_bin + 2);
+                double value = (1.0 - fractional_shift) * new_waveform->GetBinContent(shifted_bin) +
+                               fractional_shift * new_waveform->GetBinContent(shifted_bin - 1);
                 double noise = randGen.Gaus(0, rms_noise);
-                waveform[digitizer][channel][shifted_bin] += (value + noise);
+                waveform[digitizer][channel][bin] += (value + noise);
 
-                if (waveform[digitizer][channel][shifted_bin] > maxValues[remappedPMT]) waveform[digitizer][channel][shifted_bin] = maxValues[remappedPMT];
-                if (waveform[digitizer][channel][shifted_bin] < -50) waveform[digitizer][channel][shifted_bin] = -50;
+                if (waveform[digitizer][channel][bin] > maxValues[remappedPMT]) waveform[digitizer][channel][bin] = maxValues[remappedPMT];
+                if (waveform[digitizer][channel][bin] < -50) waveform[digitizer][channel][bin] = -50;
             }
 
             for (int bin = 0; bin < integer_shift; ++bin) waveform[digitizer][channel][bin] = 0.0;
@@ -202,7 +214,7 @@ std::vector<double> maxValues = {
                //new_waveform->Scale(event_area * (1077.24 / 828.03) / new_waveform->Integral(480, 640));
 	       
 	       // Scale only the bins within [500, 660]
-               double scaleFactor = event_area * (1077.24 / 828.03) / new_waveform->Integral(480, 640);
+               double scaleFactor = event_area / (828.03) * (44.8573/59.0878);
                for (int bin = 500; bin <= 660; ++bin) {
                    double binContent = new_waveform->GetBinContent(bin);
                    new_waveform->SetBinContent(bin, binContent * scaleFactor);
@@ -213,12 +225,13 @@ std::vector<double> maxValues = {
 
                //for (int bin = 0; bin < nBins; ++bin) waveform[digitizer][channel][bin] = 0.0;
 
+               //for (int bin = 500; bin < 660; ++bin) {
                for (int bin = 0; bin < nBins; ++bin) {
-                  int shifted_bin = bin + integer_shift;
-                  if (shifted_bin >= nBins - 1 || shifted_bin < 0) continue;
+                  int shifted_bin = bin - integer_shift;
+                  if (shifted_bin >= nBins || shifted_bin < 1) continue;
 
-                  double value = (1.0 - fractional_shift) * new_waveform->GetBinContent(shifted_bin + 1) +
-                                 fractional_shift * new_waveform->GetBinContent(shifted_bin + 2);
+                  double value = (1.0 - fractional_shift) * new_waveform->GetBinContent(shifted_bin) +
+                                 fractional_shift * new_waveform->GetBinContent(shifted_bin - 1);
 		  waveform[digitizer][channel][bin] += (value);
 
                }
@@ -228,6 +241,7 @@ std::vector<double> maxValues = {
                delete new_waveform;
             }
                   for (int bin = 0; bin < nBins; bin++) {
+		        if(bin<500 || bin>660) waveform[digitizer][channel][bin]=0;
                         double noise = randGen.Gaus(0, rms_noise);
 			waveform[digitizer][channel][bin] += noise;
                   	if (waveform[digitizer][channel][bin] > maxValues[remappedPMT]) waveform[digitizer][channel][bin] = maxValues[remappedPMT];
