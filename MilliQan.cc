@@ -16,6 +16,7 @@
 #include "G4UImanager.hh"
 #include "G4UIterminal.hh"
 #include "G4UItcsh.hh"
+#include "G4UIExecutive.hh"
 #include "Randomize.hh"
 
 
@@ -131,9 +132,13 @@ if (argc == 1) {
     G4String command = "/control/execute ";
     G4String macroFile = argv[2];
     UI->ApplyCommand(command + macroFile);
+    G4UIExecutive* uiExec = new G4UIExecutive(argc, argv);
+    //LoggedSession->SessionStart();
+    uiExec->SessionStart();
 
     G4cout << "MilliQan> Simulation complete. Exiting." << G4endl;
-    return 0;
+    delete uiExec;
+    //return 0;
 } else {
     // Invalid number of arguments
     G4ExceptionDescription msg;
