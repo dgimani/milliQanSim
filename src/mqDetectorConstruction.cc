@@ -981,7 +981,7 @@ G4SubtractionSolid* ScintSlabWrapSolidFront1 = new G4SubtractionSolid("ScintSlab
 					G4ThreeVector(
 						      ScintSlabWrapXFront1-(airGapThickness+wrapThickness)/2,
 						      -frontPanelOverlapShift,
-						      -ScintSlabWrapZFront1));
+						      ScintSlabWrapZFront1));
 
 G4SubtractionSolid* ScintSlabWrapSolidFront2 = new G4SubtractionSolid("ScintSlabWrapSolid1Front2",
 					ScintSlabWrapSolidTotalFront2,
@@ -990,7 +990,7 @@ G4SubtractionSolid* ScintSlabWrapSolidFront2 = new G4SubtractionSolid("ScintSlab
 					G4ThreeVector(
 						      ScintSlabWrapXFront2-(airGapThickness+wrapThickness)/2,
 						      frontPanelOverlapShift,
-						      ScintSlabWrapZFront1));
+						      -ScintSlabWrapZFront1));
 
 G4SubtractionSolid* ScintSlabWrapSolidEnd = new G4SubtractionSolid("ScintSlabWrapSolid1End",
 					ScintSlabWrapSolidTotalEnd,
@@ -1048,7 +1048,7 @@ G4SubtractionSolid* ScintSlabAirGapSolidFront1 = new G4SubtractionSolid("ScintSl
 					rotSlab1,
 					G4ThreeVector(ScintSlabAirGapYFront1-airGapThickness/2,
 						      -frontPanelOverlapShift,
-						      -ScintSlabAirGapZFront1));
+						      ScintSlabAirGapZFront1));
 
 G4SubtractionSolid* ScintSlabAirGapSolidFront2 = new G4SubtractionSolid("ScintSlabAirGapSolid1Front2",
 					ScintSlabAirGapSolidTotalFront2,
@@ -1056,7 +1056,7 @@ G4SubtractionSolid* ScintSlabAirGapSolidFront2 = new G4SubtractionSolid("ScintSl
 					rotSlab1,
 					G4ThreeVector(ScintSlabAirGapYFront2-airGapThickness/2,
 						      frontPanelOverlapShift,
-						      ScintSlabAirGapZFront1));
+						      -ScintSlabAirGapZFront1));
 
 G4SubtractionSolid* ScintSlabAirGapSolidEnd = new G4SubtractionSolid("ScintSlabAirGapSolid1End",
 					ScintSlabAirGapSolidTotalEnd,
@@ -1715,7 +1715,7 @@ if(l==1){
         new G4PVPlacement(                        
                         rotSlabBot,
                         //G4ThreeVector(-wallCylRadius+6*cm,0,-std::cos(worldRotation)*detLength+80*cm),
-                        G4ThreeVector(frontPanelOverlapShift,0,-detLength/2-slabshiftfront+ScintSlabWrapZFront1),
+                        G4ThreeVector(frontPanelOverlapShift,0,-detLength/2-slabshiftfront-ScintSlabWrapZFront1),
                         ScintSlabWrapLogicFront1,
                         "ScintSlabPhysFront1",
                         //logicWorld,
@@ -1726,7 +1726,7 @@ if(l==1){
         new G4PVPlacement(                        
                         rotSlabBot,
                         //G4ThreeVector(-wallCylRadius+6*cm,0,-std::cos(worldRotation)*detLength+80*cm),
-                        G4ThreeVector(-frontPanelOverlapShift,0,-detLength/2-slabshiftfront-ScintSlabWrapZFront1),
+                        G4ThreeVector(-frontPanelOverlapShift,0,-detLength/2-slabshiftfront+ScintSlabWrapZFront1),
                         ScintSlabWrapLogicFront2,
                         "ScintSlabPhysFront2",
                         //logicWorld,
@@ -1861,7 +1861,8 @@ if(l==1){
 	mqBarParameterisation* barParam = new mqBarParameterisation(
 			nBarXCount,
 			nBarYCount, 
-			-38*cm-zShift,
+			-38*cm-zShift, //z offset
+			//-38*cm, //z offset
 			barAngleDelta,
 			interactionDist,
 			barSpacingXY, //actually not using either of these two bottom parameters now, but we could if bars are different sizes
@@ -2389,6 +2390,7 @@ void SortProperty(G4double* energies, G4double* values, int n) {
     }
 }
 */
+
 
 G4MaterialPropertiesTable* mqDetectorConstruction::SetOpticalPropertiesOfPS(){
 
