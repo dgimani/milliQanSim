@@ -151,6 +151,9 @@ if (argc == 1) {
     G4String command = "/control/execute ";
     G4String macroFile = argv[2];
     UI->ApplyCommand(command + macroFile);
+    G4UIExecutive* uiExec = new G4UIExecutive(argc, argv);
+    //LoggedSession->SessionStart();
+    uiExec->SessionStart();
 
     //G4UIExecutive* uiExec = new G4UIExecutive(argc, argv);
     uiExec->SessionStart();
