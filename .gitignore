@@ -2,3 +2,10 @@ build/
 lib/
 condor/
 output_1.txt
+*.txt
+*.png
+*.root
+*.py
+runMac/mcp_mass_macros
+*.out
+*.log
