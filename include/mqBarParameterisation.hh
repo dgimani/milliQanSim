@@ -67,7 +67,8 @@ class mqBarParameterisation : public G4VPVParameterisation
     mqBarParameterisation(G4int    nBarX, //number of bars in layer, X axis
 			      G4int nBarY, //number of bars in layer, Y axis
                               G4double startZ, // starting position/offset of bars
-                              G4double XYspacing, //bar spacing
+                              G4double angleDelta, // angular spacing
+			      G4double sourceDist, //distance to interaction source
                               G4double halfWidthBar, //half cross section length of bar
                               G4double halfLengthBar); //half length of bar
 
@@ -114,7 +115,8 @@ class mqBarParameterisation : public G4VPVParameterisation
     G4double fStartZ;
     G4double fHalfWidth;        //  The half-width of bar cross section
     G4double fHalfLength;        //  The half-width of bar length
-    G4double fXYSpacing;          //  The distance between the bars' center in cross section
+    G4double fAngleDelta;          //  The angular spacing between the bars' center
+    G4double fSourceDist;          //  Distance to interaction source
 };
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
